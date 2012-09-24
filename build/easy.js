@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-9-24 10:4:11
+* Date : 2012-9-24 13:55:16
 */
 
 // ---------------------------------------------
@@ -5612,7 +5612,7 @@ E.mix( E.prototype, {
 		
 	slideToggle : function( duration, easing, fn ){
 		return this.forEach(function(){
-			var elem = E( this );
+			var elem = E( this ),
 				slide = elem.is( ':hidden' ) ? 
 					elem.slideDown :
 					elem.slideUp;
@@ -5732,8 +5732,6 @@ var	ajaxOptions = {
 	}
 	
 };
-
-ajaxOptions.converters.html = ajaxOptions.converters.text;
 
 var easyAjax = {
 	
@@ -5966,7 +5964,7 @@ var easyAjax = {
 			}
 		}
 		
-		prevType = dataTypes[0];	
+		prevType = dataTypes[0];
 
 		for( i = 1; i < dataTypes.length; i++ ){
 			type = dataTypes[i];
@@ -6089,7 +6087,7 @@ var transports = {
 							statusText = '';
 						}
 						
-						if( !status && isLocal && options.crossDomain ){
+						if( !status && isLocal && this.options.crossDomain ){
 							status = easyXHR.responseText ? 200 : 404;
 						}
 						else if( status === 1223 ){

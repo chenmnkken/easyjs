@@ -697,7 +697,7 @@ E.mix( E.prototype, {
 		
 	slideToggle : function( duration, easing, fn ){
 		return this.forEach(function(){
-			var elem = E( this );
+			var elem = E( this ),
 				slide = elem.is( ':hidden' ) ? 
 					elem.slideDown :
 					elem.slideUp;

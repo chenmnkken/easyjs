@@ -89,8 +89,6 @@ var	ajaxOptions = {
 	
 };
 
-ajaxOptions.converters.html = ajaxOptions.converters.text;
-
 var easyAjax = {
 	
 	/*
@@ -322,7 +320,7 @@ var easyAjax = {
 			}
 		}
 		
-		prevType = dataTypes[0];	
+		prevType = dataTypes[0];
 
 		for( i = 1; i < dataTypes.length; i++ ){
 			type = dataTypes[i];
@@ -445,7 +443,7 @@ var transports = {
 							statusText = '';
 						}
 						
-						if( !status && isLocal && options.crossDomain ){
+						if( !status && isLocal && this.options.crossDomain ){
 							status = easyXHR.responseText ? 200 : 404;
 						}
 						else if( status === 1223 ){

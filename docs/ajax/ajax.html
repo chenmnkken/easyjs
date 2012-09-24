@@ -107,8 +107,6 @@
 				<td class="t_l">
 					<p>希望服务端返回的数据类型，该参数必须指定。可用值如下：</p>
 					<p><b>xml</b>&emsp;返回 XML 文档。</p>
-					<p><b>html</b>&emsp;返回 HTML字符串。</p>
-					<p><b>script</b>&emsp;返回纯文本 JavaScript 代码。</p>
 					<p><b>json</b>&emsp;返回 JSON 格式的数据。</p>
 					<p><b>jsonp</b>&emsp;返回 JSONP 格式的数据。</p>
 					<p><b>text</b>&emsp;返回纯文本字符串。</p>
@@ -370,7 +368,7 @@
     url : 'get2.php',
     type : 'GET',
     data : { foo : 'bar' }
-    dataType : 'html',
+    dataType : 'text',
     success : function( data ){
         console.log( data );  // 如果请求成功将输出 HTML 字符串
     },
