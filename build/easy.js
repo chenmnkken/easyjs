@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-9-24 13:55:16
+* Date : 2012-9-27 18:23:50
 */
 
 // ---------------------------------------------
@@ -1436,7 +1436,7 @@ var	hasDuplicate = false,	// 是否有重复的DOM元素
 	
 	rAttr = /\[\s*((?:[\w\u00c0-\uFFFF\-]|\\.)+)\s*(?:(\S?=)\s*(?:(['"])(.*?)\3|(#?(?:[\w\u00c0-\uFFFF\-]|\\.)*)|)|)\s*\]/,
 	rPseudo = /:((?:[\w\u00c0-\uFFFF\-]|\\.)+)(?:\((['"]?)((?:\([^\)]+\)|[^\(\)]*)+)\2\))?/,
-	rRelative = /(?:\w\u00c0-\uFFFF\-])[>\+~](?:\w\u00c0-\uFFFF\-)/g,
+	rRelative = /[>\+~]/g,
 		
 	// 使用elem.id比elem.getAttribute('id')的速度要快
 	attrMap = {
@@ -2124,8 +2124,8 @@ E.mix( E, {
 			// #list .item a => [ '#list', '.item', 'a' ]
 			selectors = matches[i].replace( rRelative, function( symbol ){
 					return ' ' + symbol + ' ';
-				}).match( /[^\s]+/g );			
-			
+				}).match( /[^\s]+/g );
+
 			for( var j = 0, clen = selectors.length; j < clen; j++ ){
 				result = selectors[j];								
 				lastElem = makeArray( nodelist[ nodelist.length - 1 ] );

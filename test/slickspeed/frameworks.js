@@ -15,11 +15,6 @@ fun:"dom.query"
  fun:"jQuery"
 },
 
-"EXT 2.2":{
- file:"ext-2.2.js",
- fun:"Ext.query" 
-},
-
 "MooTools 1.4.3":{
  file:"mootools.js",
  fun:"$$"
