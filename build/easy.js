@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-9-27 18:23:50
+* Date : 2012-9-28 17:15:39
 */
 
 // ---------------------------------------------
@@ -1362,7 +1362,7 @@ var easyData = {
 		if( index in cacheData ){
 			// 有参数就删除指定的数据
 			cacheData = cacheData[ index ];
-			if( name ){
+			if( name && cacheData[type] ){
 				delete cacheData[ type ][ name ];
 			}
 			
