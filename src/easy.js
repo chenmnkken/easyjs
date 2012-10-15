@@ -349,7 +349,7 @@ var easyModule = {
 	 * 解析规则：
 	 * baseUrl = http://easyjs.org/js/                                
 	 * http://example.com/test.js => [ test, http://example.com/test.js ]
-	 *                   ajax/xhr => [ xhr, http://easyjs.org/js/xhr.js ]
+	 *                   ajax/xhr => [ xhr, http://easyjs.org/js/ajax/xhr.js ]
 	 *                    ../core => [ core, http://easyjs.org/core.js ]
 	 *                       test => [ test, http://easyjs.org/js/test.js ]
 	 * =====================================================================
