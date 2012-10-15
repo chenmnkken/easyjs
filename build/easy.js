@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-9-28 17:15:39
+* Date : 2012-10-15 13:34:10
 */
 
 // ---------------------------------------------
@@ -1407,16 +1407,20 @@ E.mix( E.prototype, {
 		if( val === undefined ){
 			return easyData.data( this[0], 'data', name );
 		}
-
-		return this.forEach(function(){
-			easyData.data( this, 'data', name, val, true );
-		});
+		
+		for( var i = 0, len = this.length; i < len; i++ ){
+			easyData.data( this[i], 'data', name, val, true );
+		}
+		
+		return this;
 	},
 		
-	removeData : function( name ){
-		return this.forEach(function(){
-			easyData.removeData( this, 'data', name );
-		});
+	removeData : function( name ){		
+		for( var i = 0, len = this.length; i < len; i++ ){
+			easyData.removeData( this[i], 'data', name );
+		}
+		
+		return this;
 	}
 	
 });
