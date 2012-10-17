@@ -115,7 +115,7 @@ if( !isECMAEvent ){
 						var name = 'special_change',
 							handles = easyEvent.data( this, name, [] );
 							
-						handles.push( fn );						
+						handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );						
 						// 利用propertychange和click事件来模拟change事件
 						// 因为无法重复触发该事件，所以只能绑定一次该事件
 						// 一个或多个事件处理器添加到数组中，依次执行
@@ -129,16 +129,22 @@ if( !isECMAEvent ){
 								// 根据触发propertychange的标记来判定是否执行事件
 								if( this.__changed__ ){					
 									e.type = 'change';
-									
-									if( extraData ){
-										e.extraData = extraData;
-									}
-									
 									this.__changed__ = false;
 									
-									for( var i = 0, j, len = handles.length; i < len; i++ ){
+									for( var i = 0, j, result, len = handles.length; i < len; i++ ){
 										j = handles[i] ? i : i - 1;
-										handles[j].call( this, e );
+										result = handles[j];
+										
+										// 将缓存的附加数据添加到event对象中
+										if( result.extraData ){
+											e.extraData = result.extraData;
+										}
+										// 附加数据不能共享以确保不冲突
+										else{
+											delete e.extraData;
+										}										
+										
+										result.handle.call( this, e );
 									}
 								}
 							});
@@ -176,11 +182,12 @@ if( !isECMAEvent ){
 							// 不同的事件处理器将添加到数组中
 							else{
 								for( ; i < handles.length; i++ ){
-									if( handles[i] === fn ){
+									if( handles[i].handle === fn ){
 										return;
 									}
 								}
-								handles.push( fn );
+								
+								handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );	
 							}							
 						}
 					};
@@ -211,7 +218,7 @@ if( !isECMAEvent ){
 						
 						if( fn ){
 							for( i = 0, len = handles.length; i < len; i++ ){
-								if( handles[i] === fn ){
+								if( handles[i].handle === fn ){
 									handles.splice( i, 1 );
 									break;
 								}
@@ -380,15 +387,15 @@ var easyEvent = {
 			handles = this.data( elem, dataName, [] );
 			
 			// 将事件处理器添加到缓存的数组中，待统一执行
-			handles.push( fn );
+			handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );
 			
 			// 确保该元素只绑定一次同类型的事件
 			if( handles.length === 1 ){
 				// 生成一个统一的事件处理方法
-				eventHandle = easyEvent.eventHandle( elem, selector, extraData );
+				eventHandle = easyEvent.eventHandle( elem, selector );
 				
 				// 然后将该方法也缓存到数组的第一个索引中，方便之后的事件卸载
-				handles.unshift( eventHandle );		
+				handles.unshift({ handle : eventHandle });		
 				elem[ ADDEVENT ]( type, eventHandle, capture );
 			}
 		}
@@ -439,7 +446,7 @@ var easyEvent = {
 						}
 					}
 				
-					if( handles[j] === fn ){
+					if( handles[j].handle === fn ){
 						handles.splice( j, 1 );
 						if( specialHandles ){
 							specialHandles.splice( j - 1, 1 );
@@ -635,21 +642,17 @@ var easyEvent = {
 	 * @param { String/Function } 事件代理的选择器或事件处理器(若为事件处理器将不予理会) 
 	 * @return { Function }
 	 */	
-	eventHandle : function( elem, selector, extraData ){	
+	eventHandle : function( elem, selector ){	
 		return function( event ){
 			event = easyEvent.fixEvent( event || window.event );
 
-			if( extraData ){
-				event.extraData = extraData;
-			}
-			
 			var orginalTarget = event.target,
 				isDelegate = false,
 				type = event.type,
 				target = elem,
 				name = type,
 				i = 1,
-				handles, len, j, filter;
+				handles, len, j, filter, result;
 			
 			// IE6-8没有currentTarget属性
 			if( !event.currentTarget ){
@@ -657,8 +660,7 @@ var easyEvent = {
 			}
 
 			// 如果有 selector 则用 target 与 selector 进行匹配，匹配成功才执行事件处理器
-			// 这就是事件代理的简单原理，利用事件冒泡的特性				
-			//if( E.isString(selector) ){					
+			// 这就是事件代理的简单原理，利用事件冒泡的特性							
 			if( selector ){					
 				filter = easyEvent.delegateFilter;	
 				// 事件代理时将 this 指向 event.target，否则默认指向 elem
@@ -684,9 +686,19 @@ var easyEvent = {
 
 				for( ; i < len; i++ ){
 					// 针对只执行一次即卸载的事件的特殊处理
-					j = handles[i] ? i : i - 1; 
+					j = handles[i] ? i : i - 1;
+					result = handles[j];
+
+					// 将缓存的附加数据添加到event对象中
+					if( result.extraData ){
+						event.extraData = result.extraData;
+					}
+					// 附加数据不能共享以确保不冲突
+					else{
+						delete event.extraData;
+					}
 					
-					if( handles[j].call(target, event) === false ){
+					if( result.handle.call(target, event) === false ){
 						event.preventDefault();
 						event.stopPropagation();
 					}
@@ -765,7 +777,7 @@ E.each({
 			fn = function( e ){
 				E( e.currentTarget ).un( type, selector, fn );
 				originalFn.call( this, e );
-			}
+			};
 		}
 		
 		// 特殊事件的绑定和卸载分支
