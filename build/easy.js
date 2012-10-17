@@ -1,11 +1,11 @@
 /*
-* easy.js v0.1.0
+* easy.js v0.2.0
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-10-17 17:58:11
+* Date : 2012-10-17 18:11:6
 */
 
 // ---------------------------------------------
@@ -228,7 +228,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-	version : '0.1.0',
+	version : '0.2.0',
 	
 	__uuid__ : 2,
 	
