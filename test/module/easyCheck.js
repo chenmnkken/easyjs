@@ -50,7 +50,7 @@ return function(){
 	check.run( 'version', function(){
 			return E.version; 
 		})
-		.equal( '0.1.0' );
+		.equal( '0.3.0' );
 	
 	// 输出结果
 	check.output();

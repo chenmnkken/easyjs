@@ -1,4 +1,4 @@
-var version = '0.2.0',
+var version = '0.3.0',
 	licenses = 'MIT and GPL Licenses',
 	date = new Date(),
 	timeStamp = date.getFullYear() + '-' + 

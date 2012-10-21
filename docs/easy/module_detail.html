@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.2.0</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.3.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -49,6 +49,7 @@
 		<p>模块标识 ajax/xhr 解析的模块路径是 http://easyjs.org/js/ajax/xhr.js，对应的模块名就是 xhr。</p>
 		<p>如果模块标识是以 ../ 开头，如 ../core，那么解析的模块路径是 http://easyjs.org/core.js，对应的模块名就是 core。</p>
 		<p>绝对标识就是普通的 url，绝对标识不会受到基础路径的影响，如 http://example.com/test.js 的路径就是其自身，模块名就是 test。</p>
+		<p>目前支持 JS 和 CSS 两种类型的模块，JS 模块为了简便，模块标识不需要 ".js" 的后缀，CSS 模块为了区分，模块标识一定要带上 ".css" 的后缀。</p>
 		<h3>模块对外接口 exports</h3>
 		<p>每个模块都定义在一个函数体内，如果该模块想让外部访问，除了使用全局变量外( 不建议使用 )，可以对外部暴露一个接口。只要在定义模块的时候，使用 return 返回一个值，就是返回了一个外部接口 exports。该接口在正式返回前可以使用 <a href="modify.html">modify</a> 方法进行修改。</p>
 		<p>在使用 use 进行模块加载时，use 的回调函数的参数就可以接收到模块的 exports，同理，在加载依赖模块时，define 的 factoy 也同样可以接收到依赖模块的 exports。</p>

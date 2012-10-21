@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.2.0</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.3.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -123,6 +123,28 @@ E.use( 'hello' );
 		</div>
 		<p><a href="#" id="runDemo3" class="btn">运行</a></p>
 	</div>
+	
+	<div class="example_box">
+		<h5>例子4</h5>
+		<p>加载一个 CSS 模块，CSS 模块标识一定要带后缀，JS 模块不需要带后缀。</p>
+		<div class="demo_box">
+			<div class="box1">box1</div>	
+		</div>
+		<div class="code_box">
+			<pre>&lt;div class="box1"&gt;box1&lt;/div&gt;</pre>
+		</div>	
+		<p>CSS 模块就是一个普通的 CSS 文件，文件名为 test_style.css，文件内的代码如下：</p>
+		<div class="code_box">
+			<pre>.box1{ font-size:14px; color : red; }</pre>
+		</div>
+		<p>使用 use 方法来进行加载：</p>
+		<div class="code_box">
+			<pre>E.use( 'test_style.css', function(){
+    alert( 'test_style.css is done' );
+});</pre>
+		</div>
+		<p><a href="#" id="runDemo4" class="btn">运行</a></p>
+	</div>
 
 </div>
 <script type="text/javascript" src="../../src/easy.js"></script>
@@ -140,12 +162,19 @@ E.use( 'event', function(){
 		e.preventDefault();
 	});
 	
-	E( '#runDemo3' ).on( 'click', function( e ){
+	E( '#runDemo3' ).one( 'click', function( e ){
 		E.use( 'http://stylechen.com/wp-content/uploads/lib/jquery-1.7.2.min.js', function(){
 			alert( $.fn.jquery );
 		});
 		e.preventDefault();
 	});
+	
+	E( '#runDemo4' ).one( 'click', function( e ){
+		E.use( '../docs/easy/demo/test_style.css', function(){
+			alert( 'test_style.css is done' );
+		});
+		e.preventDefault();
+	});	
 });
 </script>	
 </body>
