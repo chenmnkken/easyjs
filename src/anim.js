@@ -4,6 +4,8 @@
  
 define( 'anim', [ 'data', 'css' ], function( easyData, easyStyle ){
 
+'use strict';
+
 var rUnit = /^[-\d.]+/,
 	rColorVals = /\d+/g,
 	rOtherVals = /([-\d]+|[a-z%]+)/g,
@@ -634,16 +636,20 @@ E.mix( E.prototype, {
 	 */
 	stop : function( clear, end ){
 		return this.forEach(function(){
-			var currentAnim = easyAnim.data( this, 'currentAnim' );		
-			
+			var currentAnim = easyAnim.data( this, 'currentAnim' );
+					
 			if( clear ){
 				easyAnim.removeData( this, 'animQueue' );
 			}
 
-			currentAnim.stop();
+			if( currentAnim ){
+				currentAnim.stop();
+			}
 			
-			if( end ){		
-				currentAnim.run( true );
+			if( end ){
+				if( currentAnim ){
+					currentAnim.run( true );
+				}
 			}
 			else{
 				easyAnim.dequeue( this );

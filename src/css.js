@@ -4,6 +4,8 @@
  
 define( 'css', 'node', function(){
 
+'use strict';
+
 var rPosition = /^(?:left|right|top|bottom)$/i,
 	rBorderWidth = /^border(\w)+Width$/,
 	rNumpx = /^-?\d+(?:px)?$/i,

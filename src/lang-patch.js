@@ -4,6 +4,8 @@
  
 define( 'lang-patch', function(){
 
+'use strict';
+
 var AP = Array.prototype,
 	DP = Date.prototype,
 	FP = Function.prototype,

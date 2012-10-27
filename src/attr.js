@@ -4,6 +4,8 @@
  
 define( 'attr', 'node', function(){
 
+'use strict';
+
 var hasAttribute = document.documentElement.hasAttribute,
 	noButtonValue = !E.support.buttonValue,
 	

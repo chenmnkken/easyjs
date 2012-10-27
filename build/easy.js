@@ -1,11 +1,11 @@
 /*
-* easy.js v0.3.0
+* easy.js v0.3.1
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-10-21 11:48:33
+* Date : 2012-10-27 15:33:3
 */
 
 // ---------------------------------------------
@@ -13,6 +13,8 @@
 // ---------------------------------------------
  
 (function( window, undefined ){
+
+'use strict';
 
 var document = window.document,
 	
@@ -228,7 +230,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-	version : '0.3.0',
+	version : '0.3.1',
 	
 	__uuid__ : 2,
 	
@@ -723,6 +725,7 @@ window.easyJS = window.E = easyJS;
 // ---------------------------------------------
  
 
+
 var AP = Array.prototype,
 	DP = Date.prototype,
 	FP = Function.prototype,
@@ -1052,6 +1055,7 @@ if( !SP.trim ){
 // ---------------@module lang------------------
 // ---------------------------------------------
  
+
 	
 var	rValidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,	
 	rValidescape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,	
@@ -1242,6 +1246,7 @@ E.mix( E, {
 // ---------------------------------------------
  
 
+
 var support = function(){
 	var	div = document.createElement( 'div' ),
 		button,	input, select, option, testCloneEvent, event;		
@@ -1340,6 +1345,7 @@ E.support = support();
 // ---------------@module data------------------
 // ---------------------------------------------
  
+
 
 E.cache = {};
 
@@ -1486,6 +1492,7 @@ E.mix( E.prototype, {
 // --------------@module selector---------------
 // ---------------------------------------------
  
+
 
 var	hasDuplicate = false,	// 是否有重复的DOM元素
 	hasParent = false,	// 是否检测重复的父元素
@@ -2216,6 +2223,7 @@ E.mix( E, {
 // ----------------@module node-----------------
 // ---------------------------------------------
  
+
 
 var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video/i,
 	rXhtml =  /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
@@ -3159,6 +3167,7 @@ E.mix( E.prototype, {
 // ---------------------------------------------
  
 
+
 var hasAttribute = document.documentElement.hasAttribute,
 	noButtonValue = !E.support.buttonValue,
 	
@@ -3662,6 +3671,7 @@ E.mix( E.prototype, {
 // ---------------------------------------------
  
 
+
 var rPosition = /^(?:left|right|top|bottom)$/i,
 	rBorderWidth = /^border(\w)+Width$/,
 	rNumpx = /^-?\d+(?:px)?$/i,
@@ -4143,6 +4153,7 @@ E.mix( E.prototype, {
 // ---------------@module event-----------------
 // ---------------------------------------------
  
+
 
 var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which'.split( ' ' ),
 	mouseProps = 'button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement'.split( ' ' ),
@@ -4991,6 +5002,7 @@ E.mix( E.prototype, {
 // ---------------------------------------------
  
 
+
 var rUnit = /^[-\d.]+/,
 	rColorVals = /\d+/g,
 	rOtherVals = /([-\d]+|[a-z%]+)/g,
@@ -5621,16 +5633,20 @@ E.mix( E.prototype, {
 	 */
 	stop : function( clear, end ){
 		return this.forEach(function(){
-			var currentAnim = easyAnim.data( this, 'currentAnim' );		
-			
+			var currentAnim = easyAnim.data( this, 'currentAnim' );
+					
 			if( clear ){
 				easyAnim.removeData( this, 'animQueue' );
 			}
 
-			currentAnim.stop();
+			if( currentAnim ){
+				currentAnim.stop();
+			}
 			
-			if( end ){		
-				currentAnim.run( true );
+			if( end ){
+				if( currentAnim ){
+					currentAnim.run( true );
+				}
 			}
 			else{
 				easyAnim.dequeue( this );
@@ -5719,6 +5735,7 @@ E.each({
 // ---------------@module ajax------------------
 // ---------------------------------------------
  
+
 
 var	rInput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,	
 	rLocalProtocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/,

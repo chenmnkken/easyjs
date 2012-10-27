@@ -4,6 +4,8 @@
  
 define( 'node', [ 'support', 'data', 'selector' ], function( _, easyData, easySelector ){
 
+'use strict';
+
 var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video/i,
 	rXhtml =  /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
 	rSingleTag = /^<(\w+)\s*\/?>(?:<\/\1>)?$/,

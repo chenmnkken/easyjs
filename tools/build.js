@@ -1,5 +1,6 @@
-var version = '0.3.0',
+var version = '0.3.1',
 	licenses = 'MIT and GPL Licenses',
+	rDefine = /define\(.+\r\n/,
 	date = new Date(),
 	timeStamp = date.getFullYear() + '-' + 
 				( date.getMonth() + 1 ) + '-' + 
@@ -14,8 +15,13 @@ require( './combo' ).combo({
 	names : 'easy lang-patch lang support data selector node attr css event anim ajax',
 	output : '../build/easy.js',
 	format : function( content ){
-		// 去掉 define 的调用
-		content = content.replace( /define\(.+\r\n/, '' );
+		if( rDefine.test(content) ){
+			// 去掉各模块的use strict
+			content = content.replace( /['"]use strict['"];*\r\n/, '' );
+			
+			// 去掉 define 的调用
+			content = content.replace( /define\(.+\r\n/, '' );
+		}
 		
 		// 去掉 exports
 		if( ~content.indexOf('// @exports') ){

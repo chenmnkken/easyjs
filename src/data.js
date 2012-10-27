@@ -4,6 +4,8 @@
  
 define( 'data', 'lang', function(){
 
+'use strict';
+
 E.cache = {};
 
 var easyData = {

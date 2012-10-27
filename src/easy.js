@@ -4,6 +4,8 @@
  
 (function( window, undefined ){
 
+'use strict';
+
 var document = window.document,
 	
 	isReady = false,	// 判断DOM是否ready

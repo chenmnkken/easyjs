@@ -4,6 +4,8 @@
  
 define( 'event', [ 'data', 'css' ], function( easyData ){
 
+'use strict';
+
 var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which'.split( ' ' ),
 	mouseProps = 'button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement'.split( ' ' ),
 	keybordProps = 'char charCode key keyCode'.split( ' ' ),
