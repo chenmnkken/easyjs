@@ -34,7 +34,7 @@ var easyData = {
 	/*
 	 * 写入/获取缓存
 	 * @param { HTMLElement }
-	 * @param { String } 缓存的命名空间( data:外部调用, event:事件系统, anim:动画系统 )
+	 * @param { String } 缓存的命名空间( data:外部调用, event:事件系统, anim:动画系统, null:无命名空间 )
 	 * @param { String } 缓存的key
 	 * @param { Anything } 缓存的值
 	 * @param { Boolean } 是否覆盖( true:覆盖, false:不覆盖，如果缓存的值是undefined将val作为缺省值写入 )
@@ -43,6 +43,7 @@ var easyData = {
 	data : function( elem, type, name, val, overwrite ){
 		var result,
 			cache = E.cache,
+			isNamespace = type !== null,
 			isUndefined = val === undefined,
 			index = easyData.getCacheIndex( elem, !isUndefined );
 			
@@ -53,18 +54,26 @@ var easyData = {
 
 			cache = cache[ index ];
 			
-			if( !(type in cache) ){
-				cache[ type ] = {};
+			if( isNamespace ){
+				if( !(type in cache) ){
+					cache[ type ] = {};
+				}
+				
+				result = cache[ type ][ name ];			
 			}
-			
-			result = cache[ type ][ name ];
+			else{
+				result = cache[ name ];	
+			}
 			
 			if( isUndefined || (!overwrite && result !== undefined) ){
 				return result;
 			}
 
-			if( overwrite || !isUndefined ){
-				cache[ type ][ name ] = val;
+			if( overwrite || !isUndefined ){				
+				isNamespace ? 
+					( cache[ type ][ name ] = val ) : 
+					( cache[ name ] = val );
+				
 				return val;
 			}
 		}			
@@ -83,12 +92,19 @@ var easyData = {
 		if( index in cacheData ){
 			// 有参数就删除指定的数据
 			cacheData = cacheData[ index ];
-			if( name && cacheData[type] ){
-				delete cacheData[ type ][ name ];
+			if( name ){
+				if( type !== null ){
+					if( cacheData[type] ){
+						delete cacheData[ type ][ name ];
+					}
+				}
+				else{
+					delete cacheData[ name ];
+				}
 			}
 			
 			// 无参数或空对象都删除所有的数据
-			if( !name || E.isEmptyObject(cacheData[type]) ){
+			if( !name || (type !== null && E.isEmptyObject(cacheData[type])) ){
 				cacheData[ type ] = null;
 				delete cacheData[ type ];
 			}

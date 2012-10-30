@@ -658,6 +658,7 @@ E.mix( E.prototype, {
 	},
 	
 	show : function( duration, easing, fn ){
+		// 有动画效果
 		if( duration ){
 			return this.anim({
 				to : function(){
@@ -668,14 +669,31 @@ E.mix( E.prototype, {
 				complete : fn 
 			});
 		}
+		// 无动画效果
 		else{
 			return this.forEach(function(){
-				this.style.display = 'block';
+				var currentDisplay = E( this ).css( 'display' ),
+					oldDisplay;
+					
+				if( currentDisplay === 'none' ){
+					oldDisplay = easyData.data( this, null, 'display' );	
+					// 如果有缓存的显示模式就用缓存的显示模式	
+					if( oldDisplay ){
+						easyData.removeData( this, null, 'display' );
+					}
+					// 无缓存就只能强制用block了
+					else{
+						oldDisplay = currentDisplay;
+					}
+					
+					this.style.display = oldDisplay === 'none' ? 'block' : '';
+				}				
 			});
 		}
 	},
 	
 	hide : function( duration, easing, fn ){
+		// 有动画效果
 		if( duration ){
 			return this.anim({
 				to : function(){
@@ -686,9 +704,16 @@ E.mix( E.prototype, {
 				complete : fn 
 			});
 		}
+		// 无动画效果
 		else{
 			return this.forEach(function(){
-				this.style.display = 'none';
+				var currentDisplay = E( this ).css( 'display' );
+				
+				if( currentDisplay !== 'none' ){
+					// 隐藏的时候缓存原始的显示模式，以便在下次show的时候能正确的还原
+					easyData.data( this, null, 'display', currentDisplay );
+					this.style.display = 'none';
+				}
 			});
 		}
 	},

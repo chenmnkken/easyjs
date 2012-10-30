@@ -1,11 +1,11 @@
 /*
-* easy.js v0.3.1
+* easy.js v0.3.2
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-10-27 15:33:3
+* Date : 2012-10-30 15:2:46
 */
 
 // ---------------------------------------------
@@ -230,7 +230,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-	version : '0.3.1',
+	version : '0.3.2',
 	
 	__uuid__ : 2,
 	
@@ -1375,7 +1375,7 @@ var easyData = {
 	/*
 	 * 写入/获取缓存
 	 * @param { HTMLElement }
-	 * @param { String } 缓存的命名空间( data:外部调用, event:事件系统, anim:动画系统 )
+	 * @param { String } 缓存的命名空间( data:外部调用, event:事件系统, anim:动画系统, null:无命名空间 )
 	 * @param { String } 缓存的key
 	 * @param { Anything } 缓存的值
 	 * @param { Boolean } 是否覆盖( true:覆盖, false:不覆盖，如果缓存的值是undefined将val作为缺省值写入 )
@@ -1384,6 +1384,7 @@ var easyData = {
 	data : function( elem, type, name, val, overwrite ){
 		var result,
 			cache = E.cache,
+			isNamespace = type !== null,
 			isUndefined = val === undefined,
 			index = easyData.getCacheIndex( elem, !isUndefined );
 			
@@ -1394,18 +1395,26 @@ var easyData = {
 
 			cache = cache[ index ];
 			
-			if( !(type in cache) ){
-				cache[ type ] = {};
+			if( isNamespace ){
+				if( !(type in cache) ){
+					cache[ type ] = {};
+				}
+				
+				result = cache[ type ][ name ];			
 			}
-			
-			result = cache[ type ][ name ];
+			else{
+				result = cache[ name ];	
+			}
 			
 			if( isUndefined || (!overwrite && result !== undefined) ){
 				return result;
 			}
 
-			if( overwrite || !isUndefined ){
-				cache[ type ][ name ] = val;
+			if( overwrite || !isUndefined ){				
+				isNamespace ? 
+					( cache[ type ][ name ] = val ) : 
+					( cache[ name ] = val );
+				
 				return val;
 			}
 		}			
@@ -1424,12 +1433,19 @@ var easyData = {
 		if( index in cacheData ){
 			// 有参数就删除指定的数据
 			cacheData = cacheData[ index ];
-			if( name && cacheData[type] ){
-				delete cacheData[ type ][ name ];
+			if( name ){
+				if( type !== null ){
+					if( cacheData[type] ){
+						delete cacheData[ type ][ name ];
+					}
+				}
+				else{
+					delete cacheData[ name ];
+				}
 			}
 			
 			// 无参数或空对象都删除所有的数据
-			if( !name || E.isEmptyObject(cacheData[type]) ){
+			if( !name || (type !== null && E.isEmptyObject(cacheData[type])) ){
 				cacheData[ type ] = null;
 				delete cacheData[ type ];
 			}
@@ -5655,6 +5671,7 @@ E.mix( E.prototype, {
 	},
 	
 	show : function( duration, easing, fn ){
+		// 有动画效果
 		if( duration ){
 			return this.anim({
 				to : function(){
@@ -5665,14 +5682,31 @@ E.mix( E.prototype, {
 				complete : fn 
 			});
 		}
+		// 无动画效果
 		else{
 			return this.forEach(function(){
-				this.style.display = 'block';
+				var currentDisplay = E( this ).css( 'display' ),
+					oldDisplay;
+					
+				if( currentDisplay === 'none' ){
+					oldDisplay = easyData.data( this, null, 'display' );	
+					// 如果有缓存的显示模式就用缓存的显示模式	
+					if( oldDisplay ){
+						easyData.removeData( this, null, 'display' );
+					}
+					// 无缓存就只能强制用block了
+					else{
+						oldDisplay = currentDisplay;
+					}
+					
+					this.style.display = oldDisplay === 'none' ? 'block' : '';
+				}				
 			});
 		}
 	},
 	
 	hide : function( duration, easing, fn ){
+		// 有动画效果
 		if( duration ){
 			return this.anim({
 				to : function(){
@@ -5683,9 +5717,16 @@ E.mix( E.prototype, {
 				complete : fn 
 			});
 		}
+		// 无动画效果
 		else{
 			return this.forEach(function(){
-				this.style.display = 'none';
+				var currentDisplay = E( this ).css( 'display' );
+				
+				if( currentDisplay !== 'none' ){
+					// 隐藏的时候缓存原始的显示模式，以便在下次show的时候能正确的还原
+					easyData.data( this, null, 'display', currentDisplay );
+					this.style.display = 'none';
+				}
 			});
 		}
 	},
