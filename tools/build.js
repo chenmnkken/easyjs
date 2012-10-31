@@ -20,7 +20,7 @@ require( './combo' ).combo({
 			content = content.replace( /['"]use strict['"];*\r\n/, '' );
 			
 			// 去掉 define 的调用
-			content = content.replace( /define\(.+\r\n/, '' );
+			content = content.replace( rDefine, '' );
 		}
 		
 		// 去掉 exports
