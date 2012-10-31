@@ -48,7 +48,7 @@ var compress = function( options ){
 			if( options.callback ){
 				stdout = options.callback( stdout );
 			}
-						
+
 			console.log( 'Compress the [' + options.input + '] success.' );
 		
 			// 写入文件
@@ -59,11 +59,12 @@ var compress = function( options ){
 	});
 	
 	// 读取文本内容
-	content = fs.readFileSync( options.input, encoding, function( error ){
-		if( error ){
-			console.log( 'Read file error :' + error );
-		}
-	});
+	try{
+		content = fs.readFileSync( options.input, encoding );
+	}
+	catch( error ){
+		console.log( 'Read file error :' + error );
+	}
 	
 	compiler.stdin.end( content );
 };

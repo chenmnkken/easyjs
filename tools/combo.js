@@ -27,11 +27,12 @@ var combo = function( options ){
 	// 合并文本内容
 	paths.forEach(function( path ){
 		// 读取
-		content = fs.readFileSync( path, options.encoding, function( error ){
-			if( error ){
-				console.log( 'Combo error : ' + error );
-			}
-		});
+		try{
+			content = fs.readFileSync( path, options.encoding );
+		}
+		catch( error ){
+			console.log( 'Combo error : ' + error );
+		}
 		
 		// utf-8 编码格式的文件可能会有 BOM 头，需要去掉
 		if( isUTF8 && content.charCodeAt(0) === 0xFEFF ){
@@ -58,9 +59,12 @@ var combo = function( options ){
 	'======================================' );
 	
 	// 写入文件
-	fs.writeFileSync( options.output, contents, options.encoding, function( error ){
+	try{
+		fs.writeFileSync( options.output, contents, options.encoding );
+	}
+	catch( error ){
 		console.log( 'Output ' + (error ? 'error :' + error : 'the [' + options.output + '] success.') );
-	});
+	}
 };
 
 exports.combo = combo;
