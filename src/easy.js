@@ -45,7 +45,9 @@ var document = window.document,
 	
 	// DOM ready
 	ready = function( fn ){
-		var doScroll = document.documentElement.doScroll,
+		var domReady, stateChange,
+            toplevel = false,
+            doScroll = document.documentElement.doScroll,
 			eventType = doScroll ? 'onreadystatechange' : 'DOMContentLoaded',
 			fireReady = function(){
 				if( isReady ) return;
@@ -79,27 +81,28 @@ var document = window.document,
 			}
 			
 			if( document.addEventListener ){
-				var domReady = function(){
+				domReady = function(){
 					document.removeEventListener( eventType, domReady, false );
 					fireReady();
 				};
+                
 				document.addEventListener( eventType, domReady, false );
 				window.addEventListener( 'load', fireReady, false );
 			}
 			else if( document.attachEvent ){
-				var stateChange = function(){
+				stateChange = function(){
 					if( document.readyState === 'complete' ){
 						document.detachEvent( eventType, stateChange );
 						fireReady();
 					}
 				};
+                
 				document.attachEvent( eventType, stateChange );
 				window.attachEvent( 'onload', fireReady );
 				
-				var toplevel = false;
 				try {
 					toplevel = window.frameElement == null;
-				} catch(e) {}
+				}catch(_){}
 				
 				if( doScroll && toplevel ){
 					doScrollCheck();

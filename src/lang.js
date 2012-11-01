@@ -55,11 +55,12 @@ E.mix( E, {
 		if( !obj || !E.isObject(obj) ){
 			return false;
 		}
-		var name;
+		var name,
+            hasOwnProperty = Object.prototype.hasOwnProperty;
 		
 		try{
 			for( name in obj ){
-				if( !Object.prototype.hasOwnProperty.call(obj,name) ){
+				if( !hasOwnProperty.call(obj,name) ){
 					return false;
 				}
 			}
