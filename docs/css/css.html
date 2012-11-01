@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.3.2</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.4.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -47,7 +47,7 @@
 				</dl>
 				<div class="params_desc">
 					<span class="type required">必需</span>
-					<p>CSS 属性名。为 Object 时，是一次设置多个属性。</p>
+					<p>CSS 属性名。为 Object 时，是一次设置多个属性。0.4.0 的版本增加了自动给属性名添加对 CSS3 私有前缀的功能。</p>
 				</div>
 			</li>
 			<li>
@@ -154,6 +154,24 @@
 		</div>	
 		<p><a href="javascript:;" id="runDemo5" class="btn">运行</a></p>		
 	</div>
+    
+	<div class="example_box">
+		<h5>例子6</h5>
+		<p>使用 CSS3 对元素进行放大，不用添加私有的前缀来兼容各种浏览器。</p>
+		<div class="demo_box">
+			<div id="box6" style="width:100px;height:100px;background:#666" ></div>	
+		</div>
+		<div class="code_box">
+			<pre>&lt;div id="box6" style="width:100px;height:100px;backgronud:#666" &gt;box5&lt;/div&gt;</pre>
+		</div>	
+		<div class="code_box">
+			<pre>E( '#box5' ).css({
+    'backgroundColor' : '#ccc',
+    'color' : '#fff'
+});</pre>
+		</div>	
+		<p><a href="javascript:;" id="runDemo6" class="btn">运行</a></p>		
+	</div>
 	
 </div>
 
@@ -189,6 +207,15 @@ E.use( 'event', function(){
 			'backgroundColor' : '#ccc',
 			'color' : '#fff'
 		});
+		
+		e.preventDefault();
+	});
+    
+	E( '#runDemo6' ).one( 'click', function( e ){
+		E( '#box6' ).css({
+            'transition' : '0.6s linear',
+            'transform' : 'scale(1.5, 1.5)'
+        });
 		
 		e.preventDefault();
 	});

@@ -1,11 +1,11 @@
 /*
-* easy.js v0.3.2
+* easy.js v0.4.0
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-10-31 13:11:33
+* Date : 2012-11-1 11:42:55
 */
 
 // ---------------------------------------------
@@ -230,7 +230,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-	version : '0.3.2',
+	version : '0.4.0',
 	
 	__uuid__ : 2,
 	
@@ -3742,12 +3742,45 @@ var rPosition = /^(?:left|right|top|bottom)$/i,
         'teal'    :  'rgb(0, 128, 128)', 
         'aqua'    :  'rgb(0, 255, 255)'
 	},
+    
+    cssPrefix = (function(){
+        var browser = E.browser;
+        
+        return ( browser.ie && parseInt(browser.version) > 8 ) ? 'ms' :
+            ( browser.chrome || browser.safari )  ? 'webkit' :
+            browser.firefox ? 'Moz' :
+            browser.opera ? 'O' : '';
+    })(),
 		
 	getComputedStyle,
 	currentStyle,
 	getStyle;
-		
+
 var easyStyle = {
+    
+    /*
+     * 视情况给CSS3的属性名添加私有前缀
+     * @param{ String } CSS属性名
+     * @param{ Object } 内联样式对象
+     * @return { String } 处理后的CSS属性名
+     * transform in firefox => MozTransform
+     * transform in webkit => webkitTransform
+     * transform in ie => msTransform
+     * transform in opera => OTransform
+     */
+    fixName : function( name, style ){
+        if( name in style ){
+            return name;
+        }
+        
+        var newName = cssPrefix + E.capitalize( name );
+        
+        if( newName in style ){
+            return newName;
+        }
+        
+        return name;
+    },
 		
 	// 获取当前帧的窗口(window)元素
 	getWindow : function( elem ){
@@ -4024,7 +4057,7 @@ cssHooks.zIndex = {
 
 E.mix( E.prototype, {
 	
-	css : function( name, val ){		
+	css : function( name, val ){
 		if( E.isPlainObject(name) ){
 			E.each( name, function( name, val ){
 				this.css( name, val );
@@ -4037,12 +4070,14 @@ E.mix( E.prototype, {
 			name.replace( /\-([a-z])/g, function( _, word ){
 				return word.toUpperCase();
 			});
-				
+            
 		var hooks = cssHooks[ name ],
 			offset, parentOffset, elem;
 		
 		if( val === undefined ){
 			elem = this[0];
+            name = easyStyle.fixName( name, elem.style );
+            
 			if( elem && elem.nodeType === 1 ){
 				
 				if( hooks && hooks.get ){
@@ -4083,12 +4118,14 @@ E.mix( E.prototype, {
 		val += ''; 
 		
 		return this.forEach(function(){
-			if( this.nodeType === 1 ){
+			if( this.nodeType === 1 ){                
+                var style = this.style;
 				if( hooks && hooks.set ){
 					hooks.set( this, val );
 				}
 				else{
-					this.style[ name ] = val;
+                    name = easyStyle.fixName( name, style );
+					style[ name ] = val;
 				}
 			}
 		});
