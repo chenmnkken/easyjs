@@ -107,6 +107,11 @@ var easyNode = {
 			data = cacheData.data,
 			event = cacheData.event,
 			name, type, selector, names, handles;
+
+        // 克隆display的数据
+        if( cacheData.display ){
+            easyData.data( target, null, 'display', cacheData.display );
+        }
 			
 		// 克隆普通的数据	
 		for( name in data ){
@@ -196,7 +201,7 @@ var easyNode = {
 		return clone;
 	},	
 	
-	// 功能类似于Core模块中的init，但是返回值是纯数组
+	// 功能类似于easy模块中的init，但是返回值是纯数组
 	getNodelist : function( arg ){
 		var elems;
 		if( typeof arg === 'string' ){
@@ -237,6 +242,7 @@ var easyNode = {
 			event = cacheData.event;
 				
 			delete cacheData.data;
+			delete cacheData.display;
 			
 			// 清除事件
 			for( name in event ){

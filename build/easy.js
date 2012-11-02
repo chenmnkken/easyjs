@@ -1,11 +1,11 @@
 /*
-* easy.js v0.4.0
+* easy.js v0.4.1
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-11-1 11:42:55
+* Date : 2012-11-2 17:48:17
 */
 
 // ---------------------------------------------
@@ -55,7 +55,9 @@ var document = window.document,
 	
 	// DOM ready
 	ready = function( fn ){
-		var doScroll = document.documentElement.doScroll,
+		var domReady, stateChange,
+            toplevel = false,
+            doScroll = document.documentElement.doScroll,
 			eventType = doScroll ? 'onreadystatechange' : 'DOMContentLoaded',
 			fireReady = function(){
 				if( isReady ) return;
@@ -89,27 +91,28 @@ var document = window.document,
 			}
 			
 			if( document.addEventListener ){
-				var domReady = function(){
+				domReady = function(){
 					document.removeEventListener( eventType, domReady, false );
 					fireReady();
 				};
+                
 				document.addEventListener( eventType, domReady, false );
 				window.addEventListener( 'load', fireReady, false );
 			}
 			else if( document.attachEvent ){
-				var stateChange = function(){
+				stateChange = function(){
 					if( document.readyState === 'complete' ){
 						document.detachEvent( eventType, stateChange );
 						fireReady();
 					}
 				};
+                
 				document.attachEvent( eventType, stateChange );
 				window.attachEvent( 'onload', fireReady );
 				
-				var toplevel = false;
 				try {
 					toplevel = window.frameElement == null;
-				} catch(e) {}
+				}catch(_){}
 				
 				if( doScroll && toplevel ){
 					doScrollCheck();
@@ -230,7 +233,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-	version : '0.4.0',
+	version : '0.4.1',
 	
 	__uuid__ : 2,
 	
@@ -1106,11 +1109,12 @@ E.mix( E, {
 		if( !obj || !E.isObject(obj) ){
 			return false;
 		}
-		var name;
+		var name,
+            hasOwnProperty = Object.prototype.hasOwnProperty;
 		
 		try{
 			for( name in obj ){
-				if( !Object.prototype.hasOwnProperty.call(obj,name) ){
+				if( !hasOwnProperty.call(obj,name) ){
 					return false;
 				}
 			}
@@ -2342,6 +2346,11 @@ var easyNode = {
 			data = cacheData.data,
 			event = cacheData.event,
 			name, type, selector, names, handles;
+
+        // 克隆display的数据
+        if( cacheData.display ){
+            easyData.data( target, null, 'display', cacheData.display );
+        }
 			
 		// 克隆普通的数据	
 		for( name in data ){
@@ -2431,7 +2440,7 @@ var easyNode = {
 		return clone;
 	},	
 	
-	// 功能类似于Core模块中的init，但是返回值是纯数组
+	// 功能类似于easy模块中的init，但是返回值是纯数组
 	getNodelist : function( arg ){
 		var elems;
 		if( typeof arg === 'string' ){
@@ -2472,6 +2481,7 @@ var easyNode = {
 			event = cacheData.event;
 				
 			delete cacheData.data;
+			delete cacheData.display;
 			
 			// 清除事件
 			for( name in event ){

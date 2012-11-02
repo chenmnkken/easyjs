@@ -148,6 +148,17 @@ return function(){
 			return E( 'p.clonePara1' ).length;
 		})
 		.equal( 2 );
+        
+	check.run( 'clone(true)', function(){
+            var p = E( 'p.clonePara2' ),
+                clone;
+                
+            p.data( 'cloneTest', 1 );            
+			clone = p.clone( true ).appendTo( E.query('#cloneBox1') );
+            
+			return E( 'p.clonePara2' ).length + clone.data( 'cloneTest' );
+		})
+		.equal( 3 );
 		
 	// create
 	check.run( 'create', function(){
