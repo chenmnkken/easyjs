@@ -277,10 +277,10 @@ if( !isECMAEvent ){
 }
 	
 // Event接口对象的构造器
-E.Event = function( event ){
+var Event = function( event ){
 	// 无new实例化
-	if( !(this instanceof E.Event) ){
-		return new E.Event( event );
+	if( !(this instanceof Event) ){
+		return new Event( event );
 	}
 	
 	if( event && event.type ){
@@ -297,7 +297,7 @@ E.Event = function( event ){
 	this.timeStamp = event && event.timeStamp || Date.now();
 };
 
-E.Event.prototype = {
+Event.prototype = {
 
 	// 模拟DOM LV2的阻止默认事件的方法
 	preventDefault : function(){
@@ -539,7 +539,7 @@ var easyEvent = {
 			type;
 		
 		// 创建Event对象	
-		event = E.Event( sourceEvent );
+		event = Event( sourceEvent );
 		// 将原生的Event的某些常见的标准属性合并到新Event中
 		event = E.mix( event, sourceEvent, true, eventProps );
 		
