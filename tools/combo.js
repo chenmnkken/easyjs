@@ -10,61 +10,61 @@
  */ 
 
 var combo = function( options ){
-	options.encoding = ( options.encoding || 'UTF-8' ).toUpperCase();
-	
-	var fs = require( 'fs' ),
-		names = options.names.split( ' ' ),
-		isUTF8 = options.encoding.to === '',
-		paths = [],
-		contents = '',
-		content;
-	
-	// 计算 paths 
-	names.forEach(function( name ){
-		paths.push( options.path + name + '.js' );
-	});
-		
-	// 合并文本内容
-	paths.forEach(function( path ){
-		// 读取
-		try{
-			content = fs.readFileSync( path, options.encoding );
-		}
-		catch( error ){
-			console.log( 'Combo error : ' + error );
-		}
-		
-		// utf-8 编码格式的文件可能会有 BOM 头，需要去掉
-		if( isUTF8 && content.charCodeAt(0) === 0xFEFF ){
-			content = content.slice( 1 );
-		}
-		
-		// 格式化
-		if( options.format ){
-			content = options.format( content );
-		}
-		
-		// 合并
-		contents += content + '\n';
-		console.log( 'Combo the [' + path + '] success.' );
-	});
-	
-	// 合并好文本内容后的回调
-	if( options.complete ){
-		contents = options.complete( contents );
-	}
+    options.encoding = ( options.encoding || 'UTF-8' ).toUpperCase();
+    
+    var fs = require( 'fs' ),
+        names = options.names.split( ' ' ),
+        isUTF8 = options.encoding.to === '',
+        paths = [],
+        contents = '',
+        content;
+    
+    // 计算 paths 
+    names.forEach(function( name ){
+        paths.push( options.path + name + '.js' );
+    });
+        
+    // 合并文本内容
+    paths.forEach(function( path ){
+        // 读取
+        try{
+            content = fs.readFileSync( path, options.encoding );
+        }
+        catch( error ){
+            console.log( 'Combo error : ' + error );
+        }
+        
+        // utf-8 编码格式的文件可能会有 BOM 头，需要去掉
+        if( isUTF8 && content.charCodeAt(0) === 0xFEFF ){
+            content = content.slice( 1 );
+        }
+        
+        // 格式化
+        if( options.format ){
+            content = options.format( content );
+        }
+        
+        // 合并
+        contents += content + '\n';
+        console.log( 'Combo the [' + path + '] success.' );
+    });
+    
+    // 合并好文本内容后的回调
+    if( options.complete ){
+        contents = options.complete( contents );
+    }
 
-	console.log( '======================================\n' +
-	'All of [' + paths.length + '] files combo success.\n' +
-	'======================================' );
-	
-	// 写入文件
-	try{
-		fs.writeFileSync( options.output, contents, options.encoding );
-	}
-	catch( error ){
-		console.log( 'Output ' + (error ? 'error :' + error : 'the [' + options.output + '] success.') );
-	}
+    console.log( '======================================\n' +
+    'All of [' + paths.length + '] files combo success.\n' +
+    '======================================' );
+    
+    // 写入文件
+    try{
+        fs.writeFileSync( options.output, contents, options.encoding );
+    }
+    catch( error ){
+        console.log( 'Output ' + (error ? 'error :' + error : 'the [' + options.output + '] success.') );
+    }
 };
 
 exports.combo = combo;

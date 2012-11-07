@@ -29,185 +29,185 @@ ul{ list-style:none; }
 </head>
 <body>
 <div id="wrapper">
-	<h1 class="page_tit">easy.js 动画模块测试</h1>
-	<ul class="demo_list">
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="show">show</a><a href="javascript:void(0)" id="hide">hide</a></div>
-			<div class="box" id="box1">1</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="slideUp">slideUp</a><a href="javascript:void(0)" id="slideDown">slideDown</a><a href="javascript:void(0)" id="slideToggle">slideToggle</a></div>
-			<div class="box" id="box2">2</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="fadeIn">fadeIn</a><a href="javascript:void(0)" id="fadeOut">fadeOut</a></div>
-			<div class="box" id="box3">3</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="customw">custom : width</a><a href="javascript:void(0)" id="customh">custom : height</a><a href="javascript:void(0)" id="custombdw">custom : borderWidth</a><a href="javascript:void(0)" id="customfz">custom : fontSize</a></div>
-			<div class="box" id="box4">4</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="customc">custom : backgroundColor & color & borderColor</a></div>
-			<div class="box" id="box5">5</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="customleft">custom : left</a></div>
-			<div class="box" id="box6">6</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="queue">queue</a><a href="javascript:void(0)" id="stop1">stop()</a><a href="javascript:void(0)" id="stop2">stop( false, true )</a><a href="javascript:void(0)" id="stop3">stop( true, false )</a><a href="javascript:void(0)" id="stop4">stop( true, true )</a></div>
-			<div class="box" id="box7">7</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="backgroudPosition">backgroudPosition</a></div>
-			<div class="box" id="box8">8</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="borderRadius">borderRadius</a></div>
-			<div class="box" id="box9">9</div>
-		</li>
-		<li>
-			<div class="btn"><a href="javascript:void(0)" id="textShadow">textShadow</a></div>
-			<div class="box" id="box10">10</div>
-		</li>
-	</ul>
+    <h1 class="page_tit">easy.js 动画模块测试</h1>
+    <ul class="demo_list">
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="show">show</a><a href="javascript:void(0)" id="hide">hide</a></div>
+            <div class="box" id="box1">1</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="slideUp">slideUp</a><a href="javascript:void(0)" id="slideDown">slideDown</a><a href="javascript:void(0)" id="slideToggle">slideToggle</a></div>
+            <div class="box" id="box2">2</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="fadeIn">fadeIn</a><a href="javascript:void(0)" id="fadeOut">fadeOut</a></div>
+            <div class="box" id="box3">3</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="customw">custom : width</a><a href="javascript:void(0)" id="customh">custom : height</a><a href="javascript:void(0)" id="custombdw">custom : borderWidth</a><a href="javascript:void(0)" id="customfz">custom : fontSize</a></div>
+            <div class="box" id="box4">4</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="customc">custom : backgroundColor & color & borderColor</a></div>
+            <div class="box" id="box5">5</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="customleft">custom : left</a></div>
+            <div class="box" id="box6">6</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="queue">queue</a><a href="javascript:void(0)" id="stop1">stop()</a><a href="javascript:void(0)" id="stop2">stop( false, true )</a><a href="javascript:void(0)" id="stop3">stop( true, false )</a><a href="javascript:void(0)" id="stop4">stop( true, true )</a></div>
+            <div class="box" id="box7">7</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="backgroudPosition">backgroudPosition</a></div>
+            <div class="box" id="box8">8</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="borderRadius">borderRadius</a></div>
+            <div class="box" id="box9">9</div>
+        </li>
+        <li>
+            <div class="btn"><a href="javascript:void(0)" id="textShadow">textShadow</a></div>
+            <div class="box" id="box10">10</div>
+        </li>
+    </ul>
 </div>
 
 <script type="text/javascript" src="../build/easy.js"></script>
 <script type="text/javascript">
 E( '#show' ).on( 'click', function(){
-	E( '#box1' ).show( 'slow' );
+    E( '#box1' ).show( 'slow' );
 });
 
 E( '#hide' ).on( 'click', function(){
-	E( '#box1' ).hide( 'slow' );
+    E( '#box1' ).hide( 'slow' );
 });
 
 E( '#slideUp' ).on( 'click', function(){
-	E( '#box2' ).slideUp( 800, 'easeOutStrong' );
+    E( '#box2' ).slideUp( 800, 'easeOutStrong' );
 });
 
 E( '#slideDown' ).on( 'click', function(){
-	E( '#box2').slideDown( 800, 'easeOutStrong' );
+    E( '#box2').slideDown( 800, 'easeOutStrong' );
 });
 
 E( '#slideToggle' ).on( 'click', function(){
-	E( '#box2').slideToggle( 800, 'easeOutStrong' );
+    E( '#box2').slideToggle( 800, 'easeOutStrong' );
 });
 
 E( '#fadeIn' ).on( 'click', function(){
-	E( '#box3').fadeIn( 800 );
+    E( '#box3').fadeIn( 800 );
 });
 
 E( '#fadeOut' ).on( 'click', function(){
-	E( '#box3').fadeOut( 800 );
+    E( '#box3').fadeOut( 800 );
 });
 
 E( '#customw' ).on(  'click', function(){
-	E( '#box4').anim({
-		to : { width : '0px' }, 
-		duration : 'slow', 
-		reverse : true 
-	});
+    E( '#box4').anim({
+        to : { width : '0px' }, 
+        duration : 'slow', 
+        reverse : true 
+    });
 });
 
 E( '#customh' ).on(  'click', function(){
-	E( '#box4').anim({ 
-		to : { height : '0px' }, 
-		duration : 'slow',
-		reverse : true 
-	});
+    E( '#box4').anim({ 
+        to : { height : '0px' }, 
+        duration : 'slow',
+        reverse : true 
+    });
 });
 
-E( '#custombdw' ).on( 'click', function(){	
-	E( '#box4' ).anim({
-		to : { borderWidth : '20px 20px 20px 20px' },
-		duration : 'fast',
-		reverse : true 
-	});
+E( '#custombdw' ).on( 'click', function(){    
+    E( '#box4' ).anim({
+        to : { borderWidth : '20px 20px 20px 20px' },
+        duration : 'fast',
+        reverse : true 
+    });
 });
 
 E( '#customfz' ).on(  'click', function(){
-	E( '#box4' ).anim({
-		to : { fontSize : '56px' },
-		reverse : true 
-	});
+    E( '#box4' ).anim({
+        to : { fontSize : '56px' },
+        reverse : true 
+    });
 });
 
 E( '#customc' ).on(  'click', function(){
-	E( '#box5').anim({
-		to : {
-			backgroundColor : '#028fc4',
-			color : '#000',
-			borderTopColor : '#2c2c2c',
-			borderRightColor : '#2c2c2c',
-			borderBottomColor : '#2c2c2c',
-			borderLeftColor : '#2c2c2c' 
-		},
-		duration : 2000
-	});
+    E( '#box5').anim({
+        to : {
+            backgroundColor : '#028fc4',
+            color : '#000',
+            borderTopColor : '#2c2c2c',
+            borderRightColor : '#2c2c2c',
+            borderBottomColor : '#2c2c2c',
+            borderLeftColor : '#2c2c2c' 
+        },
+        duration : 2000
+    });
 });
 
 E( '#customleft' ).on(  'click', function(){
-	E( '#box6').anim({
-		to : { left : '860px' }, 
-		duration : 1000, 
-		easing : 'bounce' 
-	});
+    E( '#box6').anim({
+        to : { left : '860px' }, 
+        duration : 1000, 
+        easing : 'bounce' 
+    });
 });
 
 E( '#queue' ).on(  'click', function(){
-	E( '#box7' ).anim({ to : { left : '860px' }, duration : 'slow' })
-		.anim({ to : { backgroundColor : '#46CA3B' }, duration : 'slow' })
-		.delay( 1000 )
-		.anim({ to : { left : '430px' }, duration : 'slow' })
-		.slideUp()
-		.slideDown()
-		.anim({  to : { backgroundColor : '#028fc4' }, duration : 1200 })
-		.delay( 500 )
-		.anim({ to : { left : '0px' }, duration : 500 })
-		.anim({ to : { backgroundColor : '#2c2c2c' }, duration : 800 });
+    E( '#box7' ).anim({ to : { left : '860px' }, duration : 'slow' })
+        .anim({ to : { backgroundColor : '#46CA3B' }, duration : 'slow' })
+        .delay( 1000 )
+        .anim({ to : { left : '430px' }, duration : 'slow' })
+        .slideUp()
+        .slideDown()
+        .anim({  to : { backgroundColor : '#028fc4' }, duration : 1200 })
+        .delay( 500 )
+        .anim({ to : { left : '0px' }, duration : 500 })
+        .anim({ to : { backgroundColor : '#2c2c2c' }, duration : 800 });
 });
 
 E( '#stop1' ).on(  'click', function(){
-	E( '#box7' ).stop();
+    E( '#box7' ).stop();
 });
 
 E( '#stop2' ).on(  'click', function(){
-	E( '#box7' ).stop( false, true );
+    E( '#box7' ).stop( false, true );
 });
 
 E( '#stop3' ).on(  'click', function(){
-	E( '#box7' ).stop( true, false );
+    E( '#box7' ).stop( true, false );
 });
 
 E( '#stop4' ).on(  'click', function(){
-	E( '#box7' ).stop( true, true );
+    E( '#box7' ).stop( true, true );
 });
 
 E( '#backgroudPosition' ).on( 'click', function(){
-	E( '#box8' ).anim({
-		to : { backgroundPosition : '-10px -10px' }, 
-		duration : 6000, 
-		easing : 'easeOut' 
-	});
+    E( '#box8' ).anim({
+        to : { backgroundPosition : '-10px -10px' }, 
+        duration : 6000, 
+        easing : 'easeOut' 
+    });
 });
 
-E( '#borderRadius' ).on( 'click', function(){	
-	E( '#box9' ).anim({
-		to : { borderRadius : '50% 50% 50% 50%' },
-		duration : 'slow'
-	});
+E( '#borderRadius' ).on( 'click', function(){    
+    E( '#box9' ).anim({
+        to : { borderRadius : '50% 50% 50% 50%' },
+        duration : 'slow'
+    });
 });
 
-E( '#textShadow' ).on( 'click', function(){	
-	E( '#box10' ).anim({ 
-		to : { textShadow : '#fff 0px 0px 1px' }, 
-		complete : function(){
-			E( this ).css( 'color', '#fff' );
-		}
-	});
+E( '#textShadow' ).on( 'click', function(){    
+    E( '#box10' ).anim({ 
+        to : { textShadow : '#fff 0px 0px 1px' }, 
+        complete : function(){
+            E( this ).css( 'color', '#fff' );
+        }
+    });
 });
 </script>
 </body>
