@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.4.2</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.5.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -46,7 +46,7 @@
 				</dl>
 				<div class="params_desc">
 					<span class="type required">必需</span>
-					<p>需要卸载的事件类型，多个事件类型可以用空格隔开，这样就可以卸载多个事件类型的所有的事件处理函数。</p>
+					<p>需要卸载的事件类型，多个事件类型可以用空格隔开，这样就可以卸载多个事件类型的所有的事件处理函数。如果包含了命名空间，将只卸载指定的事件。</p>
 				</div>
 			</li>
 			<li>
@@ -171,6 +171,31 @@ demoList1.on( 'click', 'li', function(){
 		</div>	
 		<p><a href="javascript:;" id="runDemo7" class="btn">卸载</a></p>			
 	</div>
+    
+	<div class="example_box">
+		<h5>例子4</h5>
+		<p>给 div 元素绑定两个 click 事件，其中一个包含了事件命名空间。</p>
+		<div class="demo_box">
+			<div id="box3">box3 点击运行触发事件</div>	
+		</div>
+		<div class="code_box">
+			<pre>&lt;div id="box3"&gt;box3 点击运行触发事件&lt;/div&gt;</pre>
+		</div>	
+		<div class="code_box">
+		<pre>E( '#box3' ).on( 'click.test1', function(){
+        alert( 'hello1' );
+    })
+    .on( 'click', function(){
+        alert( 'hello2' );
+    });</pre>
+		</div>	
+		<p><a href="javascript:;" id="runDemo8" class="btn">绑定</a></p>
+		<p>卸载第一个事件处理函数，在有有命名空间的情况下，可以不传指定的函数名。</p>
+		<div class="code_box">
+			<pre>E( '#box3' ).un( 'click.test1' );</pre>
+		</div>		
+		<p><a href="javascript:;" id="runDemo9" class="btn">卸载</a></p>
+	</div>
 	
 </div>
 
@@ -227,6 +252,22 @@ E.use( 'event', function(){
 	
 	E( '#runDemo7' ).one( 'click', function( e ){
 		E( '#demoList1' ).un( 'click', 'li' );
+	});
+    	
+	E( '#runDemo8' ).one( 'click', function( e ){
+	
+		E( '#box3' ).on( 'click.test1', function(){
+                alert( 'hello1' );
+            })
+            .on( 'click', function(){
+                alert( 'hello2' );
+            });
+		
+		e.preventDefault();
+	});
+	
+	E( '#runDemo9' ).one( 'click', function( e ){
+		E( '#box3' ).un( 'click.test1' );
 	});
 		
 });	

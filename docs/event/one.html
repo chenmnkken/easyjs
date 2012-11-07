@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.4.2</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.5.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -46,7 +46,9 @@
 				</dl>
 				<div class="params_desc">
 					<span class="type required">必需</span>
-					<p>事件类型，不仅仅是原生的事件类型，也可以是自定义的事件类型，自定义事件类型可以使用 <a href="fire.html">fire</a> 来触发。可以是多个事件类型，多个时的参数使用空格隔开，多个事件类型共享一个事件处理函数。</p>
+					<p>事件类型，不仅仅是原生的事件类型，也可以是自定义的事件类型，自定义事件类型可以使用 <a href="fire.html">fire</a> 来触发。可以是多个事件类型，多个时的参数使用空格隔开，多个事件类型共享一个事件处理函数。<br>
+                    支持事件命名空间，比如 click.custom，click 是事件类型，custom 就是命名空间，事件命名空间对于卸载事件和触发事件很有用。
+                    </p>
 				</div>
 			</li>
 			<li>

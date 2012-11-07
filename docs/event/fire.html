@@ -12,7 +12,7 @@
 		<h2 class="sub_logo">.js</h2>
 	</div>
 
-	<h3 class="page_title">Docs<span class="ver">Version : 0.4.2</span></h3>
+	<h3 class="page_title">Docs<span class="ver">Version : 0.5.0</span></h3>
 	
 		<ul class="menu_left">
 		<li><a href="../index.html">速查表</a></li>
@@ -46,7 +46,7 @@
 				</dl>
 				<div class="params_desc">
 					<span class="type required">必需</span>
-					<p>触发的事件类型。</p>
+					<p>触发的事件类型。如果包含了命名空间，将只触发指定的事件。</p>
 				</div>
 			</li>
 		</ul>
@@ -82,6 +82,30 @@ box.fire( 'tick' );</pre>
 		</div>	
 		<p><a href="javascript:;" id="runDemo1" class="btn">运行</a></p>		
 	</div>
+    
+	<div class="example_box">
+		<h5>例子2</h5>
+		<p>给 div 元素绑定两个自定义事件，然后使用 fire 来触发其中一个事件。</p>
+		<div class="demo_box">
+			<div id="box2">box2</div>	
+		</div>
+		<div class="code_box">
+			<pre>&lt;div id="box2"&gt;box2&lt;/div&gt;</pre>
+		</div>	
+		<div class="code_box">
+			<pre>var box = E( '#box2' );
+		
+box.on( 'tick.custom', function(){
+        alert( 'tick1' );
+    })
+    .on( 'tick', function(){
+        alert( 'tick2' );
+    });
+
+box.fire( 'tick.custom' );</pre>
+		</div>	
+		<p><a href="javascript:;" id="runDemo2" class="btn">运行</a></p>		
+	</div>
 	
 </div>
 
@@ -101,6 +125,21 @@ E.use( 'event', function(){
 		
 		e.preventDefault();
 	});
+    
+ 	E( '#runDemo2' ).one( 'click', function( e ){
+		var box = E( '#box2' );
+		
+		box.on( 'tick.custom', function(){
+                alert( 'tick1' );
+            })
+            .on( 'tick', function(){
+                alert( 'tick2' );
+            });
+		
+		box.fire( 'tick.custom' );
+		
+		e.preventDefault();
+	});   
 		
 });	
 </script>	

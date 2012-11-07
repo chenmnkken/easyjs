@@ -38,38 +38,45 @@ if( !E.support.mouseEnter ){
 	}, function( name, type ){		
 		specialEvent[ name ] = {
 		
-			setup : function( elem, fn, _, extraData ){				
-				var specialName = 'special_' + type,				
+			setup : function( options ){				
+				var specialName = 'special_' + type,
+                    originalHandle = options.handle,
 					handle = function( e ){
 						var relatedTarget = e.relatedTarget;
 						// 通过判断relatedTarget不为绑定事件元素的子元素来实现模拟
 						if( this !== relatedTarget && !E.contains(this, relatedTarget) ){
 							// 修正模拟事件的一些Event属性
 							e.type = name;
-							// 执行真正的回调
-							fn.call( this, e );
+							// 执行真正的事件处理器
+							originalHandle.call( this, e );
 						}				
 					};
+                
+                // mouseenter和mouseleave不能使用事件代理
+                delete options.selector;                
+                options.dataName = options.type = type;
+                options.handle = handle;                
 
-				return elem.forEach(function(){
+				options.elems.forEach(function(){
 					var special = easyEvent.data( this, specialName, [] );
-
 					// 将2个事件处理器存到缓存中，以便卸载
 					special.push({
-						originalHandle : fn,
+						originalHandle : originalHandle,
 						handle : handle
 					});
-					
-					E( this ).on( type, extraData, handle );
 				});
+                
+                easyEvent.addEvent( options );
 			},
 
-			teardown : function( elem, fn ){
-				return elem.un( type, fn );
+			teardown : function( options ){
+                options.dataName = options.type = type;
+				easyEvent.removeEvent( options );
 			},
 			
-			trigger : function( elem ){
-				return elem.fire( type );
+			trigger : function( elem, namespace ){
+                type += ( namespace ? '.' + namespace : '' );
+				elem.fire( type );
 			}
 		};
 		
@@ -85,20 +92,22 @@ if( !E.support.focusin ){
 	}, function( name, type ){		
 		specialEvent[ name ] = {
 			
-			setup : function( elem, fn, selector, extraData ){
-				easyEvent.addEvent( elem, selector, type, type, extraData, fn, true );
-				return elem;
+			setup : function( options ){
+                options.capture = true;
+                options.dataName = options.type = type;
+				easyEvent.addEvent( options );
 			},
 			
-			teardown : function( elem, fn ){
-				easyEvent.removeEvent( elem, type, type, fn, true );
-				return elem;
+			teardown : function( options ){
+                options.capture = true;
+                options.dataName = options.type = type;
+				easyEvent.removeEvent( options );
 			},
 			
-			trigger : function( elem ){
-				return elem.fire( type );
-			}
-			
+			trigger : function( elem, namespace ){
+                type += ( namespace ? '.' + namespace : '' );
+				elem.fire( type );
+			}			
 		};	
 	});
 }
@@ -107,8 +116,27 @@ if( !E.support.focusin ){
 if( !isECMAEvent ){
 	specialEvent.change = {
 		
-		setup : function( elem, fn, selector, extraData ){
-			return elem.forEach(function(){
+		setup : function( options ){
+            var extraData = options.extraData,
+                selector = options.selector,
+                namespace = options.namespace,
+                cType = 'change',
+                bType = 'beforeactivate',
+                eventData = {
+                    handle : options.handle 
+                };                      
+                
+            if( namespace ){
+                cType += ( '.' + namespace );
+                bType += ( '.' + namespace );
+                eventData.namespace = namespace;
+            }
+
+            if( extraData ){
+                eventData.extraData = extraData;
+            }
+        
+			options.elems.forEach(function(){
 				var self = E( this );
 				
 				if( rFormElems.test(this.tagName) ){
@@ -117,44 +145,46 @@ if( !isECMAEvent ){
 						var name = 'special_change',
 							handles = easyEvent.data( this, name, [] );
 							
-						handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );						
+						handles.push( eventData );						
 						// 利用propertychange和click事件来模拟change事件
 						// 因为无法重复触发该事件，所以只能绑定一次该事件
 						// 一个或多个事件处理器添加到数组中，依次执行
 						if( handles.length === 1 ){							
 							self.on( 'propertychange', function( e ){
-								// 触发propertychange的时候给元素一个已触发的属性来标记
-								if( e.originalEvent.propertyName === 'checked' ){
-									this.__changed__ = true;
-								}								
-							}).on( 'click', function( e ){
-								// 根据触发propertychange的标记来判定是否执行事件
-								if( this.__changed__ ){					
-									e.type = 'change';
-									this.__changed__ = false;
-									
-									for( var i = 0, j, result, len = handles.length; i < len; i++ ){
-										j = handles[i] ? i : i - 1;
-										result = handles[j];
-										
-										// 将缓存的附加数据添加到event对象中
-										if( result.extraData ){
-											e.extraData = result.extraData;
-										}
-										// 附加数据不能共享以确保不冲突
-										else{
-											delete e.extraData;
-										}										
-										
-										result.handle.call( this, e );
-									}
-								}
-							});
+                                    // 触发propertychange的时候给元素一个已触发的属性来标记
+                                    if( e.originalEvent.propertyName === 'checked' ){
+                                        this.__changed__ = true;
+                                    }								
+                                })
+                                .on( 'click', function( e ){
+                                    // 根据触发propertychange的标记来判定是否执行事件
+                                    if( this.__changed__ ){					
+                                        e.type = 'change';
+                                        this.__changed__ = false;
+                                        
+                                        for( var i = 0, j, result, len = handles.length; i < len; i++ ){
+                                            j = handles[i] ? i : i - 1;
+                                            result = handles[j];
+                                            
+                                            // 将缓存的附加数据添加到event对象中
+                                            if( result.extraData ){
+                                                e.extraData = result.extraData;
+                                            }
+                                            // 附加数据不能共享以确保不冲突
+                                            else{
+                                                delete e.extraData;
+                                            }										
+                                            
+                                            result.handle.call( this, e );
+                                        }
+                                    }
+                                });
 						}
 					}
 					// 其他类型的表单元素无需模拟即可触发
 					else{
-						easyEvent.addEvent( self, selector, 'change', 'change', extraData, fn );
+                        options.elems = self;
+						easyEvent.addEvent( options );
 					}					
 				}
 				// 非表单元素也可以绑定change事件，其表单子元素可以触发该事件，类似于原生的事件代理
@@ -163,85 +193,102 @@ if( !isECMAEvent ){
 						specialName = 'special_beforeactivate',
 						subscriber = easyEvent.data( this, subscriberName, [] ),
 						special = easyEvent.data( this, specialName, [] ),
-						handle;
-
-					handle = function( e ){
-						var target = e.target,
-							i = 0,
-							handles, name;
-							
-						if( rFormElems.test(target.tagName) ){
-							name = rInputCheck.test(target.type) ? 'special_change' : 'change';
-							handles = easyEvent.data( target, name );
-							// 确保该子元素只绑定一次change事件
-							if( !handles ){								
-								E( target ).on( 'change', extraData, fn );									
-								// 只要绑定过事件都将该子元素添加到缓存中
-								subscriber[ subscriber.length++ ] = target;								
-								// 缓存正确的currentTarget元素
-								easyEvent.data( target, 'currentTarget', e.currentTarget );
-							}
-							// 不同的事件处理器将添加到数组中
-							else{
-								for( ; i < handles.length; i++ ){
-									if( handles[i].handle === fn ){
-										return;
-									}
-								}
-								
-								handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );	
-							}							
-						}
-					};
+                        originalHandle = options.handle,
+                        handle = function( e ){
+                            var target = e.target,
+                                i = 0,
+                                handles, name;
+                                
+                            if( rFormElems.test(target.tagName) ){
+                                name = rInputCheck.test(target.type) ? 'special_change' : 'change';
+                                handles = easyEvent.data( target, name );
+                                // 确保该子元素只绑定一次change事件
+                                if( !handles ){								
+                                    E( target ).on( cType, extraData, originalHandle );									
+                                    // 只要绑定过事件都将该子元素添加到缓存中
+                                    subscriber[ subscriber.length++ ] = target;								
+                                    // 缓存正确的currentTarget元素
+                                    easyEvent.data( target, 'currentTarget', e.currentTarget );
+                                }
+                                // 不同的事件处理器将添加到数组中
+                                else{
+                                    for( ; i < handles.length; i++ ){
+                                        if( handles[i].handle === originalHandle ){
+                                            return;
+                                        }
+                                    }
+                                    
+                                    handles.push( eventData );	
+                                }							
+                            }
+                        };
 				
 					// 将2个事件处理器存到缓存中，以便卸载
 					special.push({
-						originalHandle : fn,
+						originalHandle : originalHandle,
 						handle : handle
 					});
 
-					self.on( 'beforeactivate', selector, handle );
+					self.on( bType, selector, handle );
 				}
 			});	
 		},
 
-		teardown : function( elem, fn, selector ){
-			return elem.forEach(function(){
+		teardown : function( options ){
+            var handle = options.handle,
+                selector = options.selector,
+                namespace = options.namespace,
+                cType = 'change',
+                bType = 'beforeactivate';
+                
+            if( namespace ){
+                cType += ( '.' + namespace );
+                bType += ( '.' + namespace );
+            } 
+                
+			options.elems.forEach(function(){
 				var self = E( this ),
-					handles, subscriber, name, dataName, i, len;
+					handles, subscriber, name, dataName, result, i, len;
 				
 				if( rFormElems.test(this.tagName) ){						
 					if( rInputCheck.test(this.type) ){
 						name = 'special_change';						
 						handles = easyEvent.data( this, name );
-						if( !handles ){
-							return;
-						}
+                        
+						if( handles ){
 						
-						if( fn ){
-							for( i = 0, len = handles.length; i < len; i++ ){
-								if( handles[i].handle === fn ){
-									handles.splice( i, 1 );
-									break;
-								}
-							}
-						}
-						
-						if( !fn || !handles.length ){
-							self.un( 'propertychange' ).un( 'click' );
-							easyEvent.removeData( this, name );
-							easyEvent.removeData( this, 'currentTarget' );
-							// 移除用于判定是否触发过propertychange事件的属性
-							try{
-								delete this.__changed__;
-							}
-							catch( _ ){
-								this.removeAttribute( '__changed__' );
-							}
-						}						
+                            if( handle || namespace ){
+                                for( i = 0, len = handles.length; i < len; i++ ){
+                                    result = handles[i];
+                                    
+                                    if( (!namespace || result.namespace === namespace) && 
+                                        (!handle || result.handle === handle) ){
+                                        
+                                        handles.splice( i, 1 );
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if( !handle && !namespace || !handles.length ){
+                                self.un( 'propertychange click' );
+                                easyEvent.removeData( this, name );
+                                easyEvent.removeData( this, 'currentTarget' );
+                                
+                                // 移除用于判定是否触发过propertychange事件的属性
+                                try{
+                                    delete this.__changed__;
+                                }
+                                catch( _ ){
+                                    this.removeAttribute( '__changed__' );
+                                }
+                            }
+                        }
 					}
 					else{
-						easyEvent.removeEvent( self, 'change', 'change', fn );
+                        options.elems = self;
+						easyEvent.removeEvent( options );
+                        
 						if( !easyEvent.data(this, 'change') ){
 							easyEvent.removeData( this, 'currentTarget' );
 						}
@@ -250,15 +297,15 @@ if( !isECMAEvent ){
 				else{
 					name = 'subscriber_change';
 					dataName = 'beforeactivate';
-
+                    
 					// 从缓存中取出绑定过change事件的子元素
 					subscriber = easyEvent.data( this, name );
-					self.un( 'beforeactivate', selector, fn );
+					self.un( bType, selector, handle );
 					
 					if( subscriber ){
 						// 卸载子元素的change事件
 						for( i = 0, len = subscriber.length; i < len; i++ ){
-							E( subscriber[i] ).un( 'change', fn );													
+							E( subscriber[i] ).un( cType, handle );													
 						}
 						
 						if( E.isString(selector) ){
@@ -305,18 +352,16 @@ Event.prototype = {
 		this.isDefaultPrevented = true;
 		var e = this.originalEvent;
 		
-		if( !e ){
-			return;
-		}
-		
-		// DOM LV2
-		if( e.preventDefault ){
-			e.preventDefault();
-		}
-		// IE6-8
-		else{
-			e.returnValue = false;
-		}
+		if( e ){		
+            // DOM LV2
+            if( e.preventDefault ){
+                e.preventDefault();
+            }
+            // IE6-8
+            else{
+                e.returnValue = false;
+            }
+        }
 	},
 	
 	// 模拟DOM LV2阻止事件冒泡的方法
@@ -325,17 +370,15 @@ Event.prototype = {
 		this.isPropagationStopped = true;
 		var e = this.originalEvent;
 		
-		if( !e ){
-			return;
-		}
-		
-		// DOM LV2
-		if( e.stopPropagation ){
-			e.stopPropagation();
-		}
+		if( e ){		
+            // DOM LV2
+            if( e.stopPropagation ){
+                e.stopPropagation();
+            }
 
-		// IE6-8
-		e.cancelBubble = true;
+            // IE6-8
+            e.cancelBubble = true;
+        }
 	},
 	
 	// 模拟DOM LV3阻止同类型事件冒泡的方法
@@ -367,29 +410,43 @@ var easyEvent = {
 	
 	/*	
 	 * 绑定事件的内部方法
-	 * @param { easyJS Object } 
-	 * @param { String } 事件代理的选择器
-	 * @param { String } 事件类型
-	 * @param { String } 缓存事件处理器的key
-	 * @param { Function } 事件处理器
-	 * @param { Boolean } 是否捕获
+	 * @param { Object } 参数集合 
+	 * elems : easyJS Object
+	 * selector : 事件代理的选择器
+	 * type : 事件类型
+	 * dataName : 缓存事件处理器的key
+	 * handle : 事件处理器
+	 * capture : 是否捕获
+	 * extraData : 附加数据
+     * namespace : 命名空间
 	 */
-	addEvent : function( elems, selector, type, dataName, extraData, fn, capture ){
-		capture = capture || false;
-		var len = elems.length,
-			i = 0,
-			handles, eventHandle, elem;
-			
-		if( !isECMAEvent ){
-			type = 'on' + type;
-		}
+	addEvent : function( options ){        
+        var capture = options.capture === undefined ? false : options.capture,
+            type = ( isECMAEvent ? '' : 'on' ) + options.type,
+            selector = options.selector,
+            dataName = options.dataName,
+            elems = options.elems,
+            len = elems.length,
+            i = 0,
+            handles, eventHandle, elem,
+            eventData = {
+                handle : options.handle 
+            };
 
+        if( options.namespace ){
+            eventData.namespace = options.namespace;
+        }
+        
+        if( options.extraData ){
+            eventData.extraData = options.extraData;
+        }
+			
 		for( ; i < len; i++ ){
 			elem = elems[i];
 			handles = this.data( elem, dataName, [] );
 			
 			// 将事件处理器添加到缓存的数组中，待统一执行
-			handles.push( extraData ? { handle : fn, extraData : extraData } : { handle : fn } );
+			handles.push( eventData );
 			
 			// 确保该元素只绑定一次同类型的事件
 			if( handles.length === 1 ){
@@ -405,71 +462,68 @@ var easyEvent = {
 	
 	/*	
 	 * 卸载事件的内部方法
-	 * @param { easyJS Object } 
-	 * @param { String } 事件代理的选择器
-	 * @param { String } 事件类型
-	 * @param { String } 缓存事件处理器的key
-	 * @param { Function } 事件处理器
-	 * @param { Boolean } 是否捕获
+	 * @param { Object } 参数集合 参数解说同addEvent
 	 */
-	removeEvent : function( elems, type, dataName, fn, capture ){
-		capture = capture || false;
-		var	i = 0,
-			j = 1,
-			len = elems.length,
+	removeEvent : function( options ){
+        var capture = options.capture === undefined ? false : options.capture,
+            type = ( isECMAEvent ? '' : 'on' ) + options.type,            
+            namespace = options.namespace,
+            dataName = options.dataName,
+            handle = options.handle,
+            elems = options.elems,
+            len = elems.length,                        
 			nameArr = dataName.split( '_' ),
 			// specialName的命名规则是 'special_' + 原生的事件类型
 			// dataName有可能带有选择器的的前缀
-			specialName = 'special_' + nameArr[ nameArr.length - 1 ],				
-			handles, specialHandles, specialHandle, hLen, elem;
-			
-		if( !isECMAEvent ){
-			type = 'on' + type;
-		}
-	
+			specialName = 'special_' + nameArr[ nameArr.length - 1 ],            
+            i = 0,
+			handles, result, specialHandles, specialHandle, hLen, elem, j;
+
 		for( ; i < len; i++ ){
 			elem = elems[i];
 			handles = this.data( elem, dataName );	
 			
-			if( !handles ){
-				return;
-			}
-			
-			hLen = handles.length;
-			specialHandles = this.data( elem, specialName );
-			
-			// 卸载指定的事件处理器
-			if( fn ){
-				for( ; j < hLen; j++ ){					
-					if( specialHandles ){
-						specialHandle = specialHandles[ j - 1 ];
-						if( specialHandle.originalHandle === fn ){
-							fn = specialHandle.handle;
-						}
-					}
-				
-					if( handles[j].handle === fn ){
-						handles.splice( j, 1 );
-						if( specialHandles ){
-							specialHandles.splice( j - 1, 1 );
-						}
-						break;
-					}
-				}
-			}			
-			
-			// 卸载所有的事件处理器
-			if( !fn || handles.length === 1 ){
-				// 卸载统一的事件器
-				elem[ REMOVEEVENT ]( type, handles[0], capture );
-				
-				// 删除缓存中的该事件类型的所有数据
-				this.removeData( elem, dataName );
-				
-				if( specialHandles ){
-					this.removeData( elem, specialName );
-				}
-			}
+			if( handles ){
+                hLen = handles.length;
+                specialHandles = this.data( elem, specialName );
+                
+                // 卸载指定的事件处理器
+                if( handle || namespace ){
+                    for( j = 1; j < hLen; j++ ){
+                        result = handles[j];
+                        
+                        if( specialHandles ){
+                            specialHandle = specialHandles[ j - 1 ];
+                            if( specialHandle.originalHandle === handle ){
+                                handle = specialHandle.handle;
+                            }
+                        }
+                        
+                        if( (!namespace || result.namespace === namespace) && 
+                            (!handle || result.handle === handle) ){
+                            
+                            handles.splice( j, 1 );
+                            if( specialHandles ){
+                                specialHandles.splice( j - 1, 1 );
+                            }
+                            break;
+                        }
+                    }
+                }			
+                
+                // 没有指定函数名或只剩下一个【统一的事件处理器】将卸载所有的事件处理器
+                if( !handle && !namespace || handles.length === 1 ){
+                    // 卸载统一的事件处理器
+                    elem[ REMOVEEVENT ]( type, handles[0], capture );
+                    
+                    // 删除缓存中的该事件类型的所有数据
+                    this.removeData( elem, dataName );
+                    
+                    if( specialHandles ){
+                        this.removeData( elem, specialName );
+                    }
+                }
+            }
 		}			
 	},
 	
@@ -478,30 +532,44 @@ var easyEvent = {
 	 * @param { HTMLElement } 
 	 * @param { String } 事件类型
 	 * @param { Array } 事件处理器的数组
+	 * @param { String } 命名空间
 	 */	
-	fireEvent : function( elem, type, handles ){
-		var handles = handles || this.data( elem, type ),
-			event, parent, isPropagationStopped;
-			
-		if( !handles ){
-			return;
-		}			
-		// 修正Event对象
-		event = {
-			target : elem,
-			currentTarget : elem,
-			type : type,			
-			stopPropagation : function(){
-				isPropagationStopped = true;
-			}
-		};
-		
-		handles[0].call( elem, event );
-		parent = elem.parentNode;
-		// 模拟事件冒泡
-		if( parent && !isPropagationStopped ){
-			this.fireEvent( parent, type );
-		}
+	fireEvent : function( elem, type, handles, namespace ){
+        handles = handles || this.data( elem, type );
+        
+		var i = 1,
+			len, event, parent, result, isPropagationStopped;
+            
+        if( handles ){
+            // 修正Event对象
+            event = {
+                target : elem,
+                currentTarget : elem,
+                type : type,			
+                stopPropagation : function(){
+                    isPropagationStopped = true;
+                }
+            };
+            
+            if( !namespace ){
+                handles[0].handle.call( elem, event );
+            }
+            else{
+                len = handles.length;
+                for( ; i < len; i++ ){
+                    result = handles[i];
+                    if( result.namespace === namespace ){
+                        result.handle.call( elem, event );
+                    }
+                }
+            }
+            
+            parent = elem.parentNode;
+            // 模拟事件冒泡
+            if( parent && !isPropagationStopped ){
+                this.fireEvent( parent, type, null, namespace );
+            }
+        }
 	},
 		
 	/*	
@@ -639,7 +707,7 @@ var easyEvent = {
 	},
 	
 	/*	
-	 * 生成一个统一的事件处理方法，来依次执行该元素绑定的所有事件处理器
+	 * 生成一个统一的事件处理器，来依次执行该元素绑定的所有事件处理器
 	 * @param { HTMLElement } 
 	 * @param { String/Function } 事件代理的选择器或事件处理器(若为事件处理器将不予理会) 
 	 * @return { Function }
@@ -652,7 +720,7 @@ var easyEvent = {
 				isDelegate = false,
 				type = event.type,
 				target = elem,
-				name = type,
+				dataName = type,
 				i = 1,
 				handles, len, j, filter, result;
 			
@@ -667,7 +735,8 @@ var easyEvent = {
 				filter = easyEvent.delegateFilter;	
 				// 事件代理时将 this 指向 event.target，否则默认指向 elem
 				target = orginalTarget;
-				name = selector + '_' + type;
+                // 选择器 + 事件类型的方式来区分事件代理
+				dataName = selector + '_' + type;
 				
 				for( ; target !== elem; target = target.parentNode || elem ){
 					if( filter(target, selector) ){
@@ -678,33 +747,31 @@ var easyEvent = {
 			}
 
 			if( !selector || isDelegate ){
-				handles = easyEvent.data( elem, name );	
+				handles = easyEvent.data( elem, dataName );	
 				
-				if( !handles ){
-					return;
-				}
-				
-				len = handles.length;
+				if( handles ){				
+                    len = handles.length;
 
-				for( ; i < len; i++ ){
-					// 针对只执行一次即卸载的事件的特殊处理
-					j = handles[i] ? i : i - 1;
-					result = handles[j];
+                    for( ; i < len; i++ ){
+                        // 针对只执行一次即卸载的事件的特殊处理
+                        j = handles[i] ? i : i - 1;
+                        result = handles[j];
 
-					// 将缓存的附加数据添加到event对象中
-					if( result.extraData ){
-						event.extraData = result.extraData;
-					}
-					// 附加数据不能共享以确保不冲突
-					else{
-						delete event.extraData;
-					}
-					
-					if( result.handle.call(target, event) === false ){
-						event.preventDefault();
-						event.stopPropagation();
-					}
-				}
+                        // 将缓存的附加数据添加到event对象中
+                        if( result.extraData ){
+                            event.extraData = result.extraData;
+                        }
+                        // 附加数据不能共享以确保不冲突
+                        else{
+                            delete event.extraData;
+                        }
+                        
+                        if( result.handle.call(target, event) === false ){
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    }
+                }
 			}
 		};
 	}
@@ -722,23 +789,22 @@ E.each({
 			len = types.length,
 			isOn = key === 'on',
 			isOne = isOn && one === true,
+            options = {},
 			i = 0,
-			special, name, originalFn;
-			
+			special, dataName, originalFn;
+
 		if( len === 1 ){
-			type = fixEventType[ types[0] ] || types[0];
+			type = fixEventType[ types[0] ] || types[0];            
+            types = type.split( '.' );
+            type = types[0];
+            options.namespace = types[1];            
 			special = specialEvent[ type ];
-			name = type;
+			dataName = type;
 		}
 		// 多个事件类型循环绑定或卸载
 		else{
 			for( ; i < len; i++ ){
-				if( isOne ){
-					this.one( types[i], selector, extraData, fn );
-				}
-				else{
-					this[ key ]( types[i], selector, extraData, fn );
-				}	
+				this[ isOne ? 'one' : key ]( types[i], selector, extraData, fn );
 			}
 			return this;
 		}
@@ -758,7 +824,7 @@ E.each({
 				else if( E.isString(selector) ){				
 					fn = extraData;
 					// 事件代理时缓存的name格式为：选择器 + '_' + 事件类型 => '.demo_click'
-					name = selector + '_' + type;
+					dataName = selector + '_' + type;
 					extraData = null;
 				}
 			}			
@@ -770,7 +836,7 @@ E.each({
 			}
 		}
 		else if( E.isString(selector) ){
-			name = selector + '_' + type;
+			dataName = selector + '_' + type;
 		}
 
 		// one方法的实现，执行真正的事件处理器前先卸载该事件
@@ -781,21 +847,24 @@ E.each({
 				originalFn.call( this, e );
 			};
 		}
+        
+        E.mix( options, {
+            elems : this,
+            type : type,
+            handle : fn,
+            dataName : dataName,
+            selector : selector,
+            extraData : extraData            
+        });
 		
 		// 特殊事件的绑定和卸载分支
 		if( special && special[val] ){
-			return special[ val ]( this, fn, selector, extraData );
-		}	
-		
-		// 绑定
-		if( isOn ){			
-			easyEvent.addEvent( this, selector, type, name, extraData, fn );
+			special[ val ]( options );
 		}
-		// 卸载
-		else{
-			easyEvent.removeEvent( this, type, name, fn );	
-		}
-		
+        else{
+            easyEvent[ isOn ? 'addEvent' : 'removeEvent' ]( options );
+        }		
+        
 		return this;
 	};	
 	
@@ -805,39 +874,50 @@ E.mix( E.prototype, {
 
 	fire : function( type ){
 		type = fixEventType[ type ] || type;
-		var	special = specialEvent[ type ];
-		
+		var types = type.split( '.' ),
+            namespace = types[1],
+            special;
+           
+		type = types[0];
+        special = specialEvent[ type ];
+        
 		if( special && special.trigger ){
-			return special.trigger( this );
+			special.trigger( this, namespace );
+            return this;
 		}
 		
 		return this.forEach(function(){
 			var handles = easyEvent.data( this, type ),
 				event;
 				
-			if( !handles ){
-				return;
-			}
-				
-			// DOM LV2
-			if( document.createEvent ){
-				event = document.createEvent( 'HTMLEvents' );
-				// initEvent接受3个参数：事件类型，是否冒泡，是否阻止浏览器的默认行为
-				event.initEvent( type, true, true );
-				this.dispatchEvent( event );
-			}
-			// IE6-8
-			else{
-				event = document.createEventObject();
-				// 原生的fireEvent方法无法触发自定义事件
-				try{
-					this.fireEvent( 'on' + type, event );
-				}
-				catch( _ ){
-					event = null;
-					easyEvent.fireEvent( this, type, handles );
-				}
-			}
+			if( handles ){
+                // 无事件命名空间将采用原生的事件触发器
+                if( !namespace ){
+                    // DOM LV2
+                    if( document.createEvent ){
+                        event = document.createEvent( 'HTMLEvents' );
+                        // initEvent接受3个参数：事件类型，是否冒泡，是否阻止浏览器的默认行为
+                        event.initEvent( type, true, true );
+                        this.dispatchEvent( event );
+                    }
+                    // IE6-8
+                    else{
+                        event = document.createEventObject();
+                        // 原生的fireEvent方法无法触发自定义事件
+                        try{
+                            this.fireEvent( 'on' + type, event );
+                        }
+                        catch( _ ){
+                            event = null;
+                            easyEvent.fireEvent( this, type, handles );
+                        }
+                    }
+                }
+                // 有事件命名空间将模拟触发
+                else{
+                    easyEvent.fireEvent( this, type, handles, namespace );
+                }
+            }
 		});
 	},
 	
