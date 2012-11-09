@@ -712,4 +712,4 @@ if( uaMatch.browser ){
 
 window.easyJS = window.E = easyJS;
 
-})( window, undefined );
+})( window );
