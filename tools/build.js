@@ -47,7 +47,7 @@ require( './combo' ).combo({
                          
         // 设置版本号
         content = content.replace( /@version@/, version );
-        return copyright + content + '\n})( window, undefined );';
+        return copyright + content + '\n})( window );';
     }
 });
 

@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-11-9 17:59:42
+* Date : 2012-11-9 18:11:7
 */
 
 // ---------------------------------------------
@@ -6767,4 +6767,4 @@ E.mix( E.prototype, {
 
 
 
-})( window, undefined );
+})( window );
