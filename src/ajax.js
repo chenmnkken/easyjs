@@ -6,7 +6,7 @@ define( 'ajax', [ 'node', 'attr' ], function(){
 
 'use strict';
 
-var    rInput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,    
+var rInput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,    
     rLocalProtocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/,
     rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/,
     rHeaders = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg,
