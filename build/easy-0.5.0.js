@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-11-9 18:19:21
+* Date : 2012-11-10 23:42:52
 */
 
 // ---------------------------------------------
@@ -5905,7 +5905,7 @@ E.each({
  
 
 
-var    rInput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,    
+var rInput = /^(?:color|date|datetime|datetime-local|email|hidden|month|number|password|range|search|tel|text|time|url|week)$/i,    
     rLocalProtocol = /^(?:about|app|app\-storage|.+\-extension|file|res|widget):$/,
     rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+))?)?/,
     rHeaders = /^(.*?):[ \t]*([^\r\n]*)\r?$/mg,

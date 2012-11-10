@@ -15,10 +15,27 @@ var combo = function( options ){
     var fs = require( 'fs' ),
         names = options.names.split( ' ' ),
         isUTF8 = options.encoding.to === '',
+		output = options.output,
+		outputPath = output.slice( 0, output.lastIndexOf('/') ),
         paths = [],
         contents = '',
         content;
-    
+		
+	// 删除build文件夹下原来的所有文件
+	fs.readdirSync( outputPath ).forEach(function( file ){
+		var path = outputPath + '/' + file;
+		
+		try{
+			fs.unlinkSync( path );
+			console.log( 'Delete the[' + path + '] success' );
+		}
+		catch( error ){
+			console.log( 'Delete file ' + error );
+		}
+	});
+
+	console.log( '======================================' );
+	    
     // 计算 paths 
     names.forEach(function( name ){
         paths.push( options.path + name + '.js' );
@@ -31,7 +48,7 @@ var combo = function( options ){
             content = fs.readFileSync( path, options.encoding );
         }
         catch( error ){
-            console.log( 'Combo error : ' + error );
+            console.log( 'Read file ' + error );
         }
         
         // utf-8 编码格式的文件可能会有 BOM 头，需要去掉
@@ -57,13 +74,13 @@ var combo = function( options ){
     console.log( '======================================\n' +
     'All of [' + paths.length + '] files combo success.\n' +
     '======================================' );
-    
+	    
     // 写入文件
     try{
-        fs.writeFileSync( options.output, contents, options.encoding );
+        fs.writeFileSync( output, contents, options.encoding );
     }
     catch( error ){
-        console.log( 'Output ' + (error ? 'error :' + error : 'the [' + options.output + '] success.') );
+        console.log( 'Output ' + (error ? 'error :' + error : 'the [' + output + '] success.') );
     }
 };
 

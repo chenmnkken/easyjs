@@ -54,7 +54,7 @@ require( './combo' ).combo({
 // 压缩
 require( './compress' ).compress({
     compilerPath : '../../compiler.jar',
-    input : '../build/easy.js',
+    input : '../build/easy-' + version + '.js',
     output : '../build/easy-' + version + '.min.js',
     callback : function( content ){
         return '/* easy.js v' + version + ' | '+ licenses + ' | ' + timeStamp + ' */\n' + content;
