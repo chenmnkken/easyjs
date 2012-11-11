@@ -80,7 +80,7 @@ var combo = function( options ){
         fs.writeFileSync( output, contents, options.encoding );
     }
     catch( error ){
-        console.log( 'Output ' + (error ? 'error :' + error : 'the [' + output + '] success.') );
+        console.log( 'Output file ' + error );
     }
 };
 
