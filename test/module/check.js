@@ -44,6 +44,8 @@ define( 'check', function(){
             }
             
             this.writeResult( this.name, this.endTime, this.error );
+            
+            return this;
         },
         
         like : function( result ){
@@ -106,6 +108,10 @@ define( 'check', function(){
 
             if( errorCount ){
                 box.appendChild( errorList );
+                box.className += ' error_box';
+            }
+            else{
+                box.className += ' success_box';
             }
         }
         
