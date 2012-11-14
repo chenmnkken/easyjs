@@ -198,8 +198,7 @@ easySelector.finder = {
     },
     
     // class选择器
-    CLASS : function( selector, context ){
-        
+    CLASS : function( selector, context ){        
         var elems = [],
             index = selector.indexOf( '.' ),
             tagName = selector.substring( 0, index ) || '*',

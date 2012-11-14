@@ -7,8 +7,8 @@ define( 'support', function(){
 'use strict';
 
 var support = function(){
-    var    div = document.createElement( 'div' ),
-        button,    input, select, option, testCloneEvent, event;        
+    var div = document.createElement( 'div' ),
+        button, input, select, option, testCloneEvent;        
         
     div.innerHTML = '<link/><table></table><input type="checkbox" /><button value="testValue">click</button>';
     input = div.getElementsByTagName( 'input' )[0];
@@ -18,7 +18,7 @@ var support = function(){
     
     var fireEvent = function( elem, type ){
         if( document.createEvent ){
-            event = document.createEvent( 'HTMLEvents' );
+            var event = document.createEvent( 'HTMLEvents' );
             event.initEvent( type, true, true );
             elem.dispatchEvent( event );
         }
