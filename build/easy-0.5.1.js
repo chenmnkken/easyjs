@@ -1,11 +1,11 @@
 /*
-* easy.js v0.5.0
+* easy.js v0.5.1
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-11-14 10:7:2
+* Date : 2012-11-14 16:3:54
 */
 
 // ---------------------------------------------
@@ -233,7 +233,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.5.0',
+    version : '0.5.1',
     
     __uuid__ : 2,
     
@@ -4228,13 +4228,13 @@ var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles canc
     rMousewheel = /^(?:DOMMouseScroll|mousewheel)$/,
     
     fixEventType = {},
-    specialEvent = {},
+    eventHooks = {},
     
     isECMAEvent = !!document.addEventListener,    
 
     ADDEVENT = isECMAEvent ? 'addEventListener' : 'attachEvent',
     REMOVEEVENT = isECMAEvent ? 'removeEventListener' : 'detachEvent';
-        
+    
 // 唯独firefox不支持mousewheel鼠标滚轮事件，其它浏览器都支持    
 if( E.browser.firefox ){
     fixEventType.mousewheel = 'DOMMouseScroll';
@@ -4247,7 +4247,7 @@ if( !E.support.mouseEnter ){
         mouseenter : 'mouseover',
         mouseleave : 'mouseout'        
     }, function( name, type ){        
-        specialEvent[ name ] = {
+        eventHooks[ name ] = {
         
             setup : function( options ){                
                 var specialName = 'special_' + type,
@@ -4301,7 +4301,7 @@ if( !E.support.focusin ){
         focusin : 'focus',
         focusout : 'blur'        
     }, function( name, type ){        
-        specialEvent[ name ] = {
+        eventHooks[ name ] = {
             
             setup : function( options ){
                 options.capture = true;
@@ -4325,7 +4325,7 @@ if( !E.support.focusin ){
 
 // IE6-8不支持radio、checkbox的change事件，要实现代理也得模拟
 if( !isECMAEvent ){
-    specialEvent.change = {
+    eventHooks.change = {
         
         setup : function( options ){
             var extraData = options.extraData,
@@ -5009,7 +5009,7 @@ E.each({
             types = type.split( '.' );
             type = types[0];
             options.namespace = types[1];            
-            special = specialEvent[ type ];
+            special = eventHooks[ type ];
             dataName = type;
         }
         // 多个事件类型循环绑定或卸载
@@ -5090,7 +5090,7 @@ E.mix( E.prototype, {
             special;
            
         type = types[0];
-        special = specialEvent[ type ];
+        special = eventHooks[ type ];
         
         if( special && special.trigger ){
             special.trigger( this, namespace );
@@ -5153,7 +5153,7 @@ var rUnit = /^[-\d.]+/,
     sin = Math.sin,
     PI = Math.PI,
     BACK_CONST = 1.70158,
-    specialAnim = {};
+    animHooks = {};
     
 // 精挑细选过的tween(缓动)函数
 E.easing = {
@@ -5246,7 +5246,7 @@ E.easing = {
     }
 };
 
-specialAnim = {
+animHooks = {
     
     backgroundPosition : {        
         parse : function( val ){
@@ -5314,7 +5314,7 @@ specialAnim = {
 // 方位值简写格式的动画：padding:10px 10px 10px 10px;
 [ 'padding', 'margin', 'borderWidth', 'borderRadius' ].forEach(function( name ){
     
-    specialAnim[ name ] = {
+    animHooks[ name ] = {
         parse : function( val ){
             val = val.match( rOtherVals );
             return {
@@ -5344,7 +5344,7 @@ specialAnim = {
 // 颜色属性值的动画
 [ 'color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor' ].forEach(function( name ){
 
-    specialAnim[ name ] = {        
+    animHooks[ name ] = {        
         parse : function( val ){
             val = easyStyle.parseColor( val ).match( rColorVals );
             return {
@@ -5475,7 +5475,7 @@ var easyAnim = {
      * { val : 属性值, unit : 单位, compute : 计算方法, set : 设置方法 }
      */
     parseStyle : function( prop, value ){
-        var special = specialAnim[ prop ],
+        var special = animHooks[ prop ],
             val, unit, obj, compute, set;
 
         if( special ){
@@ -5563,7 +5563,7 @@ var Anim = function( elem, duration, easing, complete, type ){
 Anim.prototype = {
     
     /*
-      * 开始动画
+     * 开始动画
      * @param { Object } 动画开始时的属性值
      * @param { Object } 动画结束时的属性值
      * @param { Number } 动画属性的个数
@@ -5938,7 +5938,7 @@ ajaxLocParts = ajaxLocation.toLowerCase().match( rUrl ) || [];
 isLocal = rLocalProtocol.test( ajaxLocParts[1] );
 
 // 默认的参数
-var    ajaxOptions = {
+var ajaxOptions = {
     type : 'GET',
     contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
     async : true,

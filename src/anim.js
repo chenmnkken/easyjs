@@ -14,7 +14,7 @@ var rUnit = /^[-\d.]+/,
     sin = Math.sin,
     PI = Math.PI,
     BACK_CONST = 1.70158,
-    specialAnim = {};
+    animHooks = {};
     
 // 精挑细选过的tween(缓动)函数
 E.easing = {
@@ -107,7 +107,7 @@ E.easing = {
     }
 };
 
-specialAnim = {
+animHooks = {
     
     backgroundPosition : {        
         parse : function( val ){
@@ -175,7 +175,7 @@ specialAnim = {
 // 方位值简写格式的动画：padding:10px 10px 10px 10px;
 [ 'padding', 'margin', 'borderWidth', 'borderRadius' ].forEach(function( name ){
     
-    specialAnim[ name ] = {
+    animHooks[ name ] = {
         parse : function( val ){
             val = val.match( rOtherVals );
             return {
@@ -205,7 +205,7 @@ specialAnim = {
 // 颜色属性值的动画
 [ 'color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor' ].forEach(function( name ){
 
-    specialAnim[ name ] = {        
+    animHooks[ name ] = {        
         parse : function( val ){
             val = easyStyle.parseColor( val ).match( rColorVals );
             return {
@@ -336,7 +336,7 @@ var easyAnim = {
      * { val : 属性值, unit : 单位, compute : 计算方法, set : 设置方法 }
      */
     parseStyle : function( prop, value ){
-        var special = specialAnim[ prop ],
+        var special = animHooks[ prop ],
             val, unit, obj, compute, set;
 
         if( special ){
@@ -424,7 +424,7 @@ var Anim = function( elem, duration, easing, complete, type ){
 Anim.prototype = {
     
     /*
-      * 开始动画
+     * 开始动画
      * @param { Object } 动画开始时的属性值
      * @param { Object } 动画结束时的属性值
      * @param { Number } 动画属性的个数

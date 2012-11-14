@@ -40,7 +40,7 @@ ajaxLocParts = ajaxLocation.toLowerCase().match( rUrl ) || [];
 isLocal = rLocalProtocol.test( ajaxLocParts[1] );
 
 // 默认的参数
-var    ajaxOptions = {
+var ajaxOptions = {
     type : 'GET',
     contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
     async : true,

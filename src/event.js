@@ -17,13 +17,13 @@ var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles canc
     rMousewheel = /^(?:DOMMouseScroll|mousewheel)$/,
     
     fixEventType = {},
-    specialEvent = {},
+    eventHooks = {},
     
     isECMAEvent = !!document.addEventListener,    
 
     ADDEVENT = isECMAEvent ? 'addEventListener' : 'attachEvent',
     REMOVEEVENT = isECMAEvent ? 'removeEventListener' : 'detachEvent';
-        
+    
 // 唯独firefox不支持mousewheel鼠标滚轮事件，其它浏览器都支持    
 if( E.browser.firefox ){
     fixEventType.mousewheel = 'DOMMouseScroll';
@@ -36,7 +36,7 @@ if( !E.support.mouseEnter ){
         mouseenter : 'mouseover',
         mouseleave : 'mouseout'        
     }, function( name, type ){        
-        specialEvent[ name ] = {
+        eventHooks[ name ] = {
         
             setup : function( options ){                
                 var specialName = 'special_' + type,
@@ -90,7 +90,7 @@ if( !E.support.focusin ){
         focusin : 'focus',
         focusout : 'blur'        
     }, function( name, type ){        
-        specialEvent[ name ] = {
+        eventHooks[ name ] = {
             
             setup : function( options ){
                 options.capture = true;
@@ -114,7 +114,7 @@ if( !E.support.focusin ){
 
 // IE6-8不支持radio、checkbox的change事件，要实现代理也得模拟
 if( !isECMAEvent ){
-    specialEvent.change = {
+    eventHooks.change = {
         
         setup : function( options ){
             var extraData = options.extraData,
@@ -798,7 +798,7 @@ E.each({
             types = type.split( '.' );
             type = types[0];
             options.namespace = types[1];            
-            special = specialEvent[ type ];
+            special = eventHooks[ type ];
             dataName = type;
         }
         // 多个事件类型循环绑定或卸载
@@ -879,7 +879,7 @@ E.mix( E.prototype, {
             special;
            
         type = types[0];
-        special = specialEvent[ type ];
+        special = eventHooks[ type ];
         
         if( special && special.trigger ){
             special.trigger( this, namespace );
