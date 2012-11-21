@@ -1,11 +1,11 @@
 /*
-* easy.js v0.5.1
+* easy.js v0.5.2
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-11-14 16:3:54
+* Date : 2012-11-21 16:52:44
 */
 
 // ---------------------------------------------
@@ -233,7 +233,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.5.1',
+    version : '0.5.2',
     
     __uuid__ : 2,
     
@@ -6118,7 +6118,7 @@ var easyAjax = {
             options.type = 'GET';
             
             if( options.crossDomain ){
-                var jsonpCallback = options.jsonpCallback || E.euid + '_' + Date.now(),
+                var jsonpCallback = options.jsonpCallback || E.euid + '_' + Date.now() + (++E.__uuid__),
                     replace = '$1' + jsonpCallback + '$2',
                     response;
                     
@@ -6133,28 +6133,26 @@ var easyAjax = {
                 
                 // 无缓存时添加时间戳
                 options.url += options.cache ? '' : '&_=' + Date.now();
+                options.converters.script = {};
+                options.dataTypes = [ 'script', 'json' ];
+                options.dataType = 'script';   
             
                 // 全局回调函数
-                window[ jsonpCallback ] = function( r ){
-                    response = r;
+                window[ jsonpCallback ] = function( r ){                    
+                    options.converters.script.json = function(){
+                        if( !r ){
+                            throw( 'not call jsonpCallback : ' + jsonpCallback );
+                        }
+                        return r;            
+                    };
+                    
                     // 执行完回调即删除该回调
                     try{
                         window[ jsonpCallback ] = null;
                         delete window[ jsonpCallback ];
                     }
-                    catch(_){}
-                };
-                
-                options.converters.script = {};
-                options.converters.script.json = function(){
-                    if( !response ){
-                        throw( ' not call jsonpCallback : ' + jsonpCallback );
-                    }
-                    return response;            
-                };
-                
-                options.dataTypes = [ 'script', 'json' ];
-                options.dataType = 'script';        
+                    catch(_){}                   
+                };         
             }
             else{
                 options.dataType = 'json';
@@ -6244,12 +6242,14 @@ var transports = {
 
         send : function( options, fire, easyXHR, headers ){
             var self = this,
-                xhr = self.xhr = options.xhr(),
-                i;
-                
-            self.easyXHR = easyXHR;
-            self.options = options;
-            self.fire = fire;
+                xhr = options.xhr(),
+                i,
+                params = {                
+                    easyXHR : easyXHR,
+                    options : options,
+                    fire : fire,
+                    xhr : xhr
+                };
     
             if( options.crossDomain && !('withCredentials' in xhr) ){
                 return;
@@ -6293,24 +6293,24 @@ var transports = {
             
             // 回调
             if( !options.async ){
-                self.callback();
+                self.callback( null, false, params );
             }
             else if( xhr.readyState === 4 ){
                 setTimeout(function(){
-                    self.callback();
+                    self.callback( null, false, params );
                 }, 0 );
             }
             else{
                 xhr.onreadystatechange = function(){
-                    self.callback();
+                    self.callback( null, false, params );
                 }    
             }
         },
         
-        callback : function( event, isAbort ){
+        callback : function( _, isAbort, params ){
             try{
-                var xhr = this.xhr,
-                    easyXHR = this.easyXHR,
+                var xhr = params.xhr,
+                    easyXHR = params.easyXHR,
                     status, xml, statusText, responseHeaders;
 
                 if( isAbort || xhr.readyState === 4 ){
@@ -6335,7 +6335,7 @@ var transports = {
                         }
                         
                         easyXHR.responseText = xhr.responseText;
-                        
+
                         try{
                             statusText = xhr.statusText;
                         }
@@ -6343,7 +6343,7 @@ var transports = {
                             statusText = '';
                         }
                         
-                        if( !status && isLocal && this.options.crossDomain ){
+                        if( !status && isLocal && params.options.crossDomain ){
                             status = easyXHR.responseText ? 200 : 404;
                         }
                         else if( status === 1223 ){
@@ -6351,14 +6351,14 @@ var transports = {
                         }
                         
                         // 触发请求结束的回调
-                        this.fire( status, statusText, responseHeaders );
+                        params.fire( status, statusText, responseHeaders );
                     }
                 }    
             }
             catch( firefoxAccessException ){
                 xhr.onreadystatechange = E.noop;
                 if ( !isAbort ){
-                    this.fire( -1, firefoxAccessException, responseHeaders );
+                    params.fire( -1, firefoxAccessException, responseHeaders );
                 }
             }
         }        
@@ -6366,14 +6366,19 @@ var transports = {
     
     // script和jsonp使用的传送器
     script : {        
+    
         send : function( options, fire ){
             var self = this,
-                script = self.script = document.createElement( 'script' ),
-                head = self.head = document.head || 
+                script = document.createElement( 'script' ),
+                head = document.head || 
                     document.getElementsByTagName( 'head' )[0] || 
-                    document.documentElement;
+                    document.documentElement,
                     
-            self.fire = fire;
+                params = {
+                    script : script,
+                    head : head,
+                    fire : fire                    
+                };
             
             script.async = 'async';
             script.src = options.url;
@@ -6384,17 +6389,17 @@ var transports = {
             
             script.onerror = script.onload = script.onreadystatechange = function( e ){
                 e = e || window.event;
-                self.callback( (e.type || 'error').toLowerCase() );
+                self.callback( (e.type || 'error').toLowerCase(), false, params );
             };
             
             // 开始加载script数据
             head.insertBefore( script, head.firstChild );            
         },
         
-        callback : function( event, isAbort ){
-            var head = this.head,
-                script = this.script,
-                fire = this.fire;
+        callback : function( event, isAbort, params ){
+            var head = params.head,
+                script = params.script,
+                fire = params.fire;
                 
             if( isAbort || 
                 !script.readyState || 
@@ -6407,8 +6412,6 @@ var transports = {
                 if( head && script.parentNode ){
                     head.removeChild( script );
                 }
-                
-                this.script = this.head = null;
 
                 // 如果没有中止请求且没有报错
                 if( !isAbort && event !== 'error' ){
@@ -6447,7 +6450,7 @@ E.mix( E, {
             // 默认使用xhr传送器
             transport = transports[dataType] || transports.xhrTransport,
             responseHeaders, responseXML, responseText, timeoutTimer, ifModifiedKey, i;
-        
+
         // 模拟的xhr对象
         var easyXHR = {
         
