@@ -2,7 +2,7 @@
 // ---------------@module ajax------------------
 // ---------------------------------------------
  
-define( 'ajax', [ 'node', 'attr' ], function(){
+define( 'ajax', [ 'node', 'attr', 'promise' ], function(){
 
 'use strict';
 
@@ -220,7 +220,7 @@ var easyAjax = {
             options.type = 'GET';
             
             if( options.crossDomain ){
-                var jsonpCallback = options.jsonpCallback || E.euid + '_' + Date.now() + (++E.__uuid__),
+                var jsonpCallback = options.jsonpCallback || E.guid(),
                     replace = '$1' + jsonpCallback + '$2',
                     response;
                     
@@ -538,19 +538,21 @@ E.mix( E, {
         
             // 合并配置参数和默认参数
         var o = easyAjax.mergeOptions( options ),
-            dataType = o.dataType,
-            contentType = o.contentType,
-            accepts = o.accepts,        
-            context = o.context,
+			contentType = o.contentType,			
+			responseHeadersString = '',		
+			promise = new E.Promise(),
+            dataType = o.dataType,            
+            accepts = o.accepts,
+			requestHeaders = {},	
+            context = o.context,			
             global = o.global,
-            requestHeaders = {},
-            state = 0,
-            status = 0,
-            statusText = '',        
-            responseHeadersString = '',
+			statusText = '',
+			status = 0, 
+            state = 0,                 
             // 实例化传送器 根据dataType来判断使用合适的传送器
             // 默认使用xhr传送器
             transport = transports[dataType] || transports.xhrTransport,
+			
             responseHeaders, responseXML, responseText, timeoutTimer, ifModifiedKey, i;
 
         // 模拟的xhr对象
@@ -658,12 +660,14 @@ E.mix( E, {
             }            
 
             easyXHR.status = status;
-            easyXHR.statusText = statusText;
-            
+            easyXHR.statusText = statusText;            
             responseHeadersString = headers || '';
-    
+			// 将模拟的xhr对象合并到promise实例中	
+			E.mix( promise, easyXHR );
+			
             // 请求成功的回调
             if( isSuccess ){
+				promise.resolve([ responseData, statusText, easyXHR ]);				
                 if( o.success ){
                     o.success.call( context, responseData, statusText, easyXHR );
                 }
@@ -675,6 +679,7 @@ E.mix( E, {
             } 
             // 请求失败的回调
             else{
+				promise.reject([ statusText, easyXHR ]);
                 if( o.failure ){
                     o.failure.call( context, statusText, easyXHR );
                 }
@@ -744,9 +749,8 @@ E.mix( E, {
         }
 
         // 传送器开始发送请求
-        transport.send( o, fire, easyXHR, requestHeaders );
-        
-        return easyXHR;
+        transport.send( o, fire, easyXHR, requestHeaders );		
+        return promise;
     },
 
     getJSON: function( url, data, callback ){

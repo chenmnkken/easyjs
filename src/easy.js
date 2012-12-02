@@ -14,7 +14,8 @@ var document = window.document,
     uaMatch,
     
     rQuickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,    
-    rReadyState = /loaded|complete|undefined/,
+    rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
+    rReadyState = /loaded|complete|undefined/,    
     
     moduleCache = {},    // 模块加载时的队列数据存储对象
     modifyCache = {},    // modify的临时数据存储对象
@@ -284,7 +285,7 @@ easyJS.mix( easyJS, {
         }
         
         // 生成队列的随机属性名
-        useKey = modNames.join( '_' ) + '_' + easyJS.euid + (++easyJS.__uuid__);
+        useKey = modNames.join( '_' ) + '_' + easyJS.guid();
         // 复制模块名，在输出exports时会用到
         namesCache = namesCache.concat( modNames );
         
@@ -314,8 +315,15 @@ easyJS.mix( easyJS, {
      * @param { Object }
      */
     config : function( options ){
-        if( options.baseUrl ){
-            moduleOptions.baseUrl = options.baseUrl;
+        var baseUrl = options.baseUrl,
+            isHttp = baseUrl.slice( 0, 4 ) === 'http';
+            
+        if( isHttp ){
+            moduleOptions.baseUrl = baseUrl;
+        }
+        // 相对路径的baseUlr是基于HTML页面所在的路径(无论是http地址还是file地址)
+        else{
+            moduleOptions.baseUrl = easyModule.mergePath( baseUrl, document.location.href );
         }
         
         moduleOptions.charset = easyJS.merge( moduleOptions.charset, options.charset );
@@ -345,6 +353,49 @@ var easyModule = {
         scripts = script = null;
     },
     
+    mergePath : function( id, url ){
+        var isHttp = url.slice( 0, 4 ) === 'http',
+            domain = '',
+            i = 0,
+            protocol, isHttp, urlDir, idDir, dirPath, len, dir;
+
+        protocol = url.match( rProtocol )[1];
+        url = url.slice( protocol.length );
+        
+        // HTTP协议的路径含有域名
+        if( isHttp ){
+            domain = url.slice( 0, url.indexOf('/') + 1 );
+            url = url.slice( domain.length );
+        }
+        
+        // 组装基础路径的目录数组
+        urlDir = url.split( '/' );
+        urlDir.pop();
+        
+        // 组装模块标识的目录数组
+        idDir = id.split( '/' );
+        idDir.pop();    
+        len = idDir.length;
+        
+        for( ; i < len; i++ ){
+            dir = idDir[i];
+            // 模块标识的目录数组中含有../则基础路径的目录数组删除最后一个目录
+            // 否则直接将模块标识的目录数组的元素添加到基础路径的目录数组中        
+            if( dir === '..' ){
+                urlDir.pop();
+            }
+            else if( dir !== '.' ){
+                urlDir.push( dir );
+            }
+        }
+
+        // 基础路径的目录数组转换成目录字符串
+        dirPath = urlDir.join( '/' );    
+        // 无目录的情况不用加斜杠
+        dirPath = dirPath === '' ? '' : dirPath + '/';        
+        return protocol + domain + dirPath;
+    },
+    
     /*
      * 解析模块标识，返回模块名和模块路径
      * @parmm { String } 模块标识
@@ -354,46 +405,31 @@ var easyModule = {
      * 解析规则：
      * baseUrl = http://easyjs.org/js/                                
      * http://example.com/test.js => [ test, http://example.com/test.js ]
+     *                  style.css => [ test, http://easyjs.org/js/style.css ]
      *                   ajax/xhr => [ xhr, http://easyjs.org/js/ajax/xhr.js ]
      *                    ../core => [ core, http://easyjs.org/core.js ]
+     *                    test.js => [ test, http://easyjs.org/js/test.js ]
      *                       test => [ test, http://easyjs.org/js/test.js ]
+     *          test.js?v20121202 => [ test, http://easyjs.org/js/test.js?v20121202 ]
      * =====================================================================
      */
     parseModId : function( id, url ){
-        var modName = id,
-            isCSS = id.slice( -4 ) === '.css',
-            suffix = isCSS ? '.css' : '.js',
-            modUrl, startIndex, endIndex, href, dLen, hLen;
-            
-        if( ~id.indexOf('/') ){
-            startIndex = id.lastIndexOf( '/' ) + 1;
-            endIndex = ~id.indexOf( suffix ) ? id.lastIndexOf( suffix ) : id.length;
-            
-            modName = id.slice( startIndex, endIndex );
-        }    
-            
-        if( id.slice(0, 4) === 'http' ){
-            modUrl = id;
-        }    
-        else if( id.charAt( 0 ) === '.' ){
-            url = url.match( /([\w:]+\/\/)(.+)/ );
-            href = url[2].split( '/' );
-            hLen = href.length - 2;
-            dLen = id.match( /\.\.\//g ).length;
-            dLen = dLen > hLen ? hLen : dLen;
-            href.splice( href.length - dLen - 1, dLen );
-            id = id.replace( /(\.\.\/)+/, '' );
-
-            modUrl = url[1] + href.join( '/' ) + id + ( isCSS ? '' : '.js' );
-        }
-        else{
-            if( isCSS && !~id.indexOf('/') ){
-                modName = id.slice( 0, -4 ); 
-            }
-            
-            modUrl = url + id + ( isCSS ? '' : '.js' );
+        var rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/,    
+            isAbsoluteId = rProtocol.test( id ),        
+            result = id.match( rModId ),
+            modName = result[1],
+            suffix = result[2] || '.js',
+            search = result[3] || '',
+            baseUrl, modUrl;
+        
+        // 模块标识为绝对路径时，标识就是基础路径
+        if( isAbsoluteId ){
+            url = id;
+            id = '';
         }
 
+        baseUrl = easyModule.mergePath( id, url );
+        modUrl = baseUrl + modName + suffix + search;
         return [ modName, modUrl ];
     },
     

@@ -1,4 +1,4 @@
-var version = '0.5.2',
+var version = '0.6.0',
     licenses = 'MIT and GPL Licenses',
     rDefine = /define\(.+\r\n/,
     date = new Date(),
@@ -12,7 +12,7 @@ var version = '0.5.2',
 // 合并        
 require( './combo' ).combo({
     path : '../src/',
-    names : 'easy lang-patch lang support data selector node attr css event anim ajax',
+    names : 'easy lang-patch lang support data selector node attr css event promise anim ajax',
     output : '../build/easy-' + version + '.js',
     format : function( content ){
         if( rDefine.test(content) ){

@@ -6,7 +6,7 @@ define( 'lang', Array.isArray ? null : 'lang-patch', function(){
 
 'use strict';
     
-var    rValidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,    
+var rValidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,    
     rValidescape = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,    
     rValidbraces = /(?:^|:|,)(?:\s*\[)+/g,
     rSelectForm = /^(?:select|form)$/i,
