@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-12-2 22:44:12
+* Date : 2012-12-2 23:19:4
 */
 
 // ---------------------------------------------
@@ -363,6 +363,7 @@ var easyModule = {
         scripts = script = null;
     },
     
+    // 将模块标识(相对路径)和基础路径合并成新的真正的模块路径(不含模块的文件名)
     mergePath : function( id, url ){
         var isHttp = url.slice( 0, 4 ) === 'http',
             domain = '',

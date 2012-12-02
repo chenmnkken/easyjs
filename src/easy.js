@@ -353,6 +353,7 @@ var easyModule = {
         scripts = script = null;
     },
     
+    // 将模块标识(相对路径)和基础路径合并成新的真正的模块路径(不含模块的文件名)
     mergePath : function( id, url ){
         var isHttp = url.slice( 0, 4 ) === 'http',
             domain = '',
