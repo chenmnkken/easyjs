@@ -14,7 +14,7 @@ var combo = function( options ){
     
     var fs = require( 'fs' ),
         names = options.names.split( ' ' ),
-        isUTF8 = options.encoding.to === '',
+        isUTF8 = options.encoding === 'UTF-8',
 		output = options.output,
 		outputPath = output.slice( 0, output.lastIndexOf('/') ),
         paths = [],
