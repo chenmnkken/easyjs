@@ -2,7 +2,7 @@
 // ---------------@module ajax------------------
 // ---------------------------------------------
  
-define( 'ajax', [ 'node', 'attr', 'promise' ], function(){
+define( 'ajax', [ 'attr', 'promise' ], function(){
 
 'use strict';
 
@@ -843,34 +843,6 @@ E.mix( E.prototype, {
         return arr;
     }
     
-});
-
-// 全局回调的原型方法拼装
-[ 'ajaxStart', 'ajaxSuccess', 'ajaxFailure', 'ajaxEnd' ].forEach(function( name ){
-    var type = name.slice( 4 ).toLowerCase();
-    E.prototype[ name ] = function( fn ){
-        var cacheData = E.cache;
-
-        // 在缓存中创建一个命名空间专用于存放ajax的全局回调函数
-        if( !cacheData.ajax ){
-            cacheData.ajax = {};
-        }
-        
-        cacheData = cacheData.ajax;
-        
-        if( !cacheData[type] ){
-            cacheData[ type ] = [];
-        }
-        
-        cacheData = cacheData[ type ];
-    
-        return this.forEach(function(){
-            var self = this;
-            cacheData.push(function( xhr, options, error ){
-                fn.call( self, xhr, options, error );
-            });
-        });        
-    };    
 });
 
 });

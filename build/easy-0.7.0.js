@@ -1,11 +1,11 @@
 /*
-* easy.js v0.6.0
+* easy.js v0.7.0
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-12-7 10:46:51
+* Date : 2012-12-22 11:51:47
 */
 
 // ---------------------------------------------
@@ -35,6 +35,7 @@ var document = window.document,
     document.documentElement,
 
     baseElem = head.getElementsByTagName( 'base' )[0],
+    modFragment = document.createDocumentFragment(),
     
     // 模块加载器的配置对象
     moduleOptions = {
@@ -43,7 +44,7 @@ var document = window.document,
     },
     
     // 浏览器判定的正则    
-    rUA = [    /ms(ie)\s(\d\.\d)/,    // IE
+    rUA = [ /ms(ie)\s(\d\.\d)/,    // IE
             /(chrome)\/(\d+\.\d+)/,    // chrome
             /(firefox)\/(\d+\.\d+)/,   // firefox 
             /version\/(\d+\.\d+)(?:\.\d)?\s(safari)/,    // safari
@@ -141,6 +142,7 @@ var document = window.document,
 
         // selector为字符串
         if( typeof selector === 'string' ){
+            selector = selector.trim();
             // selector为HTML字符串时需要转换成DOM节点
             if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' && selector.length >= 3 ){
                 context = context ? context.ownerDocument || context : document;
@@ -234,11 +236,18 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.6.0',
+    version : '0.7.0',
     
     __uuid__ : 2,
     
-    browser : {},    // 存储浏览器名和版本的相关数据
+    // 存储浏览器名和版本的相关数据
+    browser : {
+        ie : false,
+        chrome : false,
+        firefox : false,
+        safari : false,
+        opera : false
+    },    
     
     module : {},    // 模块加载器的缓存对象
     
@@ -276,13 +285,12 @@ easyJS.mix( easyJS, {
             modNames = [],
             namesCache = [],
             i = 0,
-            mod, modName, modUrl, result, useKey;        
+            mod, modName, result, useKey;        
             
         for( ; i < ids.length; i++ ){
             // 获取解析后的模块名和url
             result = easyModule.parseModId( ids[i], moduleOptions.baseUrl );
             modName = result[0];
-            modUrl = result[1];
             mod = module[ modName ];            
 
             if( !mod ){
@@ -291,7 +299,7 @@ easyJS.mix( easyJS, {
             
             // 将模块名和模块路径添加到队列中
             modNames[ modNames.length++ ] = modName;
-            modUrls[ modUrls.length++ ] = mod.url = modUrl;
+            modUrls[ modUrls.length++ ] = mod.url = result[1];
         }
         
         // 生成队列的随机属性名
@@ -301,10 +309,13 @@ easyJS.mix( easyJS, {
         
         // 添加队列
         moduleCache[ useKey ] = {
-            callback : fn,
-            names : modNames,
+            length : namesCache.length,
             namesCache : namesCache,
-            urls : modUrls
+            names : [ modNames ],
+            urls : [ modUrls ],
+            callback : fn,
+            factorys : [],            
+            deps : {}
         };
 
         // 开始加载
@@ -348,13 +359,35 @@ var easyModule = {
     
     // 初始化模块加载器时获取baseUrl(既是当前js文件加载的url)
     init : function(){
-        var scripts = document.getElementsByTagName( 'script' ),
-            // 在页面加载时，当前js文件的script标签始终是最后一个
-            script = scripts[ scripts.length - 1 ],
-            initMod = script.getAttribute( 'data-main' ),
-            url = script.hasAttribute ? script.src : script.getAttribute( 'src', 4 );
+        var i = 0,
+            script, scripts, len, initMod, url;
         
+        // firefox支持currentScript属性
+        if( document.currentScript ){
+            script = document.currentScript;
+        }
+        else{
+            scripts = document.getElementsByTagName( 'script' );
+            len = scripts.length;
+            
+            // 动态加载的script通过判断状态值来判断是否为最后一个
+            for( ; i < len; i++ ){                    
+                if( scripts[i].readyState === 'interactive' ){
+                    script = scripts[i];
+                    break;
+                }                    
+            }
+            
+            // 正常情况下，在页面加载时，当前js文件的script标签始终是最后一个
+            if( !script ){
+                script = scripts[ scripts.length - 1 ];
+            }
+        }           
+
+        initMod = script.getAttribute( 'data-main' );
+        url = script.hasAttribute ? script.src : script.getAttribute( 'src', 4 );        
         moduleOptions.baseUrl = url.slice( 0, url.lastIndexOf('/') + 1 );
+        
         // 初始化时加载data-main中的模块
         if( initMod ){
             easyJS.use( initMod );
@@ -464,47 +497,172 @@ var easyModule = {
             
             return arr;
         }
+    },    
+    
+    /*
+     * 测试该模块的依赖模块是否都已加载并执行完
+     * @param { Object } 模块对象
+     * @return { Boolean } 依赖模块是否都加载并执行完
+     */    
+    isLoaded : function( mod ){
+        var deps = mod.deps,
+            len = deps.length,
+            module = easyJS.module,
+            i = 0, depMod;
+
+        for( ; i < len; i++ ){
+            depMod = module[ deps[i] ];
+            if( depMod.status !== 4 ){
+                return false;
+            }
+        }
+        
+        return true;
     },
     
     /*
      * 触发被依赖模块的factory
      * @param { Object } 模块的缓存对象
      */    
-    fireFactory : function( mod ){
-        var toDepData = mod.toDepData,
-            module = easyJS.module,
-            i = 0,
-            result, len, args, exports, toDepMod;
+    fireFactory : function( useKey ){
+        var data = moduleCache[ useKey ],
+            factorys = data.factorys,
+            result = factorys[0],            
+            args, exports, name, toDepMod;   
             
-        if( !toDepData ){
+        if( !result ){
             return;
         }
         
-        len = toDepData.length;
-            
-        // 执行被依赖模块的factory    
-        for( ; i < len; i++ ){
-            result = toDepData[i];
-            toDepMod = module[ result.name ];
-            // 被依赖模块完成解析，但还未输出exports
-            toDepMod.status = 3;                
-            
+        name = result.name;
+        toDepMod = easyJS.module[ name ];
+        
+        if( easyModule.isLoaded(toDepMod) ){            
+            factorys.shift();
+            toDepMod.status = 3;                            
             args = easyModule.getExports( toDepMod.deps );    
             exports = result.factory.apply( null, args );
             
             if( exports !== undefined ){
-                if( modifyCache[result.name] ){
-                    exports = modifyCache[ result.name ]( exports );
-                    delete modifyCache[ result.name ];
+                if( modifyCache[name] ){
+                    exports = modifyCache[ name ]( exports );
+                    delete modifyCache[ name ];
                 }
                 // 缓存被依赖模块的exports到该模块中
                 toDepMod.exports = exports;
             }
             // 被依赖模块加载并执行完毕，exports已可用
             toDepMod.status = 4;
+            data.length--;
+            
+            if( factorys.length ){
+                easyModule.fireFactory( useKey );
+            }         
+        }     
+    },
+    
+    /*
+     * 模块加载完触发的回调函数
+     * @param{ Object } 模块对象
+     * @param{ Boolean } 是否为CSS模块
+     */
+    complete : function( mod, isCSS ){
+        var module = easyJS.module,
+            useKey = mod.useKey,
+            data = moduleCache[ useKey ],
+            i = 0,
+            j = 0,
+            namesCache, args, len;  
+            
+        delete mod.useKey;    
+            
+        if( !data ){
+            return;
+        }
+
+        // 队列没加载完将继续加载
+        if( data.urls.length ){
+            easyModule.load( useKey );
+        }
+        else if( !data.length ){
+            namesCache = data.namesCache;                        
+            len = namesCache.length;
+            args = [];
+            
+            // 如果CSS模块包含了被依赖模块的信息，将在此触发factory
+            if( isCSS ){
+                easyModule.fireFactory( useKey );
+            }
+            
+            // 合并模块的exports为arguments
+            for( ; i < len; i++ ){
+                args[ j++ ] = module[ namesCache[i] ].exports;
+            }
+            
+            // 执行use的回调
+            if( data.callback ){
+                data.callback.apply( null, args );
+            }
+            
+            // 删除队列数据
+            delete moduleCache[ useKey ];            
+        }        
+    },    
+    
+    /*
+     * 模块加载完触发的回调函数
+     * @param{ String } 模块的URL
+     * @param{ String } 模块名
+     * @param{ String } 用来访问存储在moduleCache中的数据的属性名
+     * @return { HTMLElement } 用于添加到head中来进行模块加载的元素
+     */
+    create : function( url, name, useKey ){
+        var charset = moduleOptions.charset[ name ],         
+            mod = easyJS.module[ name ],
+            script, link;
+            
+        mod.useKey = useKey;
+        mod.status = 1;
+        
+        // CSS模块的处理
+        if( ~url.indexOf('.css') ){
+            link = document.createElement( 'link' );            
+            link.rel = 'stylesheet';
+            link.href = url;
+
+            if( charset ){
+                link.charset = charset;
+            }
+            
+            link.onload = link.onerror = function(){
+                link = link.onload = link.onerror = null;
+                mod.status = 4;                
+                moduleCache[ useKey ].length--;
+                easyModule.complete( mod, true );
+            };            
+            
+            return link;
         }
         
-        delete mod.toDepData;        
+        // JS模块的处理
+        script = document.createElement( 'script' );
+        script.async = 'async';
+        script.src = url;    
+        
+        if( charset ){
+            script.charset = charset;
+        }
+        
+        script.onload = script.onerror = script.onreadystatechange = function(){
+            if( rReadyState.test(script.readyState) ){            
+                script.onload = script.onerror = script.onreadystatechange = null;
+                head.removeChild( script );
+                script = null;
+                easyModule.complete( mod );
+            }
+        };
+
+        return script;
     },
     
     /*
@@ -513,106 +671,27 @@ var easyModule = {
      */ 
     load : function( useKey ){            
         var data = moduleCache[ useKey ],
-            urls = data.urls,
-            charset = moduleOptions.charset,
-            url = urls.shift(),
-            name = data.names.shift(),
-            module = easyJS.module,
-            mod = module[ name ],
-            isCSS = url.slice( -4 ) === '.css',
-            script, link,
+            names = data.names.shift(),
+            urls = data.urls.shift(),            
+            len = urls.length,
+            i = 0,
+            elem;       
             
-            // script加载完后执行的函数
-            complete = function(){
-                // 队列没加载完将继续加载
-                if( urls.length ){
-                    easyModule.load( useKey );
-                }
-                // 所有的模块都已加载完
-                else{
-                    var namesCache = data.namesCache,                        
-                        len = namesCache.length,
-                        args = [],
-                        i = 0,
-                        j = 0;
-                    
-                    // 如果CSS模块包含了被依赖模块的信息，将在此触发factory
-                    if( isCSS ){
-                        easyModule.fireFactory( mod );
-                    }
-                    
-                    // 合并模块的exports为arguments
-                    for( ; i < len; i++ ){
-                        args[ j++ ] = module[ namesCache[i] ].exports;
-                    }
-                    
-                    // 执行use的回调
-                    if( data.callback ){
-                        data.callback.apply( null, args );
-                    }
-                    
-                    // 删除队列数据
-                    delete moduleCache[ useKey ];                    
-                }
-                
-                // 删除模块缓存中的队列属性值
-                delete mod.useKey;
-            };
-
-        // 已加载过的模块不重复加载，但如果有回调还是需要执行回调
-        if( mod.status === 4 ){
-            complete();            
-            return;
-        }
-
-        if( isCSS ){            
-            link = document.createElement( 'link' );            
-            link.rel = 'stylesheet';
-            link.href = url;
+        // 多个模块将先添加到文档碎片中然后再一次性添加到页面中    
+        if( len >  1 ){
+            for( ; i < len; i++ ){
+                modFragment.appendChild( easyModule.create(urls[i], names[i], useKey) );
+            }
+            
+            elem = modFragment;
         }
         else{
-            script = document.createElement( 'script' );
-            script.async = 'async';
-            script.src = url;
+            elem = easyModule.create( urls[0], names[0], useKey );
         }
-        
-        // 如果有配置charset则指定charset
-        if( charset[name] ){
-            if( isCSS ){
-                link.charset = charset[ name ];
-            }
-            else{
-                script.charset = charset[ name ];
-            }
-        }
-        
-        if( isCSS ){
-            link.onload = link.onerror = function(){
-                link = link.onload = link.onerror = null;
-                mod.status = 4;
-                
-                complete();
-            };
-        }
-        else{
-            script.onload = script.onerror = script.onreadystatechange = function(){
-                if( rReadyState.test(script.readyState) ){            
-                    script.onload = script.onerror = script.onreadystatechange = null;
-                    head.removeChild( script );
-                    script = null;
-
-                    complete();
-                }
-            };
-        }
-        
-        mod.useKey = useKey;
-        // 开始加载模块
-        mod.status = 1;
 
         baseElem ? 
-            head.insertBefore( script || link, head.firstChild ) : 
-            head.appendChild( script || link );
+            head.insertBefore( elem, head.firstChild ) : 
+            head.appendChild( elem );        
     }
     
 };
@@ -626,71 +705,107 @@ var easyModule = {
  */
 window.define = function( name, deps, factory ){
     var module = easyJS.module,
-        mod = module[ name ],
-        toDepData = mod.toDepData,
-        getExports = easyModule.getExports,
+        mod = module[ name ],        
+        useKey = mod.useKey,
+        data = moduleCache[ useKey ],
         modUrl = mod.url,
-        data, urls, names, baseUrl, i, j, depMod, depName, lastDepName, result, exports, toDepMod, args;
-    
-    // 存储模块依赖列表的数组
-    mod.deps = [];    
+        isRepeat = false,
+        isLoaded = true,
+        names = [],
+        urls = [],
+        insertIndex = 0,
+        pullIndex = 0,
+        factorys, baseUrl, depMod, depName, result, exports, args, depsData, repeatDepsData, i, repeatName;
+
     // 开始解析模块内容
     mod.status = 2;
+    mod.deps = [];
     
     if( typeof deps === 'function' ){
         factory = deps;
         deps = null;
-    }        
+    }
 
     // 如果有依赖模块，先加载依赖模块
     if( deps ){
         deps = typeof deps === 'string' ? [ deps ] : deps;
         // 依赖模块的baseUrl是当前模块的baseUrl
-        baseUrl = modUrl.slice( 0, modUrl.lastIndexOf('/') + 1 );
-        // 取出当前模块的队列数据
-        data = moduleCache[ mod.useKey ];
-        
-        urls = data.urls;
-        names = data.names;
+        baseUrl = modUrl.slice( 0, modUrl.lastIndexOf('/') + 1 );        
+        factorys = data.factorys;
+        depsData = data.deps[ name ] = {};
 
         // 遍历依赖模块列表，如果该依赖模块没加载过，
         // 则将该依赖模块名和模块路径添加到当前模块加载队列的数据去进行加载
-        for( i = deps.length - 1; i >= 0; i-- ){
+        for( i = 0; i < deps.length; i++ ){
             result = easyModule.parseModId( deps[i], baseUrl );
             depName = result[0]; 
             depMod = module[ depName ];
-            // 第一次遍历依赖模块时保存最后一个依赖模块的模块名
-            lastDepName = lastDepName || depName;
-            mod.deps.unshift( depName );
+            mod.deps.push( depName );            
+            depsData[ depName ] = true;
 
             if( depMod ){
-                deps.splice( i, 1 );
+                if( depMod.status !== 4 ){                
+                    // 获取第一个重复依赖的模块名，会在稍后进行factorys的顺序调整
+                    if( !isRepeat ){
+                        isRepeat = true;
+                        repeatName = depName;
+                    }
+                    isLoaded = false;    
+                }              
+                deps.splice( i--, 1 );
                 continue;
             }
             else{
                 depMod = module[ depName ] = {};
-            }
-            
-            names.unshift( depName );
-            urls.unshift( (depMod.url = result[1]) );
-        }        
+            }   
+    
+            isLoaded = false;
+            data.length++;
+            names[ names.length++ ] = depName;
+            urls[ urls.length++ ] = depMod.url = result[1];
+        }
         
-        // 将当前模块名和factory存储到最后一个依赖模块的缓存中
-        // 当最后一个依赖模块加载完毕才执行当前模块的factory
-        if( deps.length ){
-            depMod = module[ lastDepName ];
-            depMod.toDepData = toDepData || [];            
-            depMod.toDepData.unshift({ 
+        // 只要当前模块有一个依赖模块没加载完就将当前模块的factory添加到factorys中
+        if( !isLoaded ){
+            factorys.unshift({
                 name : name, 
-                factory : factory
-            });
-        }            
+                factory : factory        
+            });                    
+        
+            // 有重复依赖时将调整factorys的顺序
+            if( repeatName ){
+                repeatDepsData = data.deps[ repeatName ];
+                for( i = factorys.length - 1; i >= 0; i-- ){
+                    result = factorys[i].name;
+                    if( result === repeatName ){
+                        pullIndex = i;                         
+                        if( !repeatDepsData ){
+                            break;
+                        }
+                    }
+                    
+                    if( repeatDepsData && repeatDepsData[result] ){
+                        insertIndex = i;
+                        break;
+                    }
+                }
+
+                // 将重复模块的factory插入到该模块最后一个依赖模块的factory后
+                factorys.splice( insertIndex + 1, 0, factorys.splice(pullIndex, 1)[0] );
+                // 将当前模块的factory插入到重复模块的factory后
+                factorys.splice( insertIndex + 1, 0, factorys.shift() );
+            }
+        }
+   
+        if( names.length ){
+            data.names.unshift( names );
+            data.urls.unshift( urls );
+        }
     }
-        
-    if( !deps || !deps.length ){
+    
+    if( isLoaded ){
         // 模块解析完毕，所有的依赖模块也都加载完，但还未输出exports
-        mod.status = 3;
-        
+        mod.status = 3;        
         args = easyModule.getExports( mod.deps );    
         exports = factory.apply( null, args );
         
@@ -707,18 +822,15 @@ window.define = function( name, deps, factory ){
         
         // 当前模块加载并执行完毕，exports已可用
         mod.status = 4;
-        
-        // 触发被依赖模块的factory        
-        easyModule.fireFactory( mod );
+        data.length--;
     }
+
+    easyModule.fireFactory( useKey );
     
     // 无依赖列表将删除依赖列表的数组 
     if( !mod.deps.length ){
         delete mod.deps;
     }
-    
-    // 删除当前模块的被依赖模块的相关数据
-    delete mod.toDepData;
 };
 
 // 初始化模块加载器
@@ -734,7 +846,7 @@ uaMatch = (function(){
     for( ; i < len; i++ ){
         if( (matches = ua.match(rUA[i])) ){
             break;
-        };
+        }
     }
     
     if( !matches ){
@@ -1289,6 +1401,7 @@ E.mix( E, {
 
 
 var support = function(){
+
     var div = document.createElement( 'div' ),
         button, input, select, option, testCloneEvent;        
         
@@ -1551,7 +1664,7 @@ E.mix( E.prototype, {
  
 
 
-var    hasDuplicate = false,    // 是否有重复的DOM元素
+var hasDuplicate = false,    // 是否有重复的DOM元素
     hasParent = false,    // 是否检测重复的父元素
     baseHasDuplicate = true,    // 检测浏览器是否支持自定义的sort函数
     
@@ -6982,34 +7095,6 @@ E.mix( E.prototype, {
         return arr;
     }
     
-});
-
-// 全局回调的原型方法拼装
-[ 'ajaxStart', 'ajaxSuccess', 'ajaxFailure', 'ajaxEnd' ].forEach(function( name ){
-    var type = name.slice( 4 ).toLowerCase();
-    E.prototype[ name ] = function( fn ){
-        var cacheData = E.cache;
-
-        // 在缓存中创建一个命名空间专用于存放ajax的全局回调函数
-        if( !cacheData.ajax ){
-            cacheData.ajax = {};
-        }
-        
-        cacheData = cacheData.ajax;
-        
-        if( !cacheData[type] ){
-            cacheData[ type ] = [];
-        }
-        
-        cacheData = cacheData[ type ];
-    
-        return this.forEach(function(){
-            var self = this;
-            cacheData.push(function( xhr, options, error ){
-                fn.call( self, xhr, options, error );
-            });
-        });        
-    };    
 });
 
 

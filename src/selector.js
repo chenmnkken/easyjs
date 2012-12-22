@@ -6,7 +6,7 @@ define( 'selector', 'data', function( easyData ){
 
 'use strict';
 
-var    hasDuplicate = false,    // 是否有重复的DOM元素
+var hasDuplicate = false,    // 是否有重复的DOM元素
     hasParent = false,    // 是否检测重复的父元素
     baseHasDuplicate = true,    // 检测浏览器是否支持自定义的sort函数
     

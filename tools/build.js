@@ -1,4 +1,4 @@
-var version = '0.6.0',
+var version = '0.7.0',
     licenses = 'MIT and GPL Licenses',
     rDefine = /define\(.+\r\n/,
     date = new Date(),
@@ -35,7 +35,7 @@ require( './combo' ).combo({
         return content;
     },
     complete : function( content ){
-        var    copyright = '/*\n' +
+        var copyright = '/*\n' +
                          '* easy.js v' + version + '\n' +
                          '*\n' +
                          '* Copyright (c) 2012 Yiguo Chen\n' +

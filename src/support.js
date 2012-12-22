@@ -7,6 +7,7 @@ define( 'support', function(){
 'use strict';
 
 var support = function(){
+
     var div = document.createElement( 'div' ),
         button, input, select, option, testCloneEvent;        
         
