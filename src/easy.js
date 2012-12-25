@@ -556,7 +556,7 @@ var easyModule = {
      * @param{ Object } 模块对象
      * @param{ Boolean } 是否为CSS模块
      */
-    complete : function( mod, isCSS ){
+    complete : function( mod ){
         var module = easyJS.module,
             useKey = mod.useKey,
             data = moduleCache[ useKey ],
@@ -578,11 +578,6 @@ var easyModule = {
             namesCache = data.namesCache;                        
             len = namesCache.length;
             args = [];
-            
-            // 如果CSS模块包含了被依赖模块的信息，将在此触发factory
-            if( isCSS ){
-                easyModule.fireFactory( useKey );
-            }
             
             // 合并模块的exports为arguments
             for( ; i < len; i++ ){
@@ -628,7 +623,8 @@ var easyModule = {
                 link = link.onload = link.onerror = null;
                 mod.status = 4;                
                 moduleCache[ useKey ].length--;
-                easyModule.complete( mod, true );
+                easyModule.fireFactory( useKey );
+                easyModule.complete( mod );
             };            
             
             return link;
