@@ -1,11 +1,11 @@
 /*
-* easy.js v0.7.1
+* easy.js v0.7.2
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-12-25 18:14:25
+* Date : 2012-12-26 10:41:47
 */
 
 // ---------------------------------------------
@@ -236,9 +236,12 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.7.1',
+    version : '0.7.2',
     
     __uuid__ : 2,
+    
+    // ui组件命名空间
+    ui : {},
     
     // 存储浏览器名和版本的相关数据
     browser : {
@@ -5935,8 +5938,6 @@ Anim.prototype = {
             return;
         }    
 
-        elem.style.overflow = 'hidden';
-
         easyAnim.data( elem, 'currentAnim', this );        
         
         timer = window.setInterval(function(){
@@ -5993,9 +5994,7 @@ Anim.prototype = {
                 }
             }
             // 动画结束时还原样式
-            else{
-                style.overflow = '';
-                
+            else{                
                 if( type ){
                     if( type === 'hide' ){
                         style.display = 'none';

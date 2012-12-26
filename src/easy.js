@@ -230,6 +230,9 @@ easyJS.mix( easyJS, {
     
     __uuid__ : 2,
     
+    // ui组件命名空间
+    ui : {},
+    
     // 存储浏览器名和版本的相关数据
     browser : {
         ie : false,

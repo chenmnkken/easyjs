@@ -446,8 +446,6 @@ Anim.prototype = {
             return;
         }    
 
-        elem.style.overflow = 'hidden';
-
         easyAnim.data( elem, 'currentAnim', this );        
         
         timer = window.setInterval(function(){
@@ -504,9 +502,7 @@ Anim.prototype = {
                 }
             }
             // 动画结束时还原样式
-            else{
-                style.overflow = '';
-                
+            else{                
                 if( type ){
                     if( type === 'hide' ){
                         style.display = 'none';
