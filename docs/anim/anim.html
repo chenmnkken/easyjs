@@ -12,7 +12,7 @@
         <h2 class="sub_logo">.js</h2>
     </div>
 
-    <h3 class="page_title">Docs<span class="ver">Version : 0.7.0</span></h3>
+    <h3 class="page_title">Docs<span class="ver">Version : 0.8.0</span></h3>
     
         <ul class="menu_left">
         <li><a href="../index.html">速查表</a></li>
@@ -49,7 +49,7 @@
                     <span class="type required">必需</span>
                     <p>该参数支持简写形式和多选可配置形式。<br />
                     简单的动画，可以直接用 CSS 属性和属性值以 key/value 的形式传参( 有单位的属性值一定要带单位 )，属性名就是需要实现的动画效果，属性值就是动画的终点值。<br/>
-                    如果要自定义动画的时间，缓动效果等就可以使用多选可配置形式的参数。</p>
+                    如果要自定义动画初始值、时间、缓动效果和动画完成的回调就可以使用多选可配置形式的参数。</p>
                 </div>
             </li>
         </ul>
@@ -82,12 +82,9 @@
             </tr>
             <tr class="even">
                 <td><b class="name">duration</b></td>
-                <td><span class="type">Number | String</span></td>
+                <td><span class="type">Number</span></td>
                 <td class="t_l">
-                    <p>完成动画所需的时间，默认的时间是 400ms。支持字符串形式的属性值，也支持自定义数值的属性值，单位是 ms。</p>
-                    <p><b>fast</b>&emsp;200ms</p>
-                    <p><b>normal</b>&emsp;400ms</p>
-                    <p><b>slow</b>&emsp;600ms</p>
+                    <p>完成动画所需的时间，默认的时间是 400ms。只接受数值类型的属性值，单位是 ms。</p>
                 </td>
             </tr>
             <tr>
@@ -101,17 +98,28 @@
                 </td>
             </tr>
             <tr class="even">
+                <td><b class="name">from</b></td>
+                <td><span class="type">Object</span></td>
+                <td class="t_l">
+                    <p>动画开始时的初始样式，以 key/value 的形式传参( 有单位的属性值一定要带单位 )，属性名就是需要实现的动画效果，属性值就是动画的初始值。</p>
+                    <p>如果无该参数，动画模块会获取动画元素的默认的计算样式，有该参数，则先设置初始样式，这在某些场景下会比较有用。</p>
+                    <p>该参数还有一个很大的用处，如设置动画元素的 top 为 50%，但是在某些浏览器中获取到的默认样式却是精确的以 px 为单位的值。初始样式的单位是 px 而结束样式的单位是 %，这样进行动画必然会出错。为了确保单位相同，可以在动画开始时强制设置和结束样式相同的单位值。</p>
+                    <p>from 设置的属性名必须和 to 设置的属性名相同，如果不同则会忽略掉。</p>
+                </td>
+            </tr>
+            <tr>
                 <td><b class="name">reverse</b></td>
                 <td><span class="type">Boolean</span></td>
                 <td class="t_l">
                     <p>是否进行反向动画，反向动画就是当动画运行到终点值的时候，又反过来运行动画到开始时的状态。默认为 false。</p>
                 </td>
             </tr>
-            <tr>
+            <tr class="even">
                 <td><b class="name">to</b></td>
                 <td><span class="type">Object</span></td>
                 <td class="t_l">
-                    <p>CSS 属性和属性值，以 key/value 的形式传参( 有单位的属性值一定要带单位 )，属性名就是需要实现的动画效果，属性值就是动画的终点值。</p>
+                    <p>动画结束时的 CSS 属性和属性值，以 key/value 的形式传参( 有单位的属性值一定要带单位 )，属性名就是需要实现的动画效果，属性值就是动画的结束值。</p>
+                    <p>该参数也接受 += 和 -= 这样的传参，这样就可以完成累加或累减的动画效果。</p>
                 </td>
             </tr>            
         </tbody>
@@ -217,7 +225,7 @@
         <div class="code_box">
             <pre>E( '#box6' ).anim({
     to : { borderRadius : '50% 50% 50% 50%' },
-    duration : 'slow',
+    duration : 600,
     reverse : true
 });</pre>
         </div>    
@@ -248,10 +256,10 @@
             <div id="box8">box8</div>
         </div>        
         <div class="code_box">
-            <pre>E( '#box8' ).anim({ to : { left : '570px' }, duration : 'slow' })
-    .anim({ to : { backgroundColor : '#46CA3B' }, duration : 'slow' })
+            <pre>E( '#box8' ).anim({ to : { left : '570px' }, duration : 600 })
+    .anim({ to : { backgroundColor : '#46CA3B' }, duration : 600 })
     .delay( 1000 )
-    .anim({ to : { left : '335px' }, duration : 'slow' })
+    .anim({ to : { left : '335px' }, duration : 600 })
     .slideUp()
     .slideDown()
     .anim({  to : { backgroundColor : '#028fc4' }, duration : 1200 })
@@ -261,6 +269,67 @@
         </div>    
         <p><a href="javascript:;" id="runDemo8" class="btn">运行</a></p>        
     </div>
+    
+    <div class="example_box">
+        <h5>例子9</h5>
+        <p>使用 += 和 -= 对 div 元素的位置值进行动画。</p>
+        <div class="anim_box">
+            <div id="box9">box9</div>
+        </div>        
+        <div class="code_box">
+        <pre>var box9 = E( '#box9' ),
+    left = parseInt( box9.css('left') ),
+    distance = 570,            
+    n = 114;
+
+if( left === 0 ){
+    window.symbol = '+=';
+}        
+else if( left === distance ){
+    window.symbol = '-=';
+}
+
+box9.anim({
+    to : { left : window.symbol + n + 'px' },
+    duration : 200
+});</pre>
+        </div>    
+        <p><a href="javascript:;" id="runDemo9" class="btn">运行</a></p>        
+    </div>      
+    
+    <div class="example_box">
+        <h5>例子10</h5>
+        <p>设置动画开始时的初始样式，使其每次都从最右边往最左边进行动画。</p>
+        <div class="anim_box">
+            <div id="box10">box10</div>
+        </div>        
+        <div class="code_box">
+        <pre>E( '#box10' ).anim({ 
+    from : { left : '670px' },
+    to : { left : '0px' },
+    easing : 'bounce',
+    duration : 800
+});</pre>
+        </div>    
+        <p><a href="javascript:;" id="runDemo10" class="btn">运行</a></p>        
+    </div>  
+
+    <div class="example_box">
+        <h5>例子11</h5>
+        <p>设置动画开始时的初始样式，并使用百分比为单位进行动画。</p>
+        <div class="anim_box">
+            <div id="box11">box11</div>
+        </div>        
+        <div class="code_box">
+        <pre>E( '#box11' ).anim({ 
+    from : { left : '0%' },
+    to : { left : '50%' },
+    easing : 'swingTo',
+    duration : 800
+});</pre>
+        </div>    
+        <p><a href="javascript:;" id="runDemo11" class="btn">运行</a></p>        
+    </div>       
     
 </div>
 
@@ -280,7 +349,7 @@ E.use( ['event', 'anim'], function(){
         });
     });
     
-    E( '#runDemo3' ).on( 'click', function( e ){
+    E( '#runDemo3' ).one( 'click', function( e ){
         E( '#box3' ).anim({ 
             to : { left : '570px' },
             easing : 'bounce',
@@ -313,7 +382,7 @@ E.use( ['event', 'anim'], function(){
     E( '#runDemo6' ).on( 'click', function(){    
         E( '#box6' ).anim({
             to : { borderRadius : '50% 50% 50% 50%' },
-            duration : 'slow',
+            duration : 600,
             reverse : true
         });
     });
@@ -328,10 +397,10 @@ E.use( ['event', 'anim'], function(){
     });
     
     E( '#runDemo8' ).on( 'click', function(){    
-        E( '#box8' ).anim({ to : { left : '570px' }, duration : 'slow' })
-            .anim({ to : { backgroundColor : '#46CA3B' }, duration : 'slow' })
+        E( '#box8' ).anim({ to : { left : '570px' }, duration : 600 })
+            .anim({ to : { backgroundColor : '#46CA3B' }, duration : 600 })
             .delay( 1000 )
-            .anim({ to : { left : '285px' }, duration : 'slow' })
+            .anim({ to : { left : '285px' }, duration : 600 })
             .slideUp()
             .slideDown()
             .anim({  to : { backgroundColor : '#028fc4' }, duration : 1200 })
@@ -340,6 +409,43 @@ E.use( ['event', 'anim'], function(){
             .anim({ to : { backgroundColor : '#2c2c2c' }, duration : 800 });
     });
         
+        
+    E( '#runDemo9' ).on( 'click', function(){
+        var box9 = E( '#box9' ),
+            left = parseInt( box9.css('left') ),
+            distance = 570,            
+            n = 114;
+
+        if( left === 0 ){
+            window.symbol = '+=';
+        }        
+        else if( left === distance ){
+            window.symbol = '-=';
+        }
+        
+        box9.anim({
+            to : { left : window.symbol + n + 'px' },
+            duration : 200
+        });
+    });   
+
+    E( '#runDemo10' ).on( 'click', function( e ){
+        E( '#box10' ).anim({ 
+            from : { left : '670px' },
+            to : { left : '0px' },
+            easing : 'bounce',
+            duration : 800
+        });
+    });    
+    
+    E( '#runDemo11' ).on( 'click', function( e ){
+        E( '#box11' ).anim({ 
+            from : { left : '0%' },
+            to : { left : '50%' },
+            easing : 'swingTo',
+            duration : 800
+        });
+    }); 
 });    
 </script>    
 

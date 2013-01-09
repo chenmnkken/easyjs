@@ -509,12 +509,12 @@ var easyEvent = {
                             break;
                         }
                     }
-                }            
+                }
                 
                 // 没有指定函数名或只剩下一个【统一的事件处理器】将卸载所有的事件处理器
                 if( !handle && !namespace || handles.length === 1 ){
                     // 卸载统一的事件处理器
-                    elem[ REMOVEEVENT ]( type, handles[0], capture );
+                    elem[ REMOVEEVENT ]( type, handles[0].handle, capture );
                     
                     // 删除缓存中的该事件类型的所有数据
                     this.removeData( elem, dataName );

@@ -1,11 +1,11 @@
 /*
-* easy.js v0.7.2
+* easy.js v0.8.0
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2012-12-26 10:41:47
+* Date : 2013-1-9 9:36:41
 */
 
 // ---------------------------------------------
@@ -236,7 +236,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.7.2',
+    version : '0.8.0',
     
     __uuid__ : 2,
     
@@ -1635,6 +1635,13 @@ var easyData = {
 E.mix( E.prototype, {
 
     data : function( name, val ){
+        if( E.isPlainObject(name) ){
+            E.each( name, function( name, val ){
+                this.data( name, val );
+            }, this );
+            return this;
+        }
+        
         if( val === undefined ){
             return easyData.data( this[0], 'data', name );
         }
@@ -3866,6 +3873,14 @@ var rPosition = /^(?:left|right|top|bottom)$/i,
         'Height' : [ 'Top', 'Bottom' ]
     },
     
+    // 计算元素的定位的位置时需要用到的辅助参数
+    posParams = {
+        left : [ 'left' ],
+        top : [ 'top' ],
+        right : [ 'left', 'Width' ],
+        bottom : [ 'top', 'Height' ]
+    },
+        
     // 显示隐藏元素的CSS类
     cssShow = {
         visibility : 'hidden',
@@ -4044,6 +4059,65 @@ var easyStyle = {
         }
 
         return '';
+    },
+    
+    /*    
+     * 获取元素在设置了position后其精确的定位值
+     * @param { easyJS Object } 
+     * @return { String } 定位的属性名
+     */        
+    getPosition : function( elem, name ){
+        var posType = getStyle( elem[0], 'position' );
+        
+        // static
+        if( posType === 'static' ){
+            return 'auto';
+        }
+        
+        // relative
+        if( posType === 'relative' ){
+            return '0px';
+        }
+        
+        var posName = posParams[ name ][0],
+            upName = E.capitalize( posName ),
+            offset = elem.offset()[ posName ],        
+            isSub = name === 'right' || name === 'bottom',
+            borderWidth = 0,
+            offsetParent, parent, parentOffset, posSize;
+            
+        if( posType === 'absolute' ){
+            offsetParent = elem[0].offsetParent;
+            
+            if( offsetParent.tagName === 'BODY' || offsetParent.tagName === 'HTML' ){                
+                offsetParent = window;
+            }
+            
+            parent = E( offsetParent );
+            
+            if( !E.isWindow(offsetParent) ){
+                borderWidth = parseFloat( getStyle(parent[0], 'border' + upName + 'Width') );
+            }
+            
+            parentOffset = parent.offset()[ posName ] + borderWidth; 
+        }
+        // fixed
+        else{
+            parent = E( window );
+            parentOffset = parent[ 'scroll' + upName ]();
+        }
+
+        offset -= parentOffset; 
+        
+        // right = offsetParent.innerWidth - self.outerWidth - left 
+        // bottom = offsetParent.innerWidth - self.outerWidth - top 
+        if( isSub ){            
+            posSize = posParams[ name ][1];
+            return parent[ 'inner' + posSize ]() - elem[ 'outer' + posSize ]() - offset + 'px';
+        }
+
+        // top、left
+        return offset + 'px';       
     }
     
 };
@@ -4185,9 +4259,19 @@ cssHooks.zIndex = {
 
 // width、height、outerWidth、outerHeight、innerWidth、innerHeight的原型方法拼装
 [ 'width', 'height' ].forEach(function( name ){
-    var upName = E.capitalize( name );
+    var upName = E.capitalize( name ),
+        docElem = document.documentElement;
+        
     cssHooks[ name ] = {
         get : function( elem ){
+            if( E.isWindow(elem) ){
+                return docElem[ 'client' + upName ];
+            }
+            
+            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){                
+                return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
+            }
+            
             return easyStyle.swap( elem, function(){
                 var val = getStyle( elem, name );
 
@@ -4205,6 +4289,18 @@ cssHooks.zIndex = {
     [ 'outer', 'inner' ].forEach(function( name ){
         E.prototype[ name + upName ] = function(){
             var elem = this[0];
+            if( !elem ){
+                return;
+            }
+            
+            if( E.isWindow(elem) ){
+                return docElem[ 'client' + upName ];
+            }
+            
+            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){
+                return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
+            }
+            
             return easyStyle.swap( elem, function(){
                 return easyStyle.getSize( elem, upName, name );
             });
@@ -4236,8 +4332,7 @@ E.mix( E.prototype, {
             elem = this[0];
             name = easyStyle.fixName( name, elem.style );
             
-            if( elem && elem.nodeType === 1 ){
-                
+            if( elem && elem.nodeType === 1 ){                
                 if( hooks && hooks.get ){
                     return hooks.get( elem );
                 }    
@@ -4245,23 +4340,8 @@ E.mix( E.prototype, {
                 val = getStyle( elem, name );    
                 
                 // 处理top、right、bottom、left为auto的情况
-                if( rPosition.test(name) && val === 'auto' ){
-                    var offset = this.offset(),
-                        parent = elem.offsetParent,
-                        $parent = E( elem.offsetParent ),
-                        parentOffset = $parent.offset();
-                        
-                    if( name === 'left' || name === 'top' ){
-                        return offset[ name ] - parentOffset[ name ] - parseFloat( getStyle(parent, 'border' + E.capitalize(name) + 'Width') ) + 'px'; 
-                    }
-                    
-                    if( name === 'right' ){
-                        return $parent.outerWidth() + parentOffset.left - this.outerWidth() - offset.left - parseFloat( getStyle(parent, 'borderRightWidth') ) + 'px';
-                    }
-                    
-                    if( name === 'bottom' ){
-                        return $parent.outerHeight() + parentOffset.top - this.outerHeight() - offset.top - parseFloat( getStyle(parent, 'borderBottomWidth') ) + 'px';
-                    }
+                if( rPosition.test(name) && val === 'auto' ){                    
+                    return easyStyle.getPosition( this, name );
                 }
                 
                 // 统一输出RGB的颜色值以便计算
@@ -4289,12 +4369,13 @@ E.mix( E.prototype, {
         });
     },
         
-    offset : function(){
-        var elem = this[0],
+    offset : function(){        
+        var offset = { top : 0, left : 0 },
+            elem = this[0],
             box;        
             
-        if( !elem ){
-            return { top : 0, left : 0 };
+        if( !elem || elem.nodeType !== 1 ){
+            return offset;
         }
         
         // IE浏览器中如果DOM元素未在DOM树中，使用getBoundingClientRect将会报错
@@ -4303,11 +4384,11 @@ E.mix( E.prototype, {
                 box = elem.getBoundingClientRect();
             }
             catch( _ ){
-                return { top : 0, left : 0 };
+                return offset;
             }
         }
     
-        var doc = elem.ownerDocument,
+        var doc = elem.nodeType === 9 ? elem : elem.ownerDocument,
             docElem = doc.documentElement,
             body = doc.body,
             box = box || elem.getBoundingClientRect(),        
@@ -4869,12 +4950,12 @@ var easyEvent = {
                             break;
                         }
                     }
-                }            
+                }
                 
                 // 没有指定函数名或只剩下一个【统一的事件处理器】将卸载所有的事件处理器
                 if( !handle && !namespace || handles.length === 1 ){
                     // 卸载统一的事件处理器
-                    elem[ REMOVEEVENT ]( type, handles[0], capture );
+                    elem[ REMOVEEVENT ]( type, handles[0].handle, capture );
                     
                     // 删除缓存中的该事件类型的所有数据
                     this.removeData( elem, dataName );
@@ -5727,7 +5808,7 @@ animHooks = {
 
 var easyAnim = {
 
-    interval : 16,
+    interval : 1000 / 65,
     
     data : function( elem, name, val ){
         return easyData.data( elem, 'anim', name, val );
@@ -5736,13 +5817,6 @@ var easyAnim = {
     removeData : function( elem, name ){
         return easyData.removeData( elem, 'anim', name );
     },
-    
-    // 预定义速度
-    speed : {
-        slow : 600,
-        fast : 200,
-        normal : 400
-    },
 
     // 合并动画参数
     mergeOptions : function( source ){
@@ -5750,17 +5824,14 @@ var easyAnim = {
             duration = source.duration,
             easing = source.easing;                
         
-        target.duration = E.isNumber( duration ) ? 
-            duration : 
-            E.isString(duration) && this.speed[duration] ? 
-                this.speed[ duration ]  :
-                this.speed.normal;
-                
+        target.duration = E.isNumber( duration ) ? duration : 400;
+        
         target.easing = E.isString( easing ) && E.easing[ easing ] ? 
             E.easing[ easing ] :
             E.easing.swing;
         
-        target.props = source.to || source;
+        target.targetProps = source.to || source;
+        target.sourceProps = source.from;
         target.reverse = source.reverse;
         target.complete = source.complete;    
         
@@ -6040,8 +6111,10 @@ E.mix( E.prototype, {
         options = easyAnim.mergeOptions( options );
 
         return this.forEach(function(){
-            var    fn = options.complete,
-                props = options.props,
+            var fn = options.complete,
+                sourceProps = options.sourceProps,
+                targetProps = options.targetProps,
+                isInit = sourceProps !== undefined,
                 source = {},
                 target = {},
                 elem = this,
@@ -6049,10 +6122,10 @@ E.mix( E.prototype, {
                 pattern, anim, type, complete;
 
             // 获取常见动画模式的属性值
-            if( E.isFunction(props) ){
-                pattern = props();
+            if( E.isFunction(targetProps) ){
+                pattern = targetProps();
                 type = pattern.type;
-                props = easyAnim.createProps( elem, pattern.props, type );
+                targetProps = easyAnim.createProps( elem, pattern.props, type );
             }
 
             // 回调函数的封装
@@ -6072,15 +6145,15 @@ E.mix( E.prototype, {
                     rOperator = /(?:[+-]=)/,                
                     p, sv, tv, temp;
                 
-                for( p in props ){
+                for( p in targetProps ){
                     len++;
                     // 显示类动画先将开始时的CSS属性值重置为0
                     if( type === 'show' ){                        
                         elem.css( p, p === 'opacity' ? '0' : '0px' );
                     }
                     
-                    sv = elem.css( p );
-                    tv = props[p];
+                    sv = isInit && sourceProps[p] || elem.css( p );
+                    tv = targetProps[p];
                     
                     if( !sv || !tv || sv === 'none' || tv === 'none' ){
                         continue;
@@ -6096,14 +6169,19 @@ E.mix( E.prototype, {
                             
                         tv = tv + temp.replace( rUnit, '' );
                     }
-                    
+
                     // 解析动画开始时的CSS属性值
                     source[p] = parse( p, sv );        
                     // 解析动画结束时的CSS属性值
-                    target[p] = parse( p, tv );        
-                }
+                    target[p] = parse( p, tv );   
 
-                // 开始动画
+                    // 如果有初始值，则设置动画开始时的初始值
+                    if( isInit ){
+                        elem.css( p, sourceProps[p] || '' );
+                    }
+                }
+                
+                // 开始动画                
                 anim.start( source, target, len );
             });
             

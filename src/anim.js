@@ -235,7 +235,7 @@ animHooks = {
 
 var easyAnim = {
 
-    interval : 16,
+    interval : 1000 / 65,
     
     data : function( elem, name, val ){
         return easyData.data( elem, 'anim', name, val );
@@ -244,13 +244,6 @@ var easyAnim = {
     removeData : function( elem, name ){
         return easyData.removeData( elem, 'anim', name );
     },
-    
-    // 预定义速度
-    speed : {
-        slow : 600,
-        fast : 200,
-        normal : 400
-    },
 
     // 合并动画参数
     mergeOptions : function( source ){
@@ -258,17 +251,14 @@ var easyAnim = {
             duration = source.duration,
             easing = source.easing;                
         
-        target.duration = E.isNumber( duration ) ? 
-            duration : 
-            E.isString(duration) && this.speed[duration] ? 
-                this.speed[ duration ]  :
-                this.speed.normal;
-                
+        target.duration = E.isNumber( duration ) ? duration : 400;
+        
         target.easing = E.isString( easing ) && E.easing[ easing ] ? 
             E.easing[ easing ] :
             E.easing.swing;
         
-        target.props = source.to || source;
+        target.targetProps = source.to || source;
+        target.sourceProps = source.from;
         target.reverse = source.reverse;
         target.complete = source.complete;    
         
@@ -548,8 +538,10 @@ E.mix( E.prototype, {
         options = easyAnim.mergeOptions( options );
 
         return this.forEach(function(){
-            var    fn = options.complete,
-                props = options.props,
+            var fn = options.complete,
+                sourceProps = options.sourceProps,
+                targetProps = options.targetProps,
+                isInit = sourceProps !== undefined,
                 source = {},
                 target = {},
                 elem = this,
@@ -557,10 +549,10 @@ E.mix( E.prototype, {
                 pattern, anim, type, complete;
 
             // 获取常见动画模式的属性值
-            if( E.isFunction(props) ){
-                pattern = props();
+            if( E.isFunction(targetProps) ){
+                pattern = targetProps();
                 type = pattern.type;
-                props = easyAnim.createProps( elem, pattern.props, type );
+                targetProps = easyAnim.createProps( elem, pattern.props, type );
             }
 
             // 回调函数的封装
@@ -580,15 +572,15 @@ E.mix( E.prototype, {
                     rOperator = /(?:[+-]=)/,                
                     p, sv, tv, temp;
                 
-                for( p in props ){
+                for( p in targetProps ){
                     len++;
                     // 显示类动画先将开始时的CSS属性值重置为0
                     if( type === 'show' ){                        
                         elem.css( p, p === 'opacity' ? '0' : '0px' );
                     }
                     
-                    sv = elem.css( p );
-                    tv = props[p];
+                    sv = isInit && sourceProps[p] || elem.css( p );
+                    tv = targetProps[p];
                     
                     if( !sv || !tv || sv === 'none' || tv === 'none' ){
                         continue;
@@ -604,14 +596,19 @@ E.mix( E.prototype, {
                             
                         tv = tv + temp.replace( rUnit, '' );
                     }
-                    
+
                     // 解析动画开始时的CSS属性值
                     source[p] = parse( p, sv );        
                     // 解析动画结束时的CSS属性值
-                    target[p] = parse( p, tv );        
-                }
+                    target[p] = parse( p, tv );   
 
-                // 开始动画
+                    // 如果有初始值，则设置动画开始时的初始值
+                    if( isInit ){
+                        elem.css( p, sourceProps[p] || '' );
+                    }
+                }
+                
+                // 开始动画                
                 anim.start( source, target, len );
             });
             

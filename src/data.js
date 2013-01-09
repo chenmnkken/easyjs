@@ -141,6 +141,13 @@ var easyData = {
 E.mix( E.prototype, {
 
     data : function( name, val ){
+        if( E.isPlainObject(name) ){
+            E.each( name, function( name, val ){
+                this.data( name, val );
+            }, this );
+            return this;
+        }
+        
         if( val === undefined ){
             return easyData.data( this[0], 'data', name );
         }
