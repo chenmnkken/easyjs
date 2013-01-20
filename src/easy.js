@@ -133,6 +133,14 @@ var document = window.document,
         // selector为字符串
         if( typeof selector === 'string' ){
             selector = selector.trim();
+            
+            // selector为body元素
+            if( selector === 'body' && !context && document.body ){
+                this[0] = document.body;
+                this.length = 1;
+                return this;
+            }
+            
             // selector为HTML字符串时需要转换成DOM节点
             if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' && selector.length >= 3 ){
                 context = context ? context.ownerDocument || context : document;
@@ -144,7 +152,8 @@ var document = window.document,
                 match = rQuickExpr.exec( selector );
                 // 对于单个的id选择器，使用频率较多，使用快速通道
                 if( match && ~match[0].indexOf('#') ){
-                    elem = document.getElementById( match[2] );
+                    context = context ? context.ownerDocument || context : document;                    
+                    elem = context.getElementById( match[2] );
                     if( elem ){
                         this[0] = elem;
                         this.length = 1;
@@ -161,18 +170,11 @@ var document = window.document,
         // selector为function时将回调函数放到DOM reday时执行
         if( typeof selector === 'function' ){            
             return ready( selector );
-        }          
-        
-        // selector为DOM节点
-        if( selector.nodeType ){
+        }        
+
+        // selector为DOM节点、window、document、document.documentElement
+        if( selector.nodeType || typeof selector === 'object' && 'setInterval' in selector ){
             this[0] = selector;
-            this.length = 1;
-            return this;
-        }
-        
-        // selector为body元素
-        if( selector === 'body' && !context && document.body ){
-            this[0] = document.body;
             this.length = 1;
             return this;
         }

@@ -15,7 +15,7 @@ var hasDuplicate = false,    // 是否有重复的DOM元素
     
     rAttr = /\[\s*((?:[\w\u00c0-\uFFFF\-]|\\.)+)\s*(?:(\S?=)\s*(?:(['"])(.*?)\3|(#?(?:[\w\u00c0-\uFFFF\-]|\\.)*)|)|)\s*\]/,
     rPseudo = /:((?:[\w\u00c0-\uFFFF\-]|\\.)+)(?:\((['"]?)((?:\([^\)]+\)|[^\(\)]*)+)\2\))?/,
-    rRelative = /[>\+~]/g,
+    rRelative = /[>\+~][^\d\=]/,
         
     // 使用elem.id比elem.getAttribute('id')的速度要快
     attrMap = {
@@ -160,8 +160,8 @@ var easySelector = {
             
                 case 'CLASS' :                 
                     index = selector.indexOf( '.' );                
-                    name = ' ' + selector.substring( index + 1 ) + ' ';    
-                    tagName = selector.substring( 0, index ).toUpperCase();                
+                    name = ' ' + selector.slice( index + 1 ) + ' ';    
+                    tagName = selector.slice( 0, index ).toUpperCase();                
                 break;                
                 
                 case 'TAG' :                
@@ -170,8 +170,8 @@ var easySelector = {
 
                 case 'ID' :                
                     index = selector.indexOf( '#' );                
-                    name = selector.substring( index + 1 );        
-                    tagName = selector.substring( 0, index ).toUpperCase();                    
+                    name = selector.slice( index + 1 );        
+                    tagName = selector.slice( 0, index ).toUpperCase();                    
                 break;
             }
             
@@ -193,17 +193,17 @@ var easySelector = {
 easySelector.finder = {
 
     // id选择器
-    ID : function( selector ){
-        return document.getElementById( selector.substring(selector.indexOf('#') + 1) );
+    ID : function( selector, context ){
+        return context[0].getElementById( selector.slice(selector.indexOf('#') + 1) );
     },
     
     // class选择器
     CLASS : function( selector, context ){        
         var elems = [],
             index = selector.indexOf( '.' ),
-            tagName = selector.substring( 0, index ) || '*',
+            tagName = selector.slice( 0, index ) || '*',
             // 选择器两边加空格以确保完全匹配(如：val不能匹配value) 
-            className = ' ' + selector.substring( index + 1 ) + ' ',
+            className = ' ' + selector.slice( index + 1 ) + ' ',
             i = 0, 
             l = 0,
             elem, len, name;
@@ -256,7 +256,7 @@ easySelector.finder = {
     
     // 属性选择器
     ATTR : function( selector, context, isFiltered ){
-        var    elems = [],
+        var elems = [],
             matches = selector.match( rAttr ),
             getAttribute = easySelector.getAttribute,
             attr = matches[1],
@@ -264,17 +264,16 @@ easySelector.finder = {
             attrVal = matches[5] || matches[4],            
             i = 0,
             l = 0,
-            len, elem, val, matchAttr, sMatches, filterBase, name, tagName;
+            len, elem, val, matchAttr, sMatches, filterBase, name, tagName;            
             
-            
-        selector = selector.substring( 0, selector.indexOf('[') ) || '*';
+        selector = selector.slice( 0, selector.indexOf('[') ) || '*';
         context = isFiltered ? context : easySelector.adapter( selector, context );
         len = context.length;
         sMatches = easySelector.adapter( selector );
         filterBase = easySelector.filter[ sMatches[0] ];
         name = sMatches[1];
-        tagName = sMatches[2];
-            
+        tagName = sMatches[2];       
+        
         for( ; i < len; i++ ){
             elem = context[i];
             if( !isFiltered || filterBase(elem, name, tagName) ){
@@ -288,7 +287,7 @@ easySelector.finder = {
                             symbol === '*=' ? ~val.indexOf( attrVal ) :
                             symbol === '~=' ? ~( ' ' + val + ' ' ).indexOf( ' ' + attrVal + ' ' ) :
                             symbol === '^=' ? val.indexOf( attrVal ) === 0 :
-                            symbol === '$=' ? val.substring( val.length - attrVal.length ) === attrVal :                            
+                            symbol === '$=' ? val.slice( val.length - attrVal.length ) === attrVal :                            
                             symbol === '|=' ? val === attrVal || val.indexOf( attrVal + '-' ) === 0 :
                             false;
         
@@ -314,7 +313,7 @@ easySelector.finder = {
     
     // 伪类选择器
     PSEUDO : function( selector, context, isFiltered ){
-        var    elems = [],
+        var elems = [],
             pMatches = selector.match( rPseudo ),
             pseudoType = pMatches[1],    
             filterName = pMatches[3],
@@ -324,7 +323,7 @@ easySelector.finder = {
             sMatches, filterBase, name, selectorType, len, i,
             parent, child, elem, nextElem, siblingElem;
             
-        selector = selector.substring( 0, selector.indexOf(':') ) || '*';
+        selector = selector.slice( 0, selector.indexOf(':') ) || '*';
         context = isFiltered ? context : easySelector.adapter( selector, context );
         len = context.length;
         sMatches = easySelector.adapter( selector );
@@ -671,7 +670,7 @@ E.mix( E, {
         var elems = [],
             contains = E.contains,
             makeArray = E.makeArray,
-            nodelist, selectors, result, prevElem,
+            nodelist, selectors, splitArr, matchArr, splitItem, matchItem, prevElem,
             lastElem, nextMatch, matches, elem, len, i;
         
         // 标准浏览器和IE8支持querySelectorAll方法
@@ -693,24 +692,30 @@ E.mix( E, {
             catch( e ){};
         }
         
-        matches = selector.split( ',' );
-        len = matches.length;
+        splitArr = selector.split( ',' );
+        len = splitArr.length;
         
         for( i = 0; i < len; i++ ){
             nodelist = [ context ];
+            splitItem = splitArr[i];
+            
             // 将选择器进行分割
             // #list .item a => [ '#list', '.item', 'a' ]
-            selectors = matches[i].replace( rRelative, function( symbol ){
+            if( rRelative.test(splitItem) ){
+                splitItem = splitItem.replace( /[>\+~]/g, function( symbol ){
                     return ' ' + symbol + ' ';
-                }).match( /[^\s]+/g );
+                });
+            }
+            
+            matchArr = splitItem.match( /[^\s]+/g );
 
-            for( var j = 0, clen = selectors.length; j < clen; j++ ){
-                result = selectors[j];                                
+            for( var j = 0, clen = matchArr.length; j < clen; j++ ){
+                matchItem = matchArr[j];                                
                 lastElem = makeArray( nodelist[ nodelist.length - 1 ] );
                 
                 // 关系选择器要特殊处理
-                nextMatch = /[>\+~]/.test( result.charAt(0) ) ? selectors[++j] : undefined; 
-                elem = easySelector.adapter( result, lastElem, nextMatch );    
+                nextMatch = /[>\+~]/.test( matchItem ) ? matchArr[++j] : undefined; 
+                elem = easySelector.adapter( matchItem, lastElem, nextMatch );    
 
                 if( !elem ){
                     return elems;
@@ -722,7 +727,7 @@ E.mix( E, {
             elems = makeArray( nodelist[nodelist.length - 1], elems );        
         }
         
-        nodelist = result = lastElem = context = elem = null;
+        nodelist = lastElem = context = elem = null;
         // 逗号选择器要删除重复的DOM元素
         return len > 1 ? E.unique( elems ) : elems;
     }

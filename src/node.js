@@ -151,16 +151,17 @@ var easyNode = {
      * @return { HTMLElement } 克隆后的DOM元素副本
      */    
     clone : function( elem, dataAndEvents, deepDataAndEvents ){
-        var outerHTML = elem.outerHTML,
+        var doc = elem.ownerDocument,
+            outerHTML = elem.outerHTML,
             tagName = elem.tagName,
             elems, div, clone, clones, i, len;
 
         // 修复IE6下克隆HTML5新元素时出现的一系列问题            
         if( tagName && rHtml5Tags.test(tagName) && outerHTML && !E.support.cloneHTML5 ){                
-            div = document.createElement( 'div' );                        
-            document.body.appendChild( div );        
+            div = doc.createElement( 'div' );                        
+            doc.body.appendChild( div );        
             div.innerHTML = outerHTML;    
-            document.body.removeChild( div );    
+            doc.body.removeChild( div );    
         }                
         
         clone = div ? div.firstChild : elem.cloneNode( true );        
@@ -202,11 +203,11 @@ var easyNode = {
     },    
     
     // 功能类似于easy模块中的init，但是返回值是纯数组
-    getNodelist : function( arg ){
+    getNodelist : function( arg, context ){
         var elems;
         if( typeof arg === 'string' ){
-            elems = E.create( arg );
-            return elems ? E.makeArray( elems ) : [ document.createTextNode( arg ) ];
+            elems = E.create( arg, context );
+            return elems ? E.makeArray( elems ) : [ context.createTextNode( arg ) ];
         }
         
         if( arg.nodeType === 1 ){
@@ -264,6 +265,10 @@ var easyNode = {
                     E( elem ).un( type, selector );
                 }
             }
+            
+            if( E.isEmptyObject(cacheData) ){
+                delete E.cache[ index ];
+            }
         }
 
     },
@@ -273,16 +278,17 @@ var easyNode = {
      * @param { easyJS Object / String / HTMLElement / Nodelist } 
      * @param { Function } insert适配器
      * @param { Boolean } 是否反向操作
+     * @param { Document } 根文档对象
      * @return { easyJS Object } 
      */        
-    insert : function( target, fn, isReverse ){
-        var source,    tlen, slen, lastIndex, i, fragment,
+    insert : function( target, fn, isReverse, context ){
+        var source, tlen, slen, lastIndex, i, fragment,
             getNodelist = easyNode.getNodelist,
             elems = [];
 
         // 反向操作替换源元素和目标元素
         if( isReverse ){
-            source = getNodelist( target[0] );
+            source = getNodelist( target[0], context );
             target = this;
         }
         else{
@@ -294,7 +300,7 @@ var easyNode = {
         lastIndex = slen - 1;
 
         for( i = 0; i < tlen; i++ ){
-            elems = E.makeArray( getNodelist(target[i]), elems );
+            elems = E.makeArray( getNodelist(target[i], context), elems );
         }
             
         // 只有一个元素直接赋值
@@ -303,7 +309,7 @@ var easyNode = {
         }
         // 多个元素将先添加到文档碎片中
         else{
-            fragment = document.createDocumentFragment();
+            fragment = context.createDocumentFragment();
             for( i = 0; i < elems.length; i++ ){
                 fragment.appendChild( elems[i] );
                 elems.splice( i--, 1 );
@@ -357,7 +363,7 @@ var easyNode = {
         
         unwrap : function( source ){
             var parent = source.parentNode,
-                fragment = document.createDocumentFragment(),
+                fragment = source.ownerDocument.createDocumentFragment(),
                 child, ancestor;
                 
             if( parent.nodeType === 1 && parent !== source.ownerDocument.body ){
@@ -879,7 +885,8 @@ E.mix( E.prototype, {
         name = flag ? type.substring( 0, index ) : type; 
         
     E.prototype[ type ] = function(){
-        var arg = arguments[0];
+        var arg = arguments[0],
+            context = this[0].ownerDocument;
         
         if( arg === undefined && type !== 'unwrap' ){
             return this;
@@ -893,7 +900,7 @@ E.mix( E.prototype, {
         
         return easyNode.insert.call( this, arguments, function( elem ){
             easyNode.insertAdapder[ name ]( this, elem );
-        }, flag );
+        }, flag, context );
     };
     
 });

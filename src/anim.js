@@ -326,6 +326,7 @@ var easyAnim = {
      * { val : 属性值, unit : 单位, compute : 计算方法, set : 设置方法 }
      */
     parseStyle : function( prop, value ){
+        value += '';
         var special = animHooks[ prop ],
             val, unit, obj, compute, set;
 
@@ -347,7 +348,7 @@ var easyAnim = {
             }
             
             set = function( elem, val, unit ){
-                elem.style[ prop ] = val + unit;
+                E( elem ).css( prop, val + unit );      
             }
         }
         
@@ -508,7 +509,7 @@ Anim.prototype = {
                     }                    
                 }
                 else{
-                    tp.set( elem, tv, tu );                
+                    tp.set( elem, tv, tu );     
                 }
                 
                 // 最后一个动画完成时执行回调

@@ -12,7 +12,7 @@
         <h2 class="sub_logo">.js</h2>
     </div>
 
-    <h3 class="page_title">Docs<span class="ver">Version : 0.8.0</span></h3>
+    <h3 class="page_title">Docs<span class="ver">Version : 0.8.x</span></h3>
     
         <ul class="menu_left">
         <li><a href="../index.html">速查表</a></li>
@@ -36,6 +36,7 @@
     
     <div class="mod_desc">
         <p>该模块提供了对 easJS Object 中的 DOM 元素进行事件的绑定和卸载的方法，当然还有方便的事件代理的方法。在兼容性方面，对于 mouseenter 和 mouseleave，focusin 和 focusout 以及 mousewheel 进行了处理，使其可以在主流的浏览器中使用。</p>
+        <p>大部分浏览器在触发 resize 事件时会多次触发，easy.js 的事件模块对其进行了优化，确保每次都只会触发一次 resize 事件。</p>
         <p>由于原生的 Event 对象不方便添加自定义属性，而 IE 和非 IE 浏览器在的该对象上存在较大的差异，easy.js 的事件模块依照标准模拟了一个 Event 对象，这样在使用上更方便，用户不用理会不同浏览器之间的兼容问题，可以放心的使用标准的属性和方法。具体的属性和方法说明可见下面的列表。</p>
     </div>
             

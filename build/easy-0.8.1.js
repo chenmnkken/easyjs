@@ -1,11 +1,11 @@
 /*
-* easy.js v0.8.0
+* easy.js v0.8.1
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-1-9 9:36:41
+* Date : 2013-1-20 14:46:33
 */
 
 // ---------------------------------------------
@@ -143,6 +143,14 @@ var document = window.document,
         // selector为字符串
         if( typeof selector === 'string' ){
             selector = selector.trim();
+            
+            // selector为body元素
+            if( selector === 'body' && !context && document.body ){
+                this[0] = document.body;
+                this.length = 1;
+                return this;
+            }
+            
             // selector为HTML字符串时需要转换成DOM节点
             if( selector.charAt(0) === '<' && selector.charAt(selector.length - 1) === '>' && selector.length >= 3 ){
                 context = context ? context.ownerDocument || context : document;
@@ -154,7 +162,8 @@ var document = window.document,
                 match = rQuickExpr.exec( selector );
                 // 对于单个的id选择器，使用频率较多，使用快速通道
                 if( match && ~match[0].indexOf('#') ){
-                    elem = document.getElementById( match[2] );
+                    context = context ? context.ownerDocument || context : document;                    
+                    elem = context.getElementById( match[2] );
                     if( elem ){
                         this[0] = elem;
                         this.length = 1;
@@ -171,18 +180,11 @@ var document = window.document,
         // selector为function时将回调函数放到DOM reday时执行
         if( typeof selector === 'function' ){            
             return ready( selector );
-        }          
-        
-        // selector为DOM节点
-        if( selector.nodeType ){
+        }        
+
+        // selector为DOM节点、window、document、document.documentElement
+        if( selector.nodeType || typeof selector === 'object' && 'setInterval' in selector ){
             this[0] = selector;
-            this.length = 1;
-            return this;
-        }
-        
-        // selector为body元素
-        if( selector === 'body' && !context && document.body ){
-            this[0] = document.body;
             this.length = 1;
             return this;
         }
@@ -236,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.8.0',
+    version : '0.8.1',
     
     __uuid__ : 2,
     
@@ -1679,7 +1681,7 @@ var hasDuplicate = false,    // 是否有重复的DOM元素
     
     rAttr = /\[\s*((?:[\w\u00c0-\uFFFF\-]|\\.)+)\s*(?:(\S?=)\s*(?:(['"])(.*?)\3|(#?(?:[\w\u00c0-\uFFFF\-]|\\.)*)|)|)\s*\]/,
     rPseudo = /:((?:[\w\u00c0-\uFFFF\-]|\\.)+)(?:\((['"]?)((?:\([^\)]+\)|[^\(\)]*)+)\2\))?/,
-    rRelative = /[>\+~]/g,
+    rRelative = /[>\+~][^\d\=]/,
         
     // 使用elem.id比elem.getAttribute('id')的速度要快
     attrMap = {
@@ -1824,8 +1826,8 @@ var easySelector = {
             
                 case 'CLASS' :                 
                     index = selector.indexOf( '.' );                
-                    name = ' ' + selector.substring( index + 1 ) + ' ';    
-                    tagName = selector.substring( 0, index ).toUpperCase();                
+                    name = ' ' + selector.slice( index + 1 ) + ' ';    
+                    tagName = selector.slice( 0, index ).toUpperCase();                
                 break;                
                 
                 case 'TAG' :                
@@ -1834,8 +1836,8 @@ var easySelector = {
 
                 case 'ID' :                
                     index = selector.indexOf( '#' );                
-                    name = selector.substring( index + 1 );        
-                    tagName = selector.substring( 0, index ).toUpperCase();                    
+                    name = selector.slice( index + 1 );        
+                    tagName = selector.slice( 0, index ).toUpperCase();                    
                 break;
             }
             
@@ -1857,17 +1859,17 @@ var easySelector = {
 easySelector.finder = {
 
     // id选择器
-    ID : function( selector ){
-        return document.getElementById( selector.substring(selector.indexOf('#') + 1) );
+    ID : function( selector, context ){
+        return context[0].getElementById( selector.slice(selector.indexOf('#') + 1) );
     },
     
     // class选择器
     CLASS : function( selector, context ){        
         var elems = [],
             index = selector.indexOf( '.' ),
-            tagName = selector.substring( 0, index ) || '*',
+            tagName = selector.slice( 0, index ) || '*',
             // 选择器两边加空格以确保完全匹配(如：val不能匹配value) 
-            className = ' ' + selector.substring( index + 1 ) + ' ',
+            className = ' ' + selector.slice( index + 1 ) + ' ',
             i = 0, 
             l = 0,
             elem, len, name;
@@ -1920,7 +1922,7 @@ easySelector.finder = {
     
     // 属性选择器
     ATTR : function( selector, context, isFiltered ){
-        var    elems = [],
+        var elems = [],
             matches = selector.match( rAttr ),
             getAttribute = easySelector.getAttribute,
             attr = matches[1],
@@ -1928,17 +1930,16 @@ easySelector.finder = {
             attrVal = matches[5] || matches[4],            
             i = 0,
             l = 0,
-            len, elem, val, matchAttr, sMatches, filterBase, name, tagName;
+            len, elem, val, matchAttr, sMatches, filterBase, name, tagName;            
             
-            
-        selector = selector.substring( 0, selector.indexOf('[') ) || '*';
+        selector = selector.slice( 0, selector.indexOf('[') ) || '*';
         context = isFiltered ? context : easySelector.adapter( selector, context );
         len = context.length;
         sMatches = easySelector.adapter( selector );
         filterBase = easySelector.filter[ sMatches[0] ];
         name = sMatches[1];
-        tagName = sMatches[2];
-            
+        tagName = sMatches[2];       
+        
         for( ; i < len; i++ ){
             elem = context[i];
             if( !isFiltered || filterBase(elem, name, tagName) ){
@@ -1952,7 +1953,7 @@ easySelector.finder = {
                             symbol === '*=' ? ~val.indexOf( attrVal ) :
                             symbol === '~=' ? ~( ' ' + val + ' ' ).indexOf( ' ' + attrVal + ' ' ) :
                             symbol === '^=' ? val.indexOf( attrVal ) === 0 :
-                            symbol === '$=' ? val.substring( val.length - attrVal.length ) === attrVal :                            
+                            symbol === '$=' ? val.slice( val.length - attrVal.length ) === attrVal :                            
                             symbol === '|=' ? val === attrVal || val.indexOf( attrVal + '-' ) === 0 :
                             false;
         
@@ -1978,7 +1979,7 @@ easySelector.finder = {
     
     // 伪类选择器
     PSEUDO : function( selector, context, isFiltered ){
-        var    elems = [],
+        var elems = [],
             pMatches = selector.match( rPseudo ),
             pseudoType = pMatches[1],    
             filterName = pMatches[3],
@@ -1988,7 +1989,7 @@ easySelector.finder = {
             sMatches, filterBase, name, selectorType, len, i,
             parent, child, elem, nextElem, siblingElem;
             
-        selector = selector.substring( 0, selector.indexOf(':') ) || '*';
+        selector = selector.slice( 0, selector.indexOf(':') ) || '*';
         context = isFiltered ? context : easySelector.adapter( selector, context );
         len = context.length;
         sMatches = easySelector.adapter( selector );
@@ -2335,7 +2336,7 @@ E.mix( E, {
         var elems = [],
             contains = E.contains,
             makeArray = E.makeArray,
-            nodelist, selectors, result, prevElem,
+            nodelist, selectors, splitArr, matchArr, splitItem, matchItem, prevElem,
             lastElem, nextMatch, matches, elem, len, i;
         
         // 标准浏览器和IE8支持querySelectorAll方法
@@ -2357,24 +2358,30 @@ E.mix( E, {
             catch( e ){};
         }
         
-        matches = selector.split( ',' );
-        len = matches.length;
+        splitArr = selector.split( ',' );
+        len = splitArr.length;
         
         for( i = 0; i < len; i++ ){
             nodelist = [ context ];
+            splitItem = splitArr[i];
+            
             // 将选择器进行分割
             // #list .item a => [ '#list', '.item', 'a' ]
-            selectors = matches[i].replace( rRelative, function( symbol ){
+            if( rRelative.test(splitItem) ){
+                splitItem = splitItem.replace( /[>\+~]/g, function( symbol ){
                     return ' ' + symbol + ' ';
-                }).match( /[^\s]+/g );
+                });
+            }
+            
+            matchArr = splitItem.match( /[^\s]+/g );
 
-            for( var j = 0, clen = selectors.length; j < clen; j++ ){
-                result = selectors[j];                                
+            for( var j = 0, clen = matchArr.length; j < clen; j++ ){
+                matchItem = matchArr[j];                                
                 lastElem = makeArray( nodelist[ nodelist.length - 1 ] );
                 
                 // 关系选择器要特殊处理
-                nextMatch = /[>\+~]/.test( result.charAt(0) ) ? selectors[++j] : undefined; 
-                elem = easySelector.adapter( result, lastElem, nextMatch );    
+                nextMatch = /[>\+~]/.test( matchItem ) ? matchArr[++j] : undefined; 
+                elem = easySelector.adapter( matchItem, lastElem, nextMatch );    
 
                 if( !elem ){
                     return elems;
@@ -2386,7 +2393,7 @@ E.mix( E, {
             elems = makeArray( nodelist[nodelist.length - 1], elems );        
         }
         
-        nodelist = result = lastElem = context = elem = null;
+        nodelist = lastElem = context = elem = null;
         // 逗号选择器要删除重复的DOM元素
         return len > 1 ? E.unique( elems ) : elems;
     }
@@ -2545,16 +2552,17 @@ var easyNode = {
      * @return { HTMLElement } 克隆后的DOM元素副本
      */    
     clone : function( elem, dataAndEvents, deepDataAndEvents ){
-        var outerHTML = elem.outerHTML,
+        var doc = elem.ownerDocument,
+            outerHTML = elem.outerHTML,
             tagName = elem.tagName,
             elems, div, clone, clones, i, len;
 
         // 修复IE6下克隆HTML5新元素时出现的一系列问题            
         if( tagName && rHtml5Tags.test(tagName) && outerHTML && !E.support.cloneHTML5 ){                
-            div = document.createElement( 'div' );                        
-            document.body.appendChild( div );        
+            div = doc.createElement( 'div' );                        
+            doc.body.appendChild( div );        
             div.innerHTML = outerHTML;    
-            document.body.removeChild( div );    
+            doc.body.removeChild( div );    
         }                
         
         clone = div ? div.firstChild : elem.cloneNode( true );        
@@ -2596,11 +2604,11 @@ var easyNode = {
     },    
     
     // 功能类似于easy模块中的init，但是返回值是纯数组
-    getNodelist : function( arg ){
+    getNodelist : function( arg, context ){
         var elems;
         if( typeof arg === 'string' ){
-            elems = E.create( arg );
-            return elems ? E.makeArray( elems ) : [ document.createTextNode( arg ) ];
+            elems = E.create( arg, context );
+            return elems ? E.makeArray( elems ) : [ context.createTextNode( arg ) ];
         }
         
         if( arg.nodeType === 1 ){
@@ -2658,6 +2666,10 @@ var easyNode = {
                     E( elem ).un( type, selector );
                 }
             }
+            
+            if( E.isEmptyObject(cacheData) ){
+                delete E.cache[ index ];
+            }
         }
 
     },
@@ -2667,16 +2679,17 @@ var easyNode = {
      * @param { easyJS Object / String / HTMLElement / Nodelist } 
      * @param { Function } insert适配器
      * @param { Boolean } 是否反向操作
+     * @param { Document } 根文档对象
      * @return { easyJS Object } 
      */        
-    insert : function( target, fn, isReverse ){
-        var source,    tlen, slen, lastIndex, i, fragment,
+    insert : function( target, fn, isReverse, context ){
+        var source, tlen, slen, lastIndex, i, fragment,
             getNodelist = easyNode.getNodelist,
             elems = [];
 
         // 反向操作替换源元素和目标元素
         if( isReverse ){
-            source = getNodelist( target[0] );
+            source = getNodelist( target[0], context );
             target = this;
         }
         else{
@@ -2688,7 +2701,7 @@ var easyNode = {
         lastIndex = slen - 1;
 
         for( i = 0; i < tlen; i++ ){
-            elems = E.makeArray( getNodelist(target[i]), elems );
+            elems = E.makeArray( getNodelist(target[i], context), elems );
         }
             
         // 只有一个元素直接赋值
@@ -2697,7 +2710,7 @@ var easyNode = {
         }
         // 多个元素将先添加到文档碎片中
         else{
-            fragment = document.createDocumentFragment();
+            fragment = context.createDocumentFragment();
             for( i = 0; i < elems.length; i++ ){
                 fragment.appendChild( elems[i] );
                 elems.splice( i--, 1 );
@@ -2751,7 +2764,7 @@ var easyNode = {
         
         unwrap : function( source ){
             var parent = source.parentNode,
-                fragment = document.createDocumentFragment(),
+                fragment = source.ownerDocument.createDocumentFragment(),
                 child, ancestor;
                 
             if( parent.nodeType === 1 && parent !== source.ownerDocument.body ){
@@ -3273,7 +3286,8 @@ E.mix( E.prototype, {
         name = flag ? type.substring( 0, index ) : type; 
         
     E.prototype[ type ] = function(){
-        var arg = arguments[0];
+        var arg = arguments[0],
+            context = this[0].ownerDocument;
         
         if( arg === undefined && type !== 'unwrap' ){
             return this;
@@ -3287,7 +3301,7 @@ E.mix( E.prototype, {
         
         return easyNode.insert.call( this, arguments, function( elem ){
             easyNode.insertAdapder[ name ]( this, elem );
-        }, flag );
+        }, flag, context );
     };
     
 });
@@ -4259,16 +4273,18 @@ cssHooks.zIndex = {
 
 // width、height、outerWidth、outerHeight、innerWidth、innerHeight的原型方法拼装
 [ 'width', 'height' ].forEach(function( name ){
-    var upName = E.capitalize( name ),
-        docElem = document.documentElement;
+    var upName = E.capitalize( name );
         
     cssHooks[ name ] = {
         get : function( elem ){
-            if( E.isWindow(elem) ){
-                return docElem[ 'client' + upName ];
-            }
+            var docElem;
             
-            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){                
+            if( E.isWindow(elem) ){
+                return elem.document.documentElement[ 'client' + upName ];
+            }
+    
+            if( elem.nodeType === 9 ){      
+                docElem = elem.documentElement;
                 return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
             }
             
@@ -4288,16 +4304,19 @@ cssHooks.zIndex = {
         
     [ 'outer', 'inner' ].forEach(function( name ){
         E.prototype[ name + upName ] = function(){
-            var elem = this[0];
+            var elem = this[0],
+                docElem;
+                
             if( !elem ){
                 return;
             }
             
             if( E.isWindow(elem) ){
-                return docElem[ 'client' + upName ];
+                return elem.document.documentElement[ 'client' + upName ];
             }
             
-            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){
+            if( elem.nodeType === 9 ){      
+                docElem = elem.documentElement;
                 return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
             }
             
@@ -4763,6 +4782,43 @@ if( !isECMAEvent ){
         }        
     };
 }
+
+// 对resize事件做函数节流的处理，确保每次resize的触发都只会触发一次
+eventHooks.resize = {    
+
+    setup : function( options ){                
+        var specialName = 'special_resize',
+            originalHandle = options.handle,
+            handle = (function(){
+                var timer;
+                
+                return function(){
+                    var self = this,
+                        args = arguments;
+                        
+                    clearTimeout( timer );
+                    timer = setTimeout(function(){
+                        originalHandle.call( self, args[0] );
+                    }, 50 );
+                };
+            })();
+        
+        delete options.selector;                
+        options.handle = handle;                
+
+        options.elems.forEach(function(){
+            var special = easyEvent.data( this, specialName, [] );
+            // 将2个事件处理器存到缓存中，以便卸载
+            special.push({
+                originalHandle : originalHandle,
+                handle : handle
+            });
+        });
+        
+        easyEvent.addEvent( options );
+    }  
+    
+};
     
 // Event接口对象的构造器
 var Event = function( event ){
@@ -5899,6 +5955,7 @@ var easyAnim = {
      * { val : 属性值, unit : 单位, compute : 计算方法, set : 设置方法 }
      */
     parseStyle : function( prop, value ){
+        value += '';
         var special = animHooks[ prop ],
             val, unit, obj, compute, set;
 
@@ -5920,7 +5977,7 @@ var easyAnim = {
             }
             
             set = function( elem, val, unit ){
-                elem.style[ prop ] = val + unit;
+                E( elem ).css( prop, val + unit );      
             }
         }
         
@@ -6081,7 +6138,7 @@ Anim.prototype = {
                     }                    
                 }
                 else{
-                    tp.set( elem, tv, tu );                
+                    tp.set( elem, tv, tu );     
                 }
                 
                 // 最后一个动画完成时执行回调

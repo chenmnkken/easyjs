@@ -322,6 +322,43 @@ if( !isECMAEvent ){
         }        
     };
 }
+
+// 对resize事件做函数节流的处理，确保每次resize的触发都只会触发一次
+eventHooks.resize = {    
+
+    setup : function( options ){                
+        var specialName = 'special_resize',
+            originalHandle = options.handle,
+            handle = (function(){
+                var timer;
+                
+                return function(){
+                    var self = this,
+                        args = arguments;
+                        
+                    clearTimeout( timer );
+                    timer = setTimeout(function(){
+                        originalHandle.call( self, args[0] );
+                    }, 50 );
+                };
+            })();
+        
+        delete options.selector;                
+        options.handle = handle;                
+
+        options.elems.forEach(function(){
+            var special = easyEvent.data( this, specialName, [] );
+            // 将2个事件处理器存到缓存中，以便卸载
+            special.push({
+                originalHandle : originalHandle,
+                handle : handle
+            });
+        });
+        
+        easyEvent.addEvent( options );
+    }  
+    
+};
     
 // Event接口对象的构造器
 var Event = function( event ){

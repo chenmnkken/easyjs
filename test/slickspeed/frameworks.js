@@ -30,7 +30,7 @@ fun:"dom.query"
 	fun : 'Dom.query'
 },
 
-'easy.js 0.1.0' : {
+'easy.js' : {
 	file : 'easy.js',
 	fun : 'easyJS.query'
 }

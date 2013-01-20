@@ -412,16 +412,18 @@ cssHooks.zIndex = {
 
 // width、height、outerWidth、outerHeight、innerWidth、innerHeight的原型方法拼装
 [ 'width', 'height' ].forEach(function( name ){
-    var upName = E.capitalize( name ),
-        docElem = document.documentElement;
+    var upName = E.capitalize( name );
         
     cssHooks[ name ] = {
         get : function( elem ){
-            if( E.isWindow(elem) ){
-                return docElem[ 'client' + upName ];
-            }
+            var docElem;
             
-            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){                
+            if( E.isWindow(elem) ){
+                return elem.document.documentElement[ 'client' + upName ];
+            }
+    
+            if( elem.nodeType === 9 ){      
+                docElem = elem.documentElement;
                 return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
             }
             
@@ -441,16 +443,19 @@ cssHooks.zIndex = {
         
     [ 'outer', 'inner' ].forEach(function( name ){
         E.prototype[ name + upName ] = function(){
-            var elem = this[0];
+            var elem = this[0],
+                docElem;
+                
             if( !elem ){
                 return;
             }
             
             if( E.isWindow(elem) ){
-                return docElem[ 'client' + upName ];
+                return elem.document.documentElement[ 'client' + upName ];
             }
             
-            if( elem.nodeType === 9 || elem.tagName === 'HTML' ){
+            if( elem.nodeType === 9 ){      
+                docElem = elem.documentElement;
                 return Math.max( docElem['scroll' + upName], docElem['client' + upName] ) ;
             }
             
