@@ -9,7 +9,7 @@ define( 'node', [ 'support', 'data', 'selector' ], function( _, easyData, easySe
 var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video/i,
     rXhtml =  /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
     rSingleTag = /^<(\w+)\s*\/?>(?:<\/\1>)?$/,
-    rCcsJsTag = /(<(?:script|link|style))/ig,
+    rCssJsTag = /(<(?:script|link|style))/ig,
     rTagName = /<([\w:]+)/,
     rTbody = /<tbody/i,
     
@@ -33,7 +33,7 @@ var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figc
         td : [ 3, '<table><tbody><tr>', '</tr></tbody></table>' ],
         col : [ 2, '<table><tbody></tbody><colgroup>', '</colgroup></table>' ],
         area : [ 1, '<map>', '</map>' ],
-        'default' : [ 0, '', '' ]
+        normal : [ 0, '', '' ]
     };
     
 wrapMap.optgroup = wrapMap.option;
@@ -55,7 +55,8 @@ var easyNode = {
      */
     cloneFixAttrs : function( source, target ){    
         if( target.nodeType === 1 ){
-            var tagName = target.tagName;                
+            var tagName = target.tagName,
+                euid = E.euid;
         
             // IE6-8在克隆DOM元素时也会把通过attachEvent绑定的事件
             // 一起克隆，其他浏览器就不会，为了兼容性，使用IE特有
@@ -65,6 +66,11 @@ var easyNode = {
                 // clearAttributes不会清除id和css样式
                 target.clearAttributes();
                 target.mergeAttributes( source );
+            }
+            
+            // 清除克隆元素的缓存的索引值
+            if( target.getAttribute(euid) ){      
+                target.removeAttribute( euid );
             }
 
             // IE6-8没有复制其内部元素
@@ -106,7 +112,7 @@ var easyNode = {
             cacheData = E.cache[ index ],
             data = cacheData.data,
             event = cacheData.event,
-            name, type, selector, names, handles;
+            name, type, selector, names, handles, result, namespace, extraData, i, len;
 
         // 克隆display的数据
         if( cacheData.display ){
@@ -131,13 +137,25 @@ var easyNode = {
             else{
                 type = names[0];
             }
+            
+            i = 1;
+            len = handles.length;
+            
             // 遍历原DOM元素的事件处理函数绑定到DOM元素的副本中
-            for( var i = 1; i < handles.length; i++ ){
+            for( ; i < len; i++ ){
+                result = handles[i];
+                namespace = result.namespace;
+                extraData = result.extraData;
+
+                if( namespace ){
+                    type += ( '.' + namespace );
+                }
+                
                 if( !selector ){
-                    E( target ).on( type, handles[i] );
+                    E( target ).on( type, extraData, result.handle );
                 }
                 else{                    
-                    E( target ).on( type, selector, handles[i] );
+                    E( target ).on( type, selector, extraData, result.handle );
                 }
             }
         }
@@ -557,13 +575,13 @@ E.mix( E, {
             div = doc.createElement( 'div' );
             fragment = doc.createDocumentFragment();
             // 一些特殊的元素不能直接innerHTML，需要在外部包裹一个元素
-            wrap = wrapMap[ tagName ] || wrapMap[ 'default' ];    
+            wrap = wrapMap[ tagName ] || wrapMap.normal;    
             depth = wrap[0];
             
             // 使用innerHTML创建script、link、style元素在IE6/7下
             // 会报错，在该元素前加一个DOM元素可以避免报错
             if( !E.support.htmlSerialize ){
-                html = html.replace( rCcsJsTag, '<br class="easyJS_fix"/>$1' );
+                html = html.replace( rCssJsTag, '<br class="easyJS_fix"/>$1' );
             }
 
             fragment.appendChild( div );
@@ -829,7 +847,7 @@ E.mix( E.prototype, {
         if( E.isString(content) &&
             // 排除掉script、link、style元素
             // 排除掉不能wrap的元素
-            !rCcsJsTag.test(content) &&                             
+            !rCssJsTag.test(content) &&                             
             !wrapMap[ (content.match(rTagName) || ['', ''])[1].toLowerCase() ] ){
             
             // <div/> => <div></div>

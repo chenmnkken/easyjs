@@ -418,6 +418,10 @@ cssHooks.zIndex = {
         get : function( elem ){
             var docElem;
             
+            if( !elem ){
+                return;
+            }
+            
             if( E.isWindow(elem) ){
                 return elem.document.documentElement[ 'client' + upName ];
             }
@@ -527,13 +531,21 @@ E.mix( E.prototype, {
         });
     },
         
-    offset : function(){        
+    offset : function( isContainer ){        
         var offset = { top : 0, left : 0 },
             elem = this[0],
             box;        
             
         if( !elem || elem.nodeType !== 1 ){
             return offset;
+        }
+        
+        // 如果是在一个非window的有滚动条容器中，则使用原生的offsetTop、offsetLeft
+        if( isContainer ){
+            return {
+                top : elem.offsetTop,
+                left : elem.offsetLeft
+            };
         }
         
         // IE浏览器中如果DOM元素未在DOM树中，使用getBoundingClientRect将会报错

@@ -514,21 +514,20 @@ var easyEvent = {
             // dataName有可能带有选择器的的前缀
             specialName = 'special_' + nameArr[ nameArr.length - 1 ],            
             i = 0,
-            handles, result, specialHandles, specialHandle, hLen, elem, j;
+            handles, result, specialHandles, specialHandle, elem, j;
 
         for( ; i < len; i++ ){
             elem = elems[i];
             handles = this.data( elem, dataName );    
             
             if( handles ){
-                hLen = handles.length;
                 specialHandles = this.data( elem, specialName );
                 
                 // 卸载指定的事件处理器
                 if( handle || namespace ){
-                    for( j = 1; j < hLen; j++ ){
-                        result = handles[j];
-                        
+                    for( j = 1; j < handles.length; j++ ){
+                        result = handles[j]; 
+
                         if( specialHandles ){
                             specialHandle = specialHandles[ j - 1 ];
                             if( specialHandle.originalHandle === handle ){
@@ -540,10 +539,16 @@ var easyEvent = {
                             (!handle || result.handle === handle) ){
                             
                             handles.splice( j, 1 );
+                            
                             if( specialHandles ){
                                 specialHandles.splice( j - 1, 1 );
                             }
-                            break;
+                            
+                            if( handle ){
+                                break;
+                            }
+                            
+                            j--;
                         }
                     }
                 }

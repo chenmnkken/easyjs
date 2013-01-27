@@ -1,11 +1,11 @@
 /*
-* easy.js v0.8.1
+* easy.js v0.8.2
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-1-20 14:46:33
+* Date : 2013-1-27 10:54:17
 */
 
 // ---------------------------------------------
@@ -238,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.8.1',
+    version : '0.8.2',
     
     __uuid__ : 2,
     
@@ -2410,7 +2410,7 @@ E.mix( E, {
 var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figcaption|figure|footer|header|hgroup|mark|meter|nav|output|progress|section|summary|time|video/i,
     rXhtml =  /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
     rSingleTag = /^<(\w+)\s*\/?>(?:<\/\1>)?$/,
-    rCcsJsTag = /(<(?:script|link|style))/ig,
+    rCssJsTag = /(<(?:script|link|style))/ig,
     rTagName = /<([\w:]+)/,
     rTbody = /<tbody/i,
     
@@ -2434,7 +2434,7 @@ var rHtml5Tags = /abbr|article|aside|audio|bdi|canvas|data|datalist|details|figc
         td : [ 3, '<table><tbody><tr>', '</tr></tbody></table>' ],
         col : [ 2, '<table><tbody></tbody><colgroup>', '</colgroup></table>' ],
         area : [ 1, '<map>', '</map>' ],
-        'default' : [ 0, '', '' ]
+        normal : [ 0, '', '' ]
     };
     
 wrapMap.optgroup = wrapMap.option;
@@ -2456,7 +2456,8 @@ var easyNode = {
      */
     cloneFixAttrs : function( source, target ){    
         if( target.nodeType === 1 ){
-            var tagName = target.tagName;                
+            var tagName = target.tagName,
+                euid = E.euid;
         
             // IE6-8在克隆DOM元素时也会把通过attachEvent绑定的事件
             // 一起克隆，其他浏览器就不会，为了兼容性，使用IE特有
@@ -2466,6 +2467,11 @@ var easyNode = {
                 // clearAttributes不会清除id和css样式
                 target.clearAttributes();
                 target.mergeAttributes( source );
+            }
+            
+            // 清除克隆元素的缓存的索引值
+            if( target.getAttribute(euid) ){      
+                target.removeAttribute( euid );
             }
 
             // IE6-8没有复制其内部元素
@@ -2507,7 +2513,7 @@ var easyNode = {
             cacheData = E.cache[ index ],
             data = cacheData.data,
             event = cacheData.event,
-            name, type, selector, names, handles;
+            name, type, selector, names, handles, result, namespace, extraData, i, len;
 
         // 克隆display的数据
         if( cacheData.display ){
@@ -2532,13 +2538,25 @@ var easyNode = {
             else{
                 type = names[0];
             }
+            
+            i = 1;
+            len = handles.length;
+            
             // 遍历原DOM元素的事件处理函数绑定到DOM元素的副本中
-            for( var i = 1; i < handles.length; i++ ){
+            for( ; i < len; i++ ){
+                result = handles[i];
+                namespace = result.namespace;
+                extraData = result.extraData;
+
+                if( namespace ){
+                    type += ( '.' + namespace );
+                }
+                
                 if( !selector ){
-                    E( target ).on( type, handles[i] );
+                    E( target ).on( type, extraData, result.handle );
                 }
                 else{                    
-                    E( target ).on( type, selector, handles[i] );
+                    E( target ).on( type, selector, extraData, result.handle );
                 }
             }
         }
@@ -2958,13 +2976,13 @@ E.mix( E, {
             div = doc.createElement( 'div' );
             fragment = doc.createDocumentFragment();
             // 一些特殊的元素不能直接innerHTML，需要在外部包裹一个元素
-            wrap = wrapMap[ tagName ] || wrapMap[ 'default' ];    
+            wrap = wrapMap[ tagName ] || wrapMap.normal;    
             depth = wrap[0];
             
             // 使用innerHTML创建script、link、style元素在IE6/7下
             // 会报错，在该元素前加一个DOM元素可以避免报错
             if( !E.support.htmlSerialize ){
-                html = html.replace( rCcsJsTag, '<br class="easyJS_fix"/>$1' );
+                html = html.replace( rCssJsTag, '<br class="easyJS_fix"/>$1' );
             }
 
             fragment.appendChild( div );
@@ -3230,7 +3248,7 @@ E.mix( E.prototype, {
         if( E.isString(content) &&
             // 排除掉script、link、style元素
             // 排除掉不能wrap的元素
-            !rCcsJsTag.test(content) &&                             
+            !rCssJsTag.test(content) &&                             
             !wrapMap[ (content.match(rTagName) || ['', ''])[1].toLowerCase() ] ){
             
             // <div/> => <div></div>
@@ -3385,7 +3403,7 @@ var hasAttribute = document.documentElement.hasAttribute,
     };
 
 // IE6-7中button元素的value和innerText纠缠不清    
-valHooks.button = attrHooks.value = {
+valHooks.button = {
     get : function( elem ){
         if( noButtonValue && elem.tagName === 'BUTTON' ){
             return elem.getAttributeNode( 'value' ).nodeValue || '';        
@@ -3404,17 +3422,35 @@ valHooks.button = attrHooks.value = {
     }
 };
 
+attrHooks.value = {
+    get : function( elem ){
+        var val = valHooks.button.get( elem );
+        val = val === '' ? null : val;
+        return val;
+    }    
+};
+
+attrHooks.value.set = valHooks.button.set;
+
 // get tabindex在各浏览器中有一系列的兼容问题
-propHooks.tabIndex = attrHooks.tabindex = {
+attrHooks.tabindex = {
     get : function( elem ){
         var attrNode = elem.getAttributeNode( 'tabindex' ),
             tagName = elem.tagName;
             
         return attrNode && attrNode.specified ?
-            parseInt( attrNode.value, 10 ) :
+            attrNode.value :
             rFocusable.test( tagName ) || rClickable.test( tagName ) && elem.href ?
                 0 :
-                undefined;                    
+                null;                    
+    }
+};
+
+propHooks.tabIndex = {
+    get : function( elem ){
+        var index = attrHooks.tabindex.get( elem );
+        index = index === null ? -1 : index;
+        return parseInt( index, 10 );
     }
 };
 
@@ -3543,8 +3579,7 @@ var easyAttr = {
                 return hooks.get( elem, name );
             }
             val = elem.getAttribute( name );
-            elem = null;
-            return val === null ? '' : val;
+            return val;
         }
         // setAttribute
         else{
@@ -3554,7 +3589,6 @@ var easyAttr = {
             else{
                 elem.setAttribute( name, val );
             }
-            elem = null;
         }
     },
 
@@ -3586,7 +3620,6 @@ var easyAttr = {
             else{
                 elem[ name ] = val;
             }
-            elem = null;
         }    
     }
 
@@ -4279,6 +4312,10 @@ cssHooks.zIndex = {
         get : function( elem ){
             var docElem;
             
+            if( !elem ){
+                return;
+            }
+            
             if( E.isWindow(elem) ){
                 return elem.document.documentElement[ 'client' + upName ];
             }
@@ -4388,13 +4425,21 @@ E.mix( E.prototype, {
         });
     },
         
-    offset : function(){        
+    offset : function( isContainer ){        
         var offset = { top : 0, left : 0 },
             elem = this[0],
             box;        
             
         if( !elem || elem.nodeType !== 1 ){
             return offset;
+        }
+        
+        // 如果是在一个非window的有滚动条容器中，则使用原生的offsetTop、offsetLeft
+        if( isContainer ){
+            return {
+                top : elem.offsetTop,
+                left : elem.offsetLeft
+            };
         }
         
         // IE浏览器中如果DOM元素未在DOM树中，使用getBoundingClientRect将会报错
@@ -4974,21 +5019,20 @@ var easyEvent = {
             // dataName有可能带有选择器的的前缀
             specialName = 'special_' + nameArr[ nameArr.length - 1 ],            
             i = 0,
-            handles, result, specialHandles, specialHandle, hLen, elem, j;
+            handles, result, specialHandles, specialHandle, elem, j;
 
         for( ; i < len; i++ ){
             elem = elems[i];
             handles = this.data( elem, dataName );    
             
             if( handles ){
-                hLen = handles.length;
                 specialHandles = this.data( elem, specialName );
                 
                 // 卸载指定的事件处理器
                 if( handle || namespace ){
-                    for( j = 1; j < hLen; j++ ){
-                        result = handles[j];
-                        
+                    for( j = 1; j < handles.length; j++ ){
+                        result = handles[j]; 
+
                         if( specialHandles ){
                             specialHandle = specialHandles[ j - 1 ];
                             if( specialHandle.originalHandle === handle ){
@@ -5000,10 +5044,16 @@ var easyEvent = {
                             (!handle || result.handle === handle) ){
                             
                             handles.splice( j, 1 );
+                            
                             if( specialHandles ){
                                 specialHandles.splice( j - 1, 1 );
                             }
-                            break;
+                            
+                            if( handle ){
+                                break;
+                            }
+                            
+                            j--;
                         }
                     }
                 }

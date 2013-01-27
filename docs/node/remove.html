@@ -127,7 +127,7 @@ E( '#demoList1' ).remove();</pre>
 });
 
 var parent = E( '#demoList2' ).parent();
-E( '#demoList2' ).remove()
+E( '#demoList2' ).remove( null, true )
     .css( 'backgroundColor', '#ccc' )
     .appendTo( parent );</pre>
         </div>            
@@ -159,7 +159,7 @@ E.use( 'event', function(){
 
     E( '#runDemo2' ).one( 'click', function( e ){
         var parent = E( '#demoList2' ).parent();
-        E( '#demoList2' ).remove()
+        E( '#demoList2' ).remove( null, true )
             .css( 'backgroundColor', '#ccc' )
             .appendTo( parent );
     

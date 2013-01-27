@@ -28,7 +28,7 @@ var hasAttribute = document.documentElement.hasAttribute,
     };
 
 // IE6-7中button元素的value和innerText纠缠不清    
-valHooks.button = attrHooks.value = {
+valHooks.button = {
     get : function( elem ){
         if( noButtonValue && elem.tagName === 'BUTTON' ){
             return elem.getAttributeNode( 'value' ).nodeValue || '';        
@@ -47,17 +47,35 @@ valHooks.button = attrHooks.value = {
     }
 };
 
+attrHooks.value = {
+    get : function( elem ){
+        var val = valHooks.button.get( elem );
+        val = val === '' ? null : val;
+        return val;
+    }    
+};
+
+attrHooks.value.set = valHooks.button.set;
+
 // get tabindex在各浏览器中有一系列的兼容问题
-propHooks.tabIndex = attrHooks.tabindex = {
+attrHooks.tabindex = {
     get : function( elem ){
         var attrNode = elem.getAttributeNode( 'tabindex' ),
             tagName = elem.tagName;
             
         return attrNode && attrNode.specified ?
-            parseInt( attrNode.value, 10 ) :
+            attrNode.value :
             rFocusable.test( tagName ) || rClickable.test( tagName ) && elem.href ?
                 0 :
-                undefined;                    
+                null;                    
+    }
+};
+
+propHooks.tabIndex = {
+    get : function( elem ){
+        var index = attrHooks.tabindex.get( elem );
+        index = index === null ? -1 : index;
+        return parseInt( index, 10 );
     }
 };
 
@@ -186,8 +204,7 @@ var easyAttr = {
                 return hooks.get( elem, name );
             }
             val = elem.getAttribute( name );
-            elem = null;
-            return val === null ? '' : val;
+            return val;
         }
         // setAttribute
         else{
@@ -197,7 +214,6 @@ var easyAttr = {
             else{
                 elem.setAttribute( name, val );
             }
-            elem = null;
         }
     },
 
@@ -229,7 +245,6 @@ var easyAttr = {
             else{
                 elem[ name ] = val;
             }
-            elem = null;
         }    
     }
 
