@@ -1,11 +1,11 @@
 /*
-* easy.js v0.8.2
+* easy.js v0.8.3
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-1-27 10:54:17
+* Date : 2013-1-30 18:2:33
 */
 
 // ---------------------------------------------
@@ -238,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.8.2',
+    version : '0.8.3',
     
     __uuid__ : 2,
     
@@ -1544,11 +1544,15 @@ var easyData = {
             index = easyData.getCacheIndex( elem, !isUndefined );
             
         if( index !== undefined ){
-            if( !(index in cache) ){
+            if( !(index in cache) && !isUndefined ){
                 cache[ index ] = {};
             }
 
             cache = cache[ index ];
+            
+            if( !cache ){
+                return;
+            }
             
             if( isNamespace ){
                 if( !(type in cache) ){
@@ -3224,7 +3228,8 @@ E.mix( E.prototype, {
             return text.replace( /\r\n/g, '' );
         }
         
-        if( E.isString(text) ){
+        if( E.isString(text) || E.isNumber(text) ){
+            text += '';
             return this.empty().append( text );
         }
         
@@ -3243,6 +3248,10 @@ E.mix( E.prototype, {
             return elem && elem.nodeType === 1 ?
                 elem.innerHTML :
                 null;
+        }
+        
+        if( E.isNumber(content) ){
+            content += '';
         }
         
         if( E.isString(content) &&

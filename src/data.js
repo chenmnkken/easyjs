@@ -48,11 +48,15 @@ var easyData = {
             index = easyData.getCacheIndex( elem, !isUndefined );
             
         if( index !== undefined ){
-            if( !(index in cache) ){
+            if( !(index in cache) && !isUndefined ){
                 cache[ index ] = {};
             }
 
             cache = cache[ index ];
+            
+            if( !cache ){
+                return;
+            }
             
             if( isNamespace ){
                 if( !(type in cache) ){

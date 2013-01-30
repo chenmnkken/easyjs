@@ -823,7 +823,8 @@ E.mix( E.prototype, {
             return text.replace( /\r\n/g, '' );
         }
         
-        if( E.isString(text) ){
+        if( E.isString(text) || E.isNumber(text) ){
+            text += '';
             return this.empty().append( text );
         }
         
@@ -842,6 +843,10 @@ E.mix( E.prototype, {
             return elem && elem.nodeType === 1 ?
                 elem.innerHTML :
                 null;
+        }
+        
+        if( E.isNumber(content) ){
+            content += '';
         }
         
         if( E.isString(content) &&
