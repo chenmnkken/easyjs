@@ -60,6 +60,10 @@ var easyData = {
             
             if( isNamespace ){
                 if( !(type in cache) ){
+                    if( isUndefined ){
+                        return;
+                    }
+                
                     cache[ type ] = {};
                 }
                 

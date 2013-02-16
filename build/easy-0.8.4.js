@@ -1,11 +1,11 @@
 /*
-* easy.js v0.8.3
+* easy.js v0.8.4
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-1-30 18:2:33
+* Date : 2013-2-16 13:38:28
 */
 
 // ---------------------------------------------
@@ -238,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.8.3',
+    version : '0.8.4',
     
     __uuid__ : 2,
     
@@ -1556,6 +1556,10 @@ var easyData = {
             
             if( isNamespace ){
                 if( !(type in cache) ){
+                    if( isUndefined ){
+                        return;
+                    }
+                
                     cache[ type ] = {};
                 }
                 
