@@ -1,11 +1,11 @@
 /*
-* easy.js v0.8.4
+* easy.js v0.9.0
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-2-16 13:38:28
+* Date : 2013-3-1 22:31:52
 */
 
 // ---------------------------------------------
@@ -238,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.8.4',
+    version : '0.9.0',
     
     __uuid__ : 2,
     
@@ -4524,7 +4524,7 @@ E.mix( E.prototype, {
  
 
 
-var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which'.split( ' ' ),
+var eventProps = 'attrChange attrName relatedNode srcElement altKey bubbles cancelable ctrlKey currentTarget eventPhase metaKey relatedTarget shiftKey target timeStamp view which __extraParams__'.split( ' ' ),
     mouseProps = 'button buttons clientX clientY fromElement offsetX offsetY pageX pageY screenX screenY toElement'.split( ' ' ),
     keybordProps = 'char charCode key keyCode'.split( ' ' ),
     
@@ -4592,9 +4592,9 @@ if( !E.support.mouseEnter ){
                 easyEvent.removeEvent( options );
             },
             
-            trigger : function( elem, namespace ){
+            trigger : function( elem, namespace, params ){
                 type += ( namespace ? '.' + namespace : '' );
-                elem.fire( type );
+                elem.fire( type, params );
             }
         };
         
@@ -4622,9 +4622,9 @@ if( !E.support.focusin ){
                 easyEvent.removeEvent( options );
             },
             
-            trigger : function( elem, namespace ){
+            trigger : function( elem, namespace, params ){
                 type += ( namespace ? '.' + namespace : '' );
-                elem.fire( type );
+                elem.fire( type, params );
             }            
         };    
     });
@@ -5093,13 +5093,14 @@ var easyEvent = {
      * @param { String } 事件类型
      * @param { Array } 事件处理器的数组
      * @param { String } 命名空间
+     * @param { Array } 附加参数
      */    
-    fireEvent : function( elem, type, handles, namespace ){
+    fireEvent : function( elem, type, handles, namespace, params ){
         handles = handles || this.data( elem, type );
         
         var i = 1,
             len, event, parent, result, isPropagationStopped;
-            
+
         if( handles ){
             // 修正Event对象
             event = {
@@ -5110,6 +5111,10 @@ var easyEvent = {
                     isPropagationStopped = true;
                 }
             };
+
+            if( params ){
+                event.__extraParams__ = params;
+            }
             
             if( !namespace ){
                 handles[0].handle.call( elem, event );
@@ -5127,7 +5132,7 @@ var easyEvent = {
             parent = elem.parentNode;
             // 模拟事件冒泡
             if( parent && !isPropagationStopped ){
-                this.fireEvent( parent, type, null, namespace );
+                this.fireEvent( parent, type, null, namespace, params );
             }
         }
     },
@@ -5275,14 +5280,21 @@ var easyEvent = {
     eventHandle : function( elem, selector ){    
         return function( event ){
             event = easyEvent.fixEvent( event || window.event );
-
-            var orginalTarget = event.target,
+            
+            var orginalTarget = event.target,                
                 isDelegate = false,
+                args = [ event ],
                 type = event.type,
                 target = elem,
                 dataName = type,
                 i = 1,
-                handles, len, j, filter, result;
+                handles, len, j, filter, result;  
+            
+            // 保存fire方法传递过来的附加参数
+            if( event.__extraParams__ ){
+                args = args.concat( event.__extraParams__ );
+                delete event.__extraParams__;
+            }
             
             // IE6-8没有currentTarget属性
             if( !event.currentTarget ){
@@ -5326,7 +5338,7 @@ var easyEvent = {
                             delete event.extraData;
                         }
                         
-                        if( result.handle.call(target, event) === false ){
+                        if( result.handle.apply(target, args) === false ){
                             event.preventDefault();
                             event.stopPropagation();
                         }
@@ -5432,7 +5444,7 @@ E.each({
 
 E.mix( E.prototype, {
 
-    fire : function( type ){
+    fire : function( type, params ){
         type = fixEventType[ type ] || type;
         var types = type.split( '.' ),
             namespace = types[1],
@@ -5452,7 +5464,7 @@ E.mix( E.prototype, {
                 
             if( handles ){
                 // 无事件命名空间将采用原生的事件触发器
-                if( !namespace ){
+                if( !namespace && !params ){
                     // DOM LV2
                     if( document.createEvent ){
                         event = document.createEvent( 'HTMLEvents' );
@@ -5475,7 +5487,7 @@ E.mix( E.prototype, {
                 }
                 // 有事件命名空间将模拟触发
                 else{
-                    easyEvent.fireEvent( this, type, handles, namespace );
+                    easyEvent.fireEvent( this, type, handles, namespace, params );
                 }
             }
         });

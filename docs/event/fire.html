@@ -12,7 +12,7 @@
         <h2 class="sub_logo">.js</h2>
     </div>
 
-    <h3 class="page_title">Docs<span class="ver">Version : 0.8.x</span></h3>
+    <h3 class="page_title">Docs<span class="ver">Version : 0.9.x</span></h3>
     
         <ul class="menu_left">
         <li><a href="../index.html">速查表</a></li>
@@ -32,7 +32,7 @@
 </div>
 
 <div class="content">
-    <div class="caption"><h2>fire( <span>type</span> )</h2><span class="type prototype">原型方法</span><span class="file">Define in : event.js</span></div>
+    <div class="caption"><h2>fire( <span>type, [ <em>params</em> ]</span> )</h2><span class="type prototype">原型方法</span><span class="file">Define in : event.js</span></div>
     <div class="mod_desc">
         <p>事件触发器，该方法可以触发匹配元素使用 <a href="on.html">on</a> 和 <a href="one.html">one</a> 绑定的事件。常用于自定义事件的触发。</p>
     </div>
@@ -48,6 +48,16 @@
                 <div class="params_desc">
                     <span class="type required">必需</span>
                     <p>触发的事件类型。如果包含了命名空间，将只触发指定的事件。</p>
+                </div>
+            </li>
+            <li>
+                <dl>
+                    <dt>params</dt>
+                    <dd>Array</dd>
+                </dl>
+                <div class="params_desc">
+                    <span class="type optional">可选</span>
+                    <p>可通过该参数给事件处理函数传递附加的参数。</p>
                 </div>
             </li>
         </ul>
@@ -108,6 +118,27 @@ box.fire( 'tick.custom' );</pre>
         <p><a href="javascript:;" id="runDemo2" class="btn">运行</a></p>        
     </div>
     
+    <div class="example_box">
+        <h5>例子3</h5>
+        <p>给 div 元素绑定一个自定义事件，然后使用 fire 来触发，并给事件处理函数传递附加参数。</p>
+        <div class="demo_box">
+            <div id="box3">box3</div>    
+        </div>
+        <div class="code_box">
+            <pre>&lt;div id="box3"&gt;box3&lt;/div&gt;</pre>
+        </div>    
+        <div class="code_box">
+            <pre>var box = E( '#box3' );
+        
+box.on( 'tick', function( e, a, b ){
+    alert( a + b );
+});
+
+box.fire( 'tick', [ a, b ] );</pre>
+        </div>    
+        <p><a href="javascript:;" id="runDemo3" class="btn">运行</a></p>        
+    </div>
+    
 </div>
 
 
@@ -141,6 +172,18 @@ E.use( 'event', function(){
         
         e.preventDefault();
     });   
+    
+    E( '#runDemo3' ).one( 'click', function( e ){
+        var box = E( '#box3' );
+        
+        box.on( 'tick', function( e, a, b ){
+            alert( a + b );
+        });
+        
+        box.fire( 'tick', [ 1, 2 ] );
+        
+        e.preventDefault();
+    });
         
 });    
 </script>    
