@@ -329,7 +329,20 @@ box9.anim({
 });</pre>
         </div>    
         <p><a href="javascript:;" id="runDemo11" class="btn">运行</a></p>        
-    </div>       
+    </div> 
+
+    <div class="example_box">
+        <h5>例子12</h5>
+        <p>easy.js 的 anim 模块支持 scrollTop、scrollLeft 的动画效果，下面的代码就可以轻松实现“返回顶部”的动画效果。</p>      
+        <div class="code_box">
+        <pre>E( window ).anim({ 
+    to : { scrollTop : 0 },
+    easing : 'easeOut',
+    duration : 1000
+});</pre>
+        </div>    
+        <p><a href="javascript:;" id="runDemo12" class="btn">运行</a></p>        
+    </div>     
     
 </div>
 
@@ -446,6 +459,14 @@ E.use( ['event', 'anim'], function(){
             duration : 800
         });
     }); 
+    
+    E( '#runDemo12' ).on( 'click', function( e ){
+        E( window ).anim({ 
+            to : { scrollTop : 0 },
+            easing : 'easeOut',
+            duration : 1000
+        });
+    });     
 });    
 </script>    
 

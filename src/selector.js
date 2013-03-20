@@ -156,8 +156,7 @@ var easySelector = {
             ~selector.indexOf( '.' ) ? 'CLASS' : 'TAG';            
         
         if( !context ){
-            switch( type ){
-            
+            switch( type ){            
                 case 'CLASS' :                 
                     index = selector.indexOf( '.' );                
                     name = ' ' + selector.slice( index + 1 ) + ' ';    

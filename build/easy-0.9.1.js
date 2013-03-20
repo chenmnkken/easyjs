@@ -1,11 +1,11 @@
 /*
-* easy.js v0.9.0
+* easy.js v0.9.1
 *
 * Copyright (c) 2012 Yiguo Chen
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-3-1 22:31:52
+* Date : 2013-3-20 22:44:49
 */
 
 // ---------------------------------------------
@@ -238,7 +238,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '0.9.0',
+    version : '0.9.1',
     
     __uuid__ : 2,
     
@@ -1830,8 +1830,7 @@ var easySelector = {
             ~selector.indexOf( '.' ) ? 'CLASS' : 'TAG';            
         
         if( !context ){
-            switch( type ){
-            
+            switch( type ){            
                 case 'CLASS' :                 
                     index = selector.indexOf( '.' );                
                     name = ' ' + selector.slice( index + 1 ) + ' ';    
@@ -5712,6 +5711,7 @@ E.when = function(){
 
 var rUnit = /^[-\d.]+/,
     rColorVals = /\d+/g,
+    rOperator = /(?:[+-]=)/,
     rOtherVals = /([-\d]+|[a-z%]+)/g,
 
     pow = Math.pow,
@@ -5827,10 +5827,10 @@ animHooks = {
             };
         },
 
-        compute : function( sv, tv, tu, e ){
+        compute : function( sv, ev, unit, e ){
             var cp = easyAnim.compute;
-            return cp( sv, tv, tu, e, 'x' ) + ' ' +
-                cp( sv, tv, tu, e, 'y' );
+            return cp( sv, ev, unit, e, 'x' ) + ' ' +
+                cp( sv, ev, unit, e, 'y' );
         },
 
         set : function( elem, val, unit ){                
@@ -5856,14 +5856,14 @@ animHooks = {
             }
         },
         
-        compute : function( sv, tv, tu, e ){
+        compute : function( sv, ev, unit, e ){
             var cp = easyAnim.compute;
-            return 'rgb(' + cp( sv, tv, tu, e, 'r', 0 ) + ', ' +
-                cp( sv, tv, tu, e, 'g', 0 ) + ', ' +
-                cp( sv, tv, tu, e, 'b', 0 ) + ') ' +
-                cp( sv, tv, tu, e, 'x' ) + ' ' +
-                cp( sv, tv, tu, e, 'y' ) + ' ' +
-                cp( sv, tv, tu, e, 'fuzzy' );
+            return 'rgb(' + cp( sv, ev, unit, e, 'r', 0 ) + ', ' +
+                cp( sv, ev, unit, e, 'g', 0 ) + ', ' +
+                cp( sv, ev, unit, e, 'b', 0 ) + ') ' +
+                cp( sv, ev, unit, e, 'x' ) + ' ' +
+                cp( sv, ev, unit, e, 'y' ) + ' ' +
+                cp( sv, ev, unit, e, 'fuzzy' );
         },
         
         set : function( elem, val, unit ){
@@ -5875,6 +5875,24 @@ animHooks = {
     }
     
 };
+
+[ 'scrollTop', 'scrollLeft' ].forEach(function( name ){
+
+    animHooks[ name ] = {
+        parse : function( val ){
+            return { val : parseInt( val ) };
+        },
+        
+        compute : function( sv, ev, _, e ){
+            return sv + ( ev - sv ) * e;
+        },
+        
+        set : function( elem, val, unit ){
+            E( elem )[ name ]( val );      
+        }
+    };
+
+});
 
 // 方位值简写格式的动画：padding:10px 10px 10px 10px;
 [ 'padding', 'margin', 'borderWidth', 'borderRadius' ].forEach(function( name ){
@@ -5888,12 +5906,12 @@ animHooks = {
             }
         },
         
-        compute : function( sv, tv, tu, e ){
+        compute : function( sv, ev, unit, e ){
             var cp = easyAnim.compute;
-            return cp( sv, tv, tu, e, 'top' ) + ' ' +
-                cp( sv, tv, tu, e, 'right' ) + ' ' +
-                cp( sv, tv, tu, e, 'bottom' ) + ' ' +
-                cp( sv, tv, tu, e, 'left' );
+            return cp( sv, ev, unit, e, 'top' ) + ' ' +
+                cp( sv, ev, unit, e, 'right' ) + ' ' +
+                cp( sv, ev, unit, e, 'bottom' ) + ' ' +
+                cp( sv, ev, unit, e, 'left' );
         },
         
         set : function( elem, val, unit ){
@@ -5922,10 +5940,10 @@ animHooks = {
         },
 
         // 颜色值不允许有小数点
-        compute : function( sv, tv, _, e ){
-            var r = ( sv.r + (tv.r - sv.r) * e ).toFixed(0), 
-                g = ( sv.g + (tv.g - sv.g) * e ).toFixed(0), 
-                b = ( sv.b + (tv.b - sv.b) * e ).toFixed(0);
+        compute : function( sv, ev, _, e ){
+            var r = ( sv.r + (ev.r - sv.r) * e ).toFixed(0), 
+                g = ( sv.g + (ev.g - sv.g) * e ).toFixed(0), 
+                b = ( sv.b + (ev.b - sv.b) * e ).toFixed(0);
             
             return 'rgb(' + r + ',' + g + ',' + b + ')';                
         },
@@ -5961,8 +5979,8 @@ var easyAnim = {
             E.easing[ easing ] :
             E.easing.swing;
         
-        target.targetProps = source.to || source;
-        target.sourceProps = source.from;
+        target.endProps = source.to || source;
+        target.startProps = source.from;
         target.reverse = source.reverse;
         target.complete = source.complete;    
         
@@ -6015,11 +6033,11 @@ var easyAnim = {
     },
     
     // 用于各种特殊动画计算的方法
-    compute : function( sv, tv, tu, e, name, n ){
+    compute : function( sv, ev, unit, e, name, n ){
         if( n === undefined ){
             n = 7;
         }
-        return ( sv[name] + (tv[name] - sv[name]) * e ).toFixed(n) + tu[name];
+        return ( sv[name] + (ev[name] - sv[name]) * e ).toFixed(n) + unit[name];
     },
     
     /*
@@ -6029,34 +6047,42 @@ var easyAnim = {
      * @return { Object } 
      * { val : 属性值, unit : 单位, compute : 计算方法, set : 设置方法 }
      */
-    parseStyle : function( prop, value ){
+    parseStyle : function( prop, value, isEnd ){
         value += '';
-        var special = animHooks[ prop ],
-            val, unit, obj, compute, set;
+        var VAL = isEnd ? 'endVal' : 'startVal',
+            special = animHooks[ prop ],            
+            result = {},
+            specialResult;
 
         if( special ){
-            obj = special.parse( value );
-            val = obj.val;
-            unit = obj.unit;
-            compute = special.compute;
-            set = special.set;
+            specialResult = special.parse( value );
+            result[ VAL ] = specialResult.val;
+            
+            if( isEnd ){
+                result.unit = specialResult.unit;
+                result.compute = special.compute;
+                result.set = special.set;
+            }
         }
         else{
-            val = parseFloat( value );
-            unit = value.replace( rUnit, '' );
+            result[ VAL ] = parseFloat( value );
             
-            // 总距离 * ( (当前时间 - 开始时间) / 总时间 ) = 当前距离
-            // 计算属性值时精度将直接影响到动画效果是否流畅toFixed(7)明显比toFixed(0)要流畅
-            compute = function( sv, tv, tu, e ){
-                return ( sv + (tv - sv) * e ).toFixed(7) + tu;
-            }
-            
-            set = function( elem, val, unit ){
-                E( elem ).css( prop, val + unit );      
+            if( isEnd ){
+                result.unit = value.replace( rUnit, '' );
+                
+                // 总距离 * ( (当前时间 - 开始时间) / 总时间 ) = 当前距离
+                // 计算属性值时精度将直接影响到动画效果是否流畅toFixed(7)明显比toFixed(0)要流畅
+                result.compute = function( sv, ev, unit, e ){
+                    return ( sv + (ev - sv) * e ).toFixed(7) + unit;
+                };
+                
+                result.set = function( elem, val, unit ){
+                    E( elem ).css( prop, val + unit );      
+                };
             }
         }
         
-        return { val : val, unit : unit, compute : compute, set : set };
+        return result;
     },
     
     // 将数据添加到队列中
@@ -6124,14 +6150,13 @@ Anim.prototype = {
      * @param { Object } 动画结束时的属性值
      * @param { Number } 动画属性的个数
      */
-    start : function( source, target, len ){        
+    start : function( animData, len ){        
         var self = this,
             elem = this.elem,
             timer = easyAnim.data( elem, 'timer' );
         
         this.len = len;
-        this.source = source;
-        this.target = target;
+        this.animData = animData;
         // 动画开始的时间
         this.startTime = +new Date();
         // 动画结束的时间
@@ -6159,8 +6184,7 @@ Anim.prototype = {
             $elem = this.$elem,
             style = elem.style,            
             type = this.type,
-            source = this.source,
-            target = this.target,
+            animData = this.animData,
             endTime = this.endTime,                     
             // 当前帧的时间
             elapsedTime = +new Date(),         
@@ -6168,37 +6192,53 @@ Anim.prototype = {
             t = elapsedTime < endTime ? ( elapsedTime - this.startTime ) / this.duration : 1,
             e = this.easing( t ),
             i = 0,
-            p, sv, tv, tu, tp, endVal;
+            p, sv, ev, unit, value, data;
             
-        if( type === 'show' ){
-            style.display = 'block';
+        if( type ){
+            style.overflow = 'hidden';
+            
+            if( type === 'show' ){
+                style.display = 'block';
+            }
         }
 
-        for( p in source ){
+        for( p in animData ){
             i++;
-            sv = source[p].val;  // 动画开始时的属性值
-            tp = target[p];  
-            tv = tp.val;         // 动画结束时的属性值
-            tu = tp.unit;        // 属性值的单位
+            data = animData[p]; 
+            sv = data.startVal;  // 动画开始时的属性值             
+            ev = data.endVal;  // 动画结束时的属性值
+            unit = data.unit;  // 属性值的单位
             
             if( elapsedTime < endTime && !end ){
                 // 开始值和结束值是一样的无需处理
-                if( sv === tv ){
+                if( sv === ev ){
                     continue;
                 }
                 
-                endVal = tp.compute( sv, tv, tu, e );
-
-                if( p !== 'opacity' ){
-                    style[p] = endVal;                    
-                }
-                else{
-                    $elem.css( 'opacity', endVal );
+                value = data.compute( sv, ev, unit, e );
+                
+                switch( p ){                    
+                    case 'opacity' :
+                        $elem.css( p, value );
+                    break;
+                    
+                    case 'scrollTop' : 
+                        $elem.scrollTop( value );
+                    break;
+                    
+                    case 'scrollLeft' :
+                        $elem.scrollLeft( value );
+                    break;
+                    
+                    default :
+                        style[p] = value;
                 }
             }
             // 动画结束时还原样式
             else{                
                 if( type ){
+                    style.overflow = '';
+                
                     if( type === 'hide' ){
                         style.display = 'none';
                     }
@@ -6213,7 +6253,7 @@ Anim.prototype = {
                     }                    
                 }
                 else{
-                    tp.set( elem, tv, tu );     
+                    data.set( elem, ev, unit );     
                 }
                 
                 // 最后一个动画完成时执行回调
@@ -6243,21 +6283,20 @@ E.mix( E.prototype, {
         options = easyAnim.mergeOptions( options );
 
         return this.forEach(function(){
-            var fn = options.complete,
-                sourceProps = options.sourceProps,
-                targetProps = options.targetProps,
-                isInit = sourceProps !== undefined,
-                source = {},
-                target = {},
+            var fn = options.complete,                
+                endProps = options.endProps,
+                startProps = options.startProps,
+                isInit = startProps !== undefined,                
                 elem = this,
+                animData = {},
                 len = 0,
                 pattern, anim, type, complete;
 
             // 获取常见动画模式的属性值
-            if( E.isFunction(targetProps) ){
-                pattern = targetProps();
+            if( E.isFunction(endProps) ){
+                pattern = endProps();
                 type = pattern.type;
-                targetProps = easyAnim.createProps( elem, pattern.props, type );
+                endProps = easyAnim.createProps( elem, pattern.props, type );
             }
 
             // 回调函数的封装
@@ -6272,55 +6311,74 @@ E.mix( E.prototype, {
             anim = new Anim( elem, options.duration, options.easing, complete, type );        
             
             easyAnim.queue( this, function(){
-                var elem = E( this ),
-                    parse = easyAnim.parseStyle,
-                    rOperator = /(?:[+-]=)/,                
-                    p, sv, tv, temp;
+                var parse = easyAnim.parseStyle,
+                    elem = E( this ),                    
+                    p, sv, ev, temp, startVal;
                 
-                for( p in targetProps ){
+                for( p in endProps ){
                     len++;
                     // 显示类动画先将开始时的CSS属性值重置为0
                     if( type === 'show' ){                        
                         elem.css( p, p === 'opacity' ? '0' : '0px' );
                     }
                     
-                    sv = isInit && sourceProps[p] || elem.css( p );
-                    tv = targetProps[p];
+                    sv = isInit ? startProps[p] :
+                        p === 'scrollTop' ? elem.scrollTop() :                        
+                        p === 'scrollLeft' ? elem.scrollLeft() :                        
+                        elem.css( p );
+                        
+                    ev = endProps[p];
                     
-                    if( !sv || !tv || sv === 'none' || tv === 'none' ){
+                    if( !sv && sv !== 0 ){
                         continue;
                     }
                     
                     // 处理 += / -= 的动画
-                    if( rOperator.test(tv) ){
-                        temp = tv.slice(2);
+                    if( rOperator.test(ev) ){
+                        temp = ev.slice(2);
                         
-                        tv = tv.charAt(0) === '+' ?
+                        ev = ev.charAt(0) === '+' ?
                             parseFloat( sv ) + parseFloat( temp ) : // +=
                             parseFloat( sv ) - parseFloat( temp );  // -=
                             
-                        tv = tv + temp.replace( rUnit, '' );
+                        ev = ev + temp.replace( rUnit, '' );
                     }
 
-                    // 解析动画开始时的CSS属性值
-                    source[p] = parse( p, sv );        
-                    // 解析动画结束时的CSS属性值
-                    target[p] = parse( p, tv );   
-
+                    animData[p] = E.merge( parse(p, sv, false), parse(p, ev, true) );   
+                    
                     // 如果有初始值，则设置动画开始时的初始值
                     if( isInit ){
-                        elem.css( p, sourceProps[p] || '' );
+                        startVal = startProps[p] || '';
+                        if( p === 'scrollTop' ){
+                            elem.scrollTop( startVal );
+                        }
+                        else if( p === 'scrollLeft' ){
+                            elem.scrollLeft( startVal );
+                        }                        
+                        else{
+                            elem.css( p, startVal );
+                        }
                     }
                 }
                 
                 // 开始动画                
-                anim.start( source, target, len );
+                anim.start( animData, len );
             });
             
             // 添加反向的动画队列
             if( options.reverse === true ){
-                easyAnim.queue( this, function(){                            
-                    anim.start( target, source, len );
+                easyAnim.queue( this, function(){
+                    var p, startVal, data;
+                    
+                    // 反向动画交换属性值
+                    for( p in animData ){
+                        data = animData[p];
+                        startVal = data.startVal;                    
+                        data.startVal = data.endVal;
+                        data.endVal = startVal;       
+                    }
+                    
+                    anim.start( animData, len );
                 });                
             }
         });
