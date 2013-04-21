@@ -312,11 +312,13 @@ else{
             style.zoom = 1;
             val = parseFloat( val );
             // IE6-8设置alpha(opacity=100)会造成文字模糊
-            val = val >= 1 ? '' : 'alpha(opacity=' + val * 100 + ')';
+            val = val >= 1 || isNaN( val ) ? '' : 'alpha(opacity=' + val * 100 + ')';
             
-            style.filter = rAlpha.test( filter ) ?
-                filter.replace( rAlpha, val ) :
-                filter + ' ' + val;
+            if( filter && val ){           
+                style.filter = rAlpha.test( filter ) ?
+                    filter.replace( rAlpha, val ) :
+                    filter + ' ' + val;
+            } 
         }
     };
     

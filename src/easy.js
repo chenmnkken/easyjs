@@ -188,14 +188,14 @@ var document = window.document,
 
 init.prototype = easyJS.prototype;
     
-/*
- * 将源对象的成员复制到目标对象中
- * @param { Object } 目标对象
- * @param { Object } 源对象
- * @param { Boolean } 是否覆盖 默认为true(覆盖)
- * @param { Array } 只复制该数组中在源对象中的属性
- * @return { Object } 目标对象
- */
+ /*
+  * 将源对象的成员复制到目标对象中
+  * @param { Object } 目标对象
+  * @param { Object } 源对象
+  * @param { Boolean } 是否覆盖 默认为true(覆盖)
+  * @param { Array } 只复制该数组中在源对象中的属性
+  * @return { Object } 目标对象
+  */
 easyJS.mix = function( target, source, override, whitelist ){
     if( !target || !source ) return;
     if( override === undefined ){
@@ -687,13 +687,13 @@ var easyModule = {
     
 };
 
-/*
- * 定义模块的全局方法(AMD规范)
- * @param { String } 模块名
- * @param { String / Array } 依赖模块列表，单个可以用字符串形式传参，多个用数组形式传参
- * @param { Function } 模块的内容
- * factory的参数对应依赖模块的外部接口(exports)
- */
+ /*
+  * 定义模块的全局方法(AMD规范)
+  * @param { String } 模块名
+  * @param { String / Array } 依赖模块列表，单个可以用字符串形式传参，多个用数组形式传参
+  * @param { Function } 模块的内容
+  * factory的参数对应依赖模块的外部接口(exports)
+  */
 window.define = function( name, deps, factory ){
     var module = easyJS.module,
         mod = module[ name ],        

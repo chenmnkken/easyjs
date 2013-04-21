@@ -105,6 +105,11 @@ E.easing = {
         }
 
         return r;
+    },
+    
+    // windows8开始面板的滑动切换效果
+    doubleSqrt : function( t ){
+        return Math.sqrt(Math.sqrt(t));
     }
 };
 
