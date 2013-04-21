@@ -5,7 +5,7 @@
 * Released under the MIT and GPL Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-4-21 14:53:14
+* Date : 2013-4-21 22:43:3
 */
 
 // ---------------------------------------------
@@ -4217,16 +4217,15 @@ else{
                 filter = elem.currentStyle ? elem.currentStyle.filter : style.filter || '';
     
             // IE在设置透明度的时候需要触发hasLayout
-            style.zoom = 1;
+            style.zoom = 1;            
             val = parseFloat( val );
             // IE6-8设置alpha(opacity=100)会造成文字模糊
             val = val >= 1 || isNaN( val ) ? '' : 'alpha(opacity=' + val * 100 + ')';
-            
-            if( filter && val ){           
-                style.filter = rAlpha.test( filter ) ?
-                    filter.replace( rAlpha, val ) :
-                    filter + ' ' + val;
-            } 
+         
+            style.filter = filter === '' && val === '' ? '' :
+                rAlpha.test( filter ) ?
+                filter.replace( rAlpha, val ) :
+                filter + ' ' + val;
         }
     };
     

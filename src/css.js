@@ -309,16 +309,15 @@ else{
                 filter = elem.currentStyle ? elem.currentStyle.filter : style.filter || '';
     
             // IE在设置透明度的时候需要触发hasLayout
-            style.zoom = 1;
+            style.zoom = 1;            
             val = parseFloat( val );
             // IE6-8设置alpha(opacity=100)会造成文字模糊
             val = val >= 1 || isNaN( val ) ? '' : 'alpha(opacity=' + val * 100 + ')';
-            
-            if( filter && val ){           
-                style.filter = rAlpha.test( filter ) ?
-                    filter.replace( rAlpha, val ) :
-                    filter + ' ' + val;
-            } 
+         
+            style.filter = filter === '' && val === '' ? '' :
+                rAlpha.test( filter ) ?
+                filter.replace( rAlpha, val ) :
+                filter + ' ' + val;
         }
     };
     
