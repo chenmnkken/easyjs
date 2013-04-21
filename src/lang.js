@@ -15,8 +15,9 @@ var rValidtokens = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d
     toString = Object.prototype.toString;
 
 E.type = function( obj ){
-    return obj===null ? 'null' :
- 		(obj===undefined && 'undefined' || toString.call( obj ).slice( 8, -1 ).toLowerCase());
+    return obj === null ? 'null' :
+        obj === undefined ? 'undefined' :
+        toString.call( obj ).slice( 8, -1 ).toLowerCase();
 };
 
 //-----------------------------
