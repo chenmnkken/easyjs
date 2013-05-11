@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>swichable demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/switchable_style.css" />
+<style type="text/css">
+body{ color:#333; font:12px/24px arial; padding-bottom:100px; background:#f5f5f5; }
+h1{ width:500px; font-size:28px; font-weight:400; margin:0 auto; height:80px; line-height:80px; }
+.box{ width:500px; background:#fff; box-shadow:0 1px 1px rgba(0, 0, 0, 0.2); margin:0 auto 20px; padding:20px; }
+</style>
+</head>
+<body>
+
+<h1>swichable demo</h1>
+
+
+<div class="box">
+
+    <div id="switchable3" class="eui_switchable">
+        <div class="sc_container">
+            <ul>
+                <li class="item1"><a href="#"><img src="images/002.jpg" alt="" /></a></li>
+                <li class="item2"><a href="#"><img src="images/003.jpg" alt="" /></a></li>
+                <li class="item3"><a href="#"><img src="images/004.jpg" /></a></li>
+                <li class="item4"><a href="#"><img src="images/001.jpg" /></a></li>
+            </ul>
+        </div>
+        <!--<a href="#" class="sc_prev">Previous</a>
+        <a href="#" class="sc_next">Next</a>-->    
+    </div>
+
+    <button id="btn1">pause</button>
+    <button id="btn2">play</button>    
+    
+
+</div>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'switchable', function(){
+    var Switchable = E.ui.Switchable,
+        sc;
+    
+    
+    var sc = new Switchable( '#switchable3', {
+        effects : 'fade',
+        nav : true
+    });    
+    
+    E( '#btn1' ).on( 'click', function(){
+        sc.pause();
+    });
+    
+    E( '#btn2' ).on( 'click', function(){
+        sc.play();
+    });
+});
+</script>
+</body>
+</html>

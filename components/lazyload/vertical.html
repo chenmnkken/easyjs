@@ -1,0 +1,56 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>横向滚动-图片延迟加载的演示</title>
+<style type="text/css">
+*{ margin:0; padding:0; }
+.wrapper{ width:9800px; }
+.img_box{ height:280px; width:480px; padding-bottom:30px; float:left; }
+</style>
+
+</head>
+<body>
+<h1>横向滚动的图片延迟加载</h1>
+<hr />
+<div class="wrapper" id="wrapper">
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/001.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/002.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/003.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/004.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/005.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/006.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/007.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/008.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/009.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/010.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/011.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/012.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/013.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/014.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/015.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/016.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/017.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/018.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/019.jpg" alt="" /></div>
+    <div class="img_box"><img src="../base/images/placeholder.png" data-lazysrc="images/020.jpg" alt="" /></div>
+</div>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'lazyload', function(){    
+    var lazyload = E.ui.Lazyload,
+        imgs = E( '#wrapper img' );
+    
+    new lazyload( imgs, {
+        axis : 'x',
+        effects : 'slideY'
+    });
+});
+</script>
+</body>
+</html>

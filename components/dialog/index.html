@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Dialog demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/dialog_style.css" />
+<style type="text/css">
+#hello{ width:300px; height:50px; line-height:50px; background:#f5f5f5; }
+</style>
+</head>
+<body>
+<h1 style="font-size:36px;">Dialog demo</h1>
+<hr />
+<p style="height:300px"></p>
+
+<button id="open">open</button>
+<button id="destroy">destroy</button>
+
+<p style="height:1000px"></p>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'dialog', function(){
+    var Dialog = E.ui.Dialog,
+        testDialog;
+    
+    testDialog = new Dialog( '#open', {
+        title : '对话框标题',
+        content : 'hello world : )',
+        yesFn : function(){
+            console.log( 'yes' );
+        },
+        noFn : function(){
+            console.log( 'no' );
+        },
+        effects : 'fade'
+    });
+});
+</script>
+</body>
+
+</html>

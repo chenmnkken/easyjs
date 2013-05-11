@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Drag demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<style type="text/css">
+.box1{ width:500px; height:320px; border:1px solid #ddd; margin:50px auto 0; position:relative; }
+.box2{ width:300px; height:200px; border:1px solid #06c; margin:40px 0 0 50px; padding:20px; }
+.box3{ background:#333; width:100px; height:100px;  }
+</style>
+</head>
+<body>
+<h1 style="font-size:36px;">Drag demo</h1>
+<hr />
+
+<div class="box1" id="box1">
+	<div class="box2" id="box2">
+		<div class="box3" id="box3"></div>
+	</div>
+</div>
+
+<button id="teardown">teardown</button>
+
+<p style="height:1000px;"></p>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+
+E.use( 'drag', function(){
+    var Drag = E.ui.Drag,
+        drag = new Drag( '#box3', { proxy : false } );
+        
+        
+    drag.on( 'drag', function( e ){
+        console.log( e.pageX );
+        console.log( e.pageY );
+    });
+
+    E( '#teardown' ).one( 'click', function(){
+        drag.destroy();
+    });
+    
+});
+
+</script>    
+</body>
+
+</html>

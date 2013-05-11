@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Tab demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/tab_style.css" />
+<style type="text/css">
+.eui_tab{ width:320px; height:200px; margin:50px auto 0; }
+.eui_tab .tab_wrapper{ border:solid #ddd; border-width:0 1px 1px; }
+.eui_tab .tab_content div{ width:278px; height:129px; padding:20px; }
+.eui_tab .tab_content p{ line-height:24px; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Tab demo</h1>
+<hr />
+
+<div class="eui_tab" id="tab1">
+	<ul class="tab_menu">
+		<li class="current">火星</li>
+		<li>非洲</li>
+		<li>酸奶</li>
+	</ul>
+    
+    <div class="tab_wrapper">
+        <div class="tab_content">
+            <div>
+                <p>36年前的打印数据被还原，对它们的最新分析显示美国宇航局（NASA）可能已经在火星上发现了生命。这项研究成果被一个由数学家和科学家组成的国际团队于本周发表。</p>
+            </div>
+            <div style="display:none">
+                <p>当非洲成为世界上增速最快的经济体之一时，为什么美国媒体仍将非洲描述为“一个无尽凄惨的大陆”？</p>
+            </div>
+            <div style="display:none">
+                <p>日本研究发现，通过持续摄入含R-1乳酸菌的酸奶，可有效降低中小学生患流感的机率，其机理在于提高了一种杀灭坏细胞的NK细胞的活性，从而降低了病菌感染率。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<button id="destoryBtn">destroy</button>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'tab', function(){
+    var Tab = E.ui.Tab,
+        demoTab = new Tab( '#tab1',{
+            effects : 'slideX'
+        });
+    
+    demoTab.on( 'init', function( e ){
+        console.log( e.index );
+        console.log( e.menu );
+        console.log( e.target );
+    });
+
+    
+    E( '#destoryBtn' ).on( 'click', function(){
+        demoTab.destroy();
+    });
+});
+</script>
+</body>
+</html>

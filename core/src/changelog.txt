@@ -1,0 +1,15 @@
+1、easyJS构造器去掉对Function参数的支持，domReady方法通过E.ready来访问。
+
+2、去掉every、some、map原型方法。
+
+3、节点操作的原型方法不再接受Function参数，其中包含了( after afterTo append appendTo before beforeTo prepend prependTo html wrap text replace addClass removeClass toggleClass val )
+
+4、实现了mouseenter、mouseleave事件的代理
+
+5、E.prototpye.fire方法传递附加数据的优化，并统一使用模拟的触发器
+
+6、对节点模块进行优化，让其支持文档碎片的自由append
+
+7、语言扩展模块增加数组去重distinct的方法
+
+8、对模块加载器进行优化，

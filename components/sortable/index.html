@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Sortable demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<style type="text/css">
+.wrapper{ width:508px; margin:50px auto 0; }
+.list{ border:1px solid #ccc; padding:20px 20px 10px; float:left; margin-right:20px; }
+.list2{ margin:0; }
+.list li{ margin-bottom:10px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.25); width:200px; height:32px; line-height:32px; text-align:center; color:#000; font-size:14px; border:1px solid; }
+.list .item1{ background:#F2C89F; border-color:#B19C87; }
+.list .item2{ background:#B6BFDA; border-color:#7E869D; }
+.list .disable{ background:#eee; border-color:#ccc; color:#ccc; box-shadow:none; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Sortable demo</h1>
+<hr />
+
+<div class="wrapper">
+    <ul id="list1" class="list">
+        <li class="item1">1</li>
+        <li class="item1">2</li>
+        <li class="item1">3</li>
+        <li class="item1">4</li>
+        <li class="item1">5</li>
+        <li class="item1">6</li>
+    </ul>
+
+    <ul id="list2" class="list list2">
+        <li class="item2">A</li>
+        <li class="item2">B</li>
+        <li class="item2">C</li>
+        <li class="item2">D</li>
+        <li class="item2">E</li>
+        <li class="item2">F</li>
+    </ul>
+    
+    <button id="destroy">destroy</button>
+</div>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'sortable', function(){
+    var Sortable = E.ui.Sortable,
+        sort1, sort2;
+    
+    var sort1 = new Sortable( '#list1',{
+        connect : null
+    });
+    
+    var sort2 = new Sortable( '#list2', {
+        connect : '#list1'
+    });
+    
+    E( '#destroy' ).one( 'click', function(){
+        sort1.destroy();
+        sort2.destroy();
+    });
+    
+    sort1.on( 'moved', function( e ){
+        console.log( e.drag );
+        console.log( e.drop );
+    });
+});
+</script>
+</body>
+</html>

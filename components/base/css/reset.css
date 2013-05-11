@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6,pre, form, fieldset, input, textarea, p, blockquote, th, td {padding:0;margin:0;}   
+body{ font:12px/1.5 "Microsoft yahei",arial; color:#333; }
+fieldset, img {border:0;}   
+table{border-collapse:collapse;border-spacing:0;}   
+ol, ul{list-style:none;}   
+address, caption, cite, code, th{font-weight:normal;font-style:normal;}    
+h1, h2, h3, h4, h5, h6{font-size:100%;}   
+
+input[type="submit"]::-moz-focus-inner,input[type="button"]::-moz-focus-inner,button::-moz-focus-inner{ border:0; padding:0; margin:0; } 
+button, input, select, textarea { font-family: tahoma, arial, \5b8b\4f53, sans-serif; }

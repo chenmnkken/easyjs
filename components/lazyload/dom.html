@@ -1,0 +1,773 @@
+﻿<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>DOM延迟加载的演示</title>
+<style type="text/css">
+*{ margin:0; padding:0; }
+.box{ width:600px; height:600px; overflow:hidden; margin:0 auto; margin-bottom:200px; background:#f0f0f0; padding:50px; }
+.fragment_box{ display:none; }
+</style>
+
+</head>
+<body>
+<h1>DOM延迟加载的演示</h1>
+<hr>
+
+<p style="height:1000px;"></p>
+
+<div class="wrapper" id="wrapper">
+    <div class="box">
+        <textarea class="fragment_box">
+        <div class="panel">
+			<div class="nav">
+				<a href="http://g.360.cn">游戏</a><a href="http://v.360.cn/dianying/index.html">电影</a><a href="http://v.360.cn/dianshi/index.html">电视剧</a><a href="http://xiaoshuo.360.cn/">小说</a><a href="http://music.so.com">音乐</a><a href="http://g.360.cn">闪游</a><a href="http://mall.360.cn/?fname=hao_main1_1130_mall1&amp;eee=hao_main1_1130_mall1">购物</a><a href="http://tuan.360.cn/?do=movie&amp;fname=hao_main1_movie&amp;eee=hao_main1_movie&amp;fsign=6706b09022">团电影票</a><a href="http://tejia.youhui.360.cn/?fname=hao_main1_1130_zhidemai&amp;eee=hao_main1_1130_zhidemai">今日特价品</a><a href="http://tao.mall.360.cn/?eee=tiyan">淘宝皇冠店</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://g.360.cn">页游</a></h3>
+				<ul class="list">
+					<li><a href="http://jjsg.wan.360.cn/?src=DHN-kz-mid01">街机三国</a></li>
+					<li><a href="http://ljol2.wan.360.cn/?src=DHN-kz-mid02">龙将2</a></li>
+					<li><a href="http://djj.wan.360.cn/?src=DHN-kz-mid03">大将军</a></li>
+					<li><a href="http://cssg.wan.360.cn/?src=DHN-kz-mid04">创世三国</a></li>
+					<li><a href="http://dpqk.wan.360.cn/?src=DH-bot-mid05">斗破乾坤</a></li>
+					<li><a href="http://xyb.wan.360.cn/?src=DHN-kz-mid06">轩辕变</a></li>
+				</ul>
+				<a class="more" href="http://g.360.cn">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://v.360.cn/">影视</a></h3>
+				<ul class="list">
+					<li><a href="http://v.360.cn/dianying/index.html">电 影</a></li>
+					<li><a href="http://v.360.cn/dianshi/index.html">电视剧</a></li>
+					<li><a href="http://v.360.cn/zongyi/index.php">综 艺</a></li>
+					<li><a href="http://v.360.cn/yule/index.html">娱 乐</a></li>
+					<li><a href="http://v.360.cn/dongman/index.php">动 漫</a></li>
+					<li><a href="http://v.360.cn/live">电视直播</a></li>
+				</ul>
+				<a class="more" href="http://v.360.cn/">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://v.360.cn/site.html">视频</a></h3>
+				<ul class="list">
+				  <li><a href="http://www.youku.com/">优 酷</a></li>
+                  <li><a href="http://www.tudou.com/?TPA=dW5pb25faWQ9MTAwMzYwXzEwMDAwNF8wMV8wMQ">土豆网</a></li>
+                  <li><a href="http://tv.sohu.com/?pvid=de3fb3b6e98091e7">搜狐视频</a></li>
+                  <li><a href="http://www.letv.com/">乐视网高清</a></li>
+                  <li><a href="http://www.6.cn/">六间房秀场</a></li>
+                  <li><a href="http://v.360.cn/special/wsgs.html">我是歌手</a></li>
+				</ul>
+				<a class="more" href="http://v.360.cn/site.html">更多»</a>
+			</div>
+			<div data-item="novel" class="item ">
+				<h3 class="subtitle"><a href="http://xiaoshuo.360.cn/">小说</a><a class="guess-toggle" href="">酷站猜</a></h3>
+				<ul class="list">
+					<li><a href="http://www.qidian.com">起点中文网</a></li>
+					<li><a href="http://www.zongheng.com/">纵横中文网</a></li>
+					<li><a href="http://www.zhulang.com/">逐浪小说网</a></li>
+					<li><a href="http://www.17k.com/">17K小说网</a></li>
+					<li><a href="http://book.sina.com.cn/">新浪读书</a></li>
+					<li><a href="http://xiaoshuo.360.cn/girl">言情小说</a></li>
+				</ul>
+				<div id="cool-guess-novel" class="cool-site-guess"><ul>
+	<li>
+		<ins class="dot">•</ins><a class="blue" href="http://xiaoshuo.360.cn/boy">男生</a>|
+		<a href="http://xiaoshuo.360.cn/list?type=1">武侠</a>
+		<a href="http://xiaoshuo.360.cn/list?type=2">仙侠</a>
+		<a href="http://xiaoshuo.360.cn/list?type=3">玄幻</a>
+		<a href="http://xiaoshuo.360.cn/list?type=4">奇幻</a>
+		<a href="http://xiaoshuo.360.cn/list?type=12">都市</a>
+		<a href="http://xiaoshuo.360.cn/list?type=18">伦理</a>
+		<a href="http://xiaoshuo.360.cn/list?type=11">黑道</a>
+	</li>
+	<li>
+		<ins class="dot">•</ins><a class="blue" href="http://xiaoshuo.360.cn/girl">女生</a>|
+		<a href="http://xiaoshuo.360.cn/list?type=14">现代言情</a>
+		<a href="http://xiaoshuo.360.cn/list?type=13">古代言情</a>
+		<a href="http://xiaoshuo.360.cn/list?type=17">时空穿越</a>
+		<a href="http://xiaoshuo.360.cn/list?type=15">总裁豪门</a>
+	</li>
+	<li>
+		<ins class="dot">•</ins><a class="blue" href="http://xiaoshuo.360.cn/">推荐</a>|
+		<a href="http://xiaoshuo.360.cn/novel/LNTUDRCyLH34Pj.html">邪丐凌仙</a>
+		<a href="http://xiaoshuo.360.cn/novel/LtLUDRG4NHS3OD.html">和姐姐大人同居的日子</a>
+		<a href="http://xiaoshuo.360.cn/novel/KtbYDRKyMXv3QD.html">全能医药师</a>
+	</li>
+	<li>
+		<ins class="dot">•</ins><a class="blue" href="http://top.hongxiu.com/">排行</a>|
+		<a href="http://xiaoshuo.360.cn/novel/MdTZDRG4Mn7CPj.html">贴身美女军团</a>
+		<a href="http://xiaoshuo.360.cn/novel/LtPaDRG5MH7DPD.html">莽荒纪</a>
+		<a href="http://xiaoshuo.360.cn/novel/KtTXDRG4MnCAOj.html">斗破苍穹续集</a>
+	</li>
+</ul><div class="g-point g-point-top"><span class="border"></span><span class="border"></span><span class="bg"></span></div></div>				<a class="more" href="http://xiaoshuo.360.cn/">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://music.so.com">音乐</a></h3>
+				<ul class="list">
+					<li><a href="http://www.kugou.com/1099">酷狗音乐</a></li>
+					<li><a href="http://www.1ting.com/">一听音乐网</a></li>
+					<li><a href="http://www.9ku.com/">九酷音乐网</a></li>
+					<li><a href="http://v.6.cn/?src=360music#r1">音乐现场</a></li>
+					<li><a href="http://fanxing.kugou.com/ext/union/?unionId=2&amp;url=room">美女音乐秀</a></li>
+					<li><a href="http://www.migu.cn">咪咕音乐</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/yinyuewz.html">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://g.360.cn">游戏</a></h3>
+				<ul class="list">
+					<li><a href="http://www.4399.com/">4399小游戏</a></li>
+					<li><a href="http://www.7k7k.com/">7K7K小游戏</a></li>
+                                         <li><a href="http://www.2144.cn">2144小游戏</a></li>
+					<li><a href="http://zsg.173.com/event/201303/0312arrival/index.htm?dida=x130013d50028f6000&amp;pageinfo=wmadap&amp;type=1">战三国</a></li>
+                                        <li><a href="http://counter.ztgame.com/ref.php?ref=584182&amp;return_url=http%3A%2F%2Fzt2.ztgame.com%2Factivity%2Fggao%2Findex.html%3Fad%3D584182">征途2</a></li>
+                                       <li><a href="http://allyes.nie.163.com/main/adfclick?db=afanie&amp;bid=729925,363667,909&amp;cid=61802,399,1&amp;sid=728622&amp;show=ignore&amp;url=http://qn2.163.com/360/">倩女幽魂2</a></li>
+				</ul>
+				<a class="more" href="http://g.360.cn">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://mall.360.cn/?fname=hao_main1_1130_mall2&amp;eee=hao_main1_1130_mall2">购物</a></h3>
+				<ul class="list">
+					<li><a href="http://click.union.jd.com/JdClick/?unionId=34&amp;siteid=360_kzgw_2&amp;to=http://www.jd.com">京东商城</a></li>
+					<li><a href="http://www.suning.com/?utm_medium=kuzhan&amp;utm_source=hao360&amp;utm_campaign=g1">苏宁易购</a></li>
+					<li><a style="background-image:url(http://p1.qhimg.com/t01066b223e14d00d0b.png);" class="favicon" href="http://www.amazon.cn/?tag=360daohangkz01-23">亚马逊</a></li>
+					<li><a href="http://www.vancl.com/?source=3602010gw">凡客诚品</a></li>
+					<li><a href="http://track.lefeng.com/track.jsp?aid=4880&amp;url=http://www.lefeng.com/?utm_source=hao360&amp;utm_medium=cpm&amp;utm_campaign=113" class="orange">乐蜂网化妆品</a></li>
+					<li><a href="http://union.dangdang.com/adlink_transfer.php?fromweb=536-534-hao360ku&amp;backurl=http://click.r.dangdang.com/_utm_ad_id/30270/http%3A%2F%2Fwww.dangdang.com%2F">当当网商城</a></li>
+				</ul>
+				<a class="more" href="http://mall.360.cn/?fname=hao_main1_1130_mall3&amp;eee=hao_main1_1130_mall3">更多»</a>
+			</div>
+		</div>
+        </textarea>
+    </div>
+    <div class="box">
+        <textarea class="fragment_box">
+        <div class="panel">
+			<div class="nav">
+				<a href="http://sh.qihoo.com/">新闻</a><a href="http://hao.360.cn/junshiguofang.html">军事</a><a href="http://hao.360.cn/tiyuyundong.html">体育</a><a href=" http://hao.360.cn/nba.html">NBA</a><a href="http://hao.360.cn/gupiaojijin.html">财经</a><a href="http://g.360.cn">网游</a><a href="http://xiaoyouxi.360.cn/">小游戏</a><a href="http://qipai.360.cn/?src=DH-mid-qipai">棋牌</a><a href="http://cp.360.cn/ssq/?a=dhgg">双色球</a><a href="http://edu.360.cn/exam/gaokao/">高考</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://hao.360.cn/mianfeiziyuan.html">邮箱</a></h3>
+				<ul class="list">
+					<li><a href="http://mail.163.com/">163邮箱</a></li>
+					<li><a href="http://www.126.com/">126邮箱</a></li>
+					<li><a href="http://mail.cn.yahoo.com/">雅虎邮箱</a></li>
+					<li><a href="http://mail.qq.com/">QQ邮箱</a></li>
+					<li><a href="http://mail.sina.com.cn/">新浪邮箱</a></li>
+					<li><a href="http://www.hotmail.com/">Hotmail</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/mianfeiziyuan.html">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://sh.qihoo.com/">新闻</a></h3>
+				<ul class="list">
+					<li><a href="http://news.sina.com.cn/">新浪新闻</a></li>
+					<li><a href="http://news.163.com/">网易新闻</a></li>
+					<li><a href="http://news.sohu.com/">搜狐新闻</a></li>
+					<li><a href="http://news.ifeng.com/">凤凰新闻</a></li>
+					<li><a href="http://www.huanqiu.com/">环球网</a></li>
+					<li><a href="http://www.xinhuanet.com/">新华网</a></li>
+				</ul>
+				<a class="more" href="http://sh.qihoo.com/">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://hao.360.cn/junshiguofang.html">军事</a></h3>
+				<ul class="list">
+					<li><a href="http://military.china.com/zh_cn/">中华网军事</a></li>
+					<li><a href="http://www.tiexue.net/?360">铁血军事</a></li>
+					<li><a href="http://www.miercn.com/">米尔军情网</a></li>
+					<li><a href="http://www.xinjunshi.com">环球新军事</a></li>
+					<li><a href="http://junshi.xilu.com/?czclac=4ecf28a8626490009d78e14da04fae66">西陆军事</a></li>
+					<li><a href="http://www.qianyan001.com/">军事前沿</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/junshiguofang.html">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://hao.360.cn/tiyuyundong.html">体育</a></h3>
+				<ul class="list">
+					<li><a href="http://sports.sina.com.cn/">新浪体育</a></li>
+					<li><a href="http://sports.sohu.com/">搜狐体育</a></li>
+					<li><a href="http://sports.163.com/">网易体育</a></li>
+					<li><a href="http://www.hupu.com/">虎扑体育</a></li>
+					<li><a href="http://360kan.fengyunzhibo.com/live/cctv5/?site=fengyunzhibo">CCTV5直播</a></li>
+					<li><a href="http://sports.sina.com.cn/nba/">NBA常规赛</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/tiyuyundong.html">更多»</a>
+			</div>
+			<div class="item ">
+				<h3 class="subtitle"><a href="http://hao.360.cn/gupiaojijin.html">财经</a></h3>
+				<ul class="list">
+					<li><a href="http://www.eastmoney.com/">东方财富网</a></li>
+					<li><a href="http://www.hexun.com/">和讯财经</a></li>
+					<li><a href="http://finance.sina.com.cn/">新浪财经</a></li>
+					<li><a href="http://business.sohu.com/">搜狐财经</a></li>
+					<li><a href="http://cn.wsj.com/">华尔街日报</a></li>
+					<li><a href="http://www.cnfol.com/">中金在线</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/gupiaojijin.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://g.360.cn">网游</a></h3>
+				<ul class="list">
+                                <li><a href="http://c.admaster.com.cn/c/a11875,b200161381,c1856,i0,m101,h">完美国际</a></li>
+                               <li><a href="http://tl.changyou.com/load/20130314/?rcc_id=8affc0cf3da061aa013db57ffc644c6b">天龙八部</a></li>
+                               <li><a href="http://www.mygame66.com/210350048.html">天 界</a></li>
+                               <li><a href="http://event50.wanmei.com/zhuxian/201303/zhuxian20319arrival/index.htm?dida=x130013e5003cac000&amp;pageinfo=wmadap&amp;type=1">诛 仙</a></li>
+                               <li><a href="http://i.xiakeol.com/ggdir.aspx?ggid=97">侠客无双</a></li>
+                              <li><a class="orange" href="http://counter.ztgame.com/ref.php?ref=532454&amp;return_url=http%3A%2F%2Fxx.ztgame.com%2Findex.html%3Fad%3D532454">仙侠世界</a></li>
+		 		</ul>
+				<a class="more" href="http://g.360.cn">更多»</a>
+			</div>
+		</div>
+        </div>
+        </textarea>
+    </div>
+    
+    
+    <div class="box">
+    <textarea class="fragment_box">
+<div class="panel">
+			<div class="nav">
+				<a href="http://mall.360.cn/?fname=hao_main1_1130_mall4&amp;eee=hao_main1_1130_mall4">商城</a><a href="http://tuan.360.cn/?fname=hao_main1_tuan&amp;eee=hao_main1_tuan&amp;fsign=6f57c4d5af">团购</a><a href="http://tao.mall.360.cn/?eee=tiyan">皇冠店</a><a href="http://www.taobao.com/go/chn/tbk_channel/onsale.php?pid=mm_15144495_2216478_9097195&amp;unid=1">淘宝特卖</a><a href="http://youhui.360.cn/quan?aname=tiyan&amp;eee=hao_main1_quan&amp;fname=hao_main1_quan">优惠券</a><a href="http://hao.360.cn/yinhang.html">银行</a><a href="http://hao.360.cn/jiaoyou.html">交友</a><a href="http://hao.360.cn/shequluntan.html">社区</a><a href="http://hao.360.cn/usedcar.html">二手车</a> <a href="http://www.875.cn/index360.html">好项目</a>
+			</div>
+			<div data-item="car" class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/cars.html">汽车</a><a class="guess-toggle" href="">酷站猜</a></h3>
+				<ul class="list">
+					<li><a href="http://www.bitauto.com/?WT.mc_id=360kz">易车网</a></li>
+					<li><a href="http://www.autohome.com.cn/?pvareaid=100520">汽车之家</a></li>
+					<li><a href="http://www.cheshi.com">网上车市</a></li>
+					<li><a href="http://auto.sina.com.cn/?c=spr_web_sq_hao360_auto_t001">新浪汽车</a></li>
+					<li><a href="http://www.pcauto.com.cn/?ad=3474">太平洋汽车</a></li>
+					<li><a href="http://www.xcar.com.cn">爱卡汽车</a></li>
+				</ul>
+				<div id="cool-guess-car" class="cool-site-guess"><ul>
+	<li><ins class="dot">•</ins><a class="blue" href="http://www.bitauto.com/?WT.mc_id=360kuzhan">综合</a>|<a href="http://www.pcauto.com.cn/qcbj/bj/">行情</a><a href="http://news.cheshi.com/newcar.shtml">新车</a><a href="http://hao.360.cn/usedcar.html">二手车</a><a href=" http://car.bitauto.com/tree_daogou/?WT.mc_id=360kuzhan">导购</a><a href=" http://news.cheshi.com/sjpc/">评测</a><a href="http://baa.bitauto.com/?WT.mc_id=360kuzhan">论坛</a><a href=" http://model.auto.sina.com.cn/">车模</a></li>
+	<li><ins class="dot">•</ins><a class="blue" href="http://price.bitauto.com/city.aspx?cityCode=2401?WT.mc_id=360kuzhan">报价</a>|<a href="http://price.pcauto.com.cn/price/q-p1.html">5万以下</a><a href="http://price.pcauto.com.cn/price/q-p2.html"> 5-8万</a><a href="http://price.pcauto.com.cn/price/q-ps8-pe15.html">8-15万</a><a href="http://price.pcauto.com.cn/price/q-ps15-pe30.html">15-30万</a><a href="http://price.pcauto.com.cn/price/q-ps30.html">30万以上</a></li>
+	<li><ins class="dot">•</ins><a class="blue" href="http://car.bitauto.com/?WT.mc_id=360kuzhan">车型</a>|<a href="http://car.bitauto.com/weixingche/?WT.mc_id=360kuzhan">微型</a><a href="http://car.bitauto.com/zhongxingche/?WT.mc_id=360kuzhan">中型</a><a href="http://car.bitauto.com/jincouxingche/?WT.mc_id=360kuzhan">紧凑型</a><a href="http://car.bitauto.com/suv/?WT.mc_id=360kuzhan">SUV</a><a href="http://car.bitauto.com/xiaoxingche/?WT.mc_id=360kuzhan">小型</a><a href="http://car.bitauto.com/paoche/?WT.mc_id=360kuzhan">跑车</a><a href="http://car.bitauto.com/haohuaxingche/?WT.mc_id=360kuzhan">豪华型</a></li>
+	<li><ins class="dot">•</ins><a class="blue" href="http://car.autohome.com.cn/zhaoche/pinpai/">品牌</a>|<a href="http://car.autohome.com.cn/price/brand-33.html">奥迪</a><a href="http://www.autohome.com.cn/442/">速腾</a><a href="http://data.auto.sina.com.cn/573">宝来</a><a href="http://data.auto.sina.com.cn/brands/6">大众</a><a href="http://www.autohome.com.cn/614/">朗逸</a><a href="http://data.auto.sina.com.cn/6">帕萨特</a><a href="http://data.auto.sina.com.cn/13">高尔夫</a></li>
+</ul><div class="g-point g-point-top"><span class="border"></span><span class="border"></span><span class="bg"></span></div></div>				<a class="more" href="http://hao.360.cn/cars.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/yinhang.html">银行</a></h3>
+				<ul class="list">
+					<li><a href="http://www.icbc.com.cn/">工商银行</a></li>
+					<li><a href="http://www.ccb.com/">建设银行</a></li>
+					<li><a href="http://www.boc.cn/">中国银行</a></li>
+					<li><a href="http://www.cmbchina.com/">招商银行</a></li>
+					<li><a href="http://www.abchina.com/">农业银行</a></li>
+					<li><a href="http://www.bankcomm.com/">交通银行</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/yinhang.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://mall.360.cn/?fname=hao_main1_1130_mall5&amp;eee=hao_main1_1130_mall5">商城</a></h3>
+				<ul class="list">
+
+					<li><a href="http://www.1mall.com/?tracker_u=6425448">1号商城</a></li>
+					<li><a href="http://www.gome.com.cn/ec/homeus/?cmpid=dh_360_sc">国美在线</a></li>
+					<li><a href="http://a1722.oadz.com/link/C/1722/3081/IxHUGZ90vB8.kyVh-hHcIe5.Ehk_/p016/0/http://www.jiuxian.com/coop/cpstrack.php?src=sem&amp;code=360_kz_20120929&amp;url=http://www.jiuxian.com" class="orange">酒仙网购酒</a></li>
+					<li><a href="http://an.moonbasa.com/transfer.aspx?cn=6854&amp;type=0&amp;adsiteid=10000007&amp;url=http://www.moonbasa.com/">梦芭莎女装</a></li>
+					<li><a style="background-image:url(http://p0.qhimg.com/t012d99bdbfc05a1818.png);" class="favicon" href="http://www.jumei.com?referer=360_kz_sc&amp;utm_medium=nav&amp;utm_source=360&amp;utm_content=kz_sc">聚美优品</a></li>
+					<li><a href="http://www.xiu.com/?from=13993740&amp;utm_content=13993740&amp;utm_campaign=navs&amp;utm_source=360daohang&amp;utm_medium=shangcheng-kuzhan&amp;utm_term=xiu-tuwen">走秀网</a></li>
+				</ul>
+				<a class="more" href="http://mall.360.cn/?fname=hao_main1_1130_mall6&amp;eee=hao_main1_1130_mall6">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://tuan.360.cn/?fname=hao_main1_tuan&amp;eee=hao_main1_tuan&amp;fsign=6f57c4d5af">团购</a></h3>
+				<ul class="list">
+					<li><a href="http://www.meituan.com/?utm_campaign=hao.360.cn&amp;utm_medium=nav&amp;utm_source=hao.360.cn&amp;utm_content=type">美团网</a></li>
+					<li><a href="http://open.union.360.cn/go?bid=2000345&amp;qihoo_id=36100&amp;cid=0&amp;aid=142164&amp;url=http%3A%2F%2F55tuan.com%2F%3Ffrom%3Ddaohang-hao360sykz&amp;sign=1c3b7d45b3">窝窝团</a></li>
+					<li><a href="http://www.lashou.com/?qdh=3012">拉手网</a></li>
+					<li><a href="http://click.union.jd.com/JdClick/?unionId=34&amp;siteid=360_kztg&amp;to=http://tuan.jd.com">京东团购</a></li>
+					<li><a href="http://www.1mall.com/tuangou/index.do?tracker_u=10634120034">1号店团购</a></li>
+				  <li><a href="http://tuan.elong.com/?banid=tgku360">艺龙酒店团</a></li> 
+				</ul>
+				<a class="more" href="http://tuan.360.cn/?fname=hao_main1_tuan&amp;eee=hao_main1_tuan&amp;fsign=6f57c4d5af">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/jiaoyou.html">交友</a></h3>
+				<ul class="list">
+					            <li><a href="http://www.jiayuan.com/st/?id=4678&amp;url=www.jiayuan.com">世纪佳缘交友</a></li>
+					<li><a href="http://www.zhenai.com/901181.html">珍爱婚恋网</a></li>
+				                    <li><a href="http://www.baihe.com/?policy=1&amp;Channel=hao360-k&amp;Code=140011-b">百合网</a></li>					
+				                    <li><a href="http://www.renren.com/">人人网</a></li>
+				                    <li><a href="http://www.juedui100.com/jueduiJumpResource/20001/?url=http://www.juedui100.com/">绝对100交友</a></li>
+				                    <li><a href="http://www.zhiji.com/">知己同城交友</a></li>
+				</ul>
+				                    <a class="more" href="http://hao.360.cn/jiaoyou.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/shequluntan.html">社区</a></h3>
+				<ul class="list">
+					<li><a href="http://www.kaixin001.com/">开心网</a></li>
+					<li><a href="http://qzone.qq.com/">QQ空间</a></li>
+					<li><a href="http://www.tianya.cn/">天涯社区</a></li>
+					<li><a href="http://dzh.mop.com/">猫扑大杂烩</a></li>
+                                        <li><a href="http://weibo.com/?c=spr_web_360_hao360_weibo_t002">新浪微博</a></li>
+					<li><a href="http://www.douban.com/">豆 瓣</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/shequluntan.html">更多»</a>
+			</div>
+		</div>    
+    
+    </div>
+    <div class="box">
+    <textarea class="fragment_box">
+    <div class="panel">
+			<div class="nav">
+				<a href="http://cp.360.cn/?a=dhgg1">彩票</a><a href="http://go.360.cn/">旅游</a><a href="http://hao.360.cn/nvxing.html">女性</a><a href="http://hao.360.cn/fashion.html">时尚</a><a href="http://hao.360.cn/rencaizhaopin.html">招聘</a><a href="http://hao.360.cn/diannaowangluo.html">电脑</a><a href="http://baoku.360.cn">软件</a><a href="http://hao.360.cn/shoujitongxin.html">手机</a><a href="http://zhushou.360.cn/soft/?ref=wzdh">手机应用</a><a href="http://hao.360.cn/baoxian.html">保险</a>
+			</div>
+			<div data-item="caipiao" class="item guess-open">
+				<h3 class="subtitle"><a href="http://hao.360.cn/shenghuoxinxi.html">生活</a><a class="guess-toggle" href="">酷站猜</a></h3>
+				<ul class="list">
+					<li><a href="http://www.ganji.com/?ca_name=hao360_hao360_042_quanguoshouye">赶集网</a></li>
+					<li><a href="http://www.mmbang.com">怀孕妈妈帮</a></li>
+					<li><a href="http://www.soufun.com/">搜房网</a></li>
+					<li><a href="http://www.anjuke.com/?utm_source=navi-360-kz&amp;utm_medium=cpc&amp;pi=navi-360-kz">安居客房产</a></li>
+					<li><a href="http://www.baixing.com/">百姓网</a></li>
+					<li><a href="http://www.58.com/?path=?utm_source%3dhao360%26utm_campaign%3dhao360-102&amp;360cool_site">58同城</a></li>
+				</ul>
+				<div id="cool-guess-life" class="cool-site-guess"><ul>
+	<li>		
+		<ins class="dot">•</ins><a class="blue" href="http://hao.360.cn/fangchanjiaju.html">房产</a>|
+		<a href="http://soufun.com/house/">新房</a>
+		<a href="http://soufun.com/house/proj_list_ALL.htm">热盘</a>
+		<a href="http://www.58.com/?path=zufang?utm_source%3dhao360%26utm_campaign%3dhao360-149">租房</a>
+		<a href="http://anjuke.com/sale/">二手房</a>
+		<a href="http://home.soufun.com/">家居装修</a>
+	</li>
+	<li>
+		<ins class="dot">•</ins><a class="blue" href="http://www.58.com/?path=sale.shtml?utm_source%3dhao360%26utm_campaign%3dhao360-166">二手</a>|
+		<a href="http://www.58.com/?path=shouji/?utm_source%3dhao360%26utm_campaign%3dhao360-167">手机</a>
+		<a href="http://www.58.com/?path=shumaxiangji/?utm_source%3dhao360%26utm_campaign%3dhao360-168">相机</a>
+		<a href="http://www.58.com/?path=diannao/?utm_source%3dhao360%26utm_campaign%3dhao360-169">电脑</a>
+		<a href="http://www.58.com/fuzhuangshoubiao/">手表</a>
+		<a href="http://www.58.com/jiadian/">家电</a>
+		<a href="http://www.58.com/ershoujiaju/">家具</a>
+	</li>
+	<li>		
+		<ins class="dot">•</ins><a class="blue" href="http://www.58.com/?path=shenghuo/?utm_source%3dhao360%26utm_campaign%3dhao360-15">家政</a>|
+		<a href="http://www.58.com/?path=banjia/?utm_source%3dhao360%26utm_campaign%3dhao360-153">搬家</a>
+		<a href="http://www.58.com/?path=baomu/?utm_source%3dhao360%26utm_campaign%3dhao360-154">保姆</a>
+		<a href="http://www.58.com/?path=yuesao/?utm_source%3dhao360%26utm_campaign%3dhao360-155">月嫂</a>
+		<a href="http://www.ganji.com/baojie/">保洁</a>
+		<a href="http://www.ganji.com/huishou/">回收</a>
+		<a href="http://www.ganji.com/jiadianweixiu/">家电维修</a>
+	</li>
+	<li>		
+		<ins class="dot">•</ins><a class="blue" href="http://tuan.360.cn/?fname=hao_main1open_tuan&amp;eee=hao_main1open_tuan&amp;fsign=735d1a12bf">团购</a>|
+		<a href="http://tuan.360.cn/?do=category&amp;clazz=1&amp;fname=hao_main1open_tuan_meishi&amp;eee=hao_main1open_tuan_meishi&amp;fsign=6af751d972#tuan_list_mark">美食</a>
+		<a href="http://tuan.360.cn/movie/?fname=hao_main1open_tuan_movie&amp;eee=hao_main1open_tuan_movie&amp;fsign=48fe4b1b05">电影票</a>
+		<a href="http://tuan.360.cn/?do=category&amp;clazz=204&amp;fname=hao_main1open_tuan_ktv&amp;eee=hao_main1open_tuan_ktv&amp;fsign=93b523852b#tuan_list_mark">KTV</a>
+		<a href="http://tuan.360.cn/?do=category&amp;clazz=502&amp;fname=hao_main1open_tuan_jiudian&amp;eee=hao_main1open_tuan_jiudian&amp;fsign=256c619b09#tuan_list_mark">酒店</a>
+		<a href="http://tuan.360.cn/?do=category&amp;clazz=306&amp;fname=hao_main1open_tuan_zuliao&amp;eee=hao_main1open_tuan_zuliao&amp;fsign=cd665bb7e8#tuan_list_mark">足疗</a>
+		<a href="http://tuan.360.cn/?do=category&amp;clazz=201&amp;fname=hao_main1open_tuan_xiezhen&amp;eee=hao_main1open_tuan_xiezhen&amp;fsign=1cdad50fc0#tuan_list_mark">摄影写真</a>
+	</li>
+</ul><div class="g-point g-point-top"><span class="border"></span><span class="border"></span><span class="bg"></span></div></div>				<a class="more" href="http://hao.360.cn/shenghuoxinxi.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://cp.360.cn/?a=dhgg2">彩票</a></h3>
+				<ul class="list">
+					<li><a href="http://cp.360.cn/kj/kaijiang.html?a=dhgg">最新开奖号码</a></li>
+					<li><a href="http://cp.360.cn/ssq/?a=dhgg">双色球</a></li>
+					<li><a href="http://cp.360.cn/coophall/?a=dhgg">彩票合买</a></li>
+					<li><a href="http://zst.cp.360.cn/chart.html?LotID=51&amp;ChartID=20001&amp;StatType=1&amp;MinIssue=0&amp;MaxIssue=0&amp;IssueTop=30&amp;src=dhgg">分析图表</a></li>
+					<li><a href="http://cp.360.cn/slt/?a=dhgg">大乐透</a></li>
+					<li><a href="http://cp.360.cn/sd/?a=dhgg">福彩3D</a></li>
+				</ul>
+				<a class="more" href="http://cp.360.cn/hall/hall.html?a=dhgg">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://go.360.cn/">旅游</a></h3>
+				<ul class="list">
+					<li><a href="http://u.ctrip.com/union/CtripRedirect.aspx?TypeID=2&amp;Allianceid=1328&amp;sid=1551&amp;OUID=&amp;jumpUrl=http://vacations.ctrip.com">携程旅游度假</a></li>
+					<li><a href="http://www.qunar.com?ex_track=auto_4e23aea8">去哪儿机票</a></li>
+					<li><a href="http://jipiao.kuxun.cn/index_s.html?fromid=Khl360cn-S1173791-T1203571&amp;est=marketing">酷讯机票</a></li>
+					<li><a style="background-image:url(http://p0.qhimg.com/t01972aa7aa7957e369.png);" class="favicon" href="http://www.tuniu.com/?p=1592&amp;cmpid=mkt_08004801&amp;utm_campaign=daohang&amp;utm_source=hao.360.cn&amp;utm_medium=referral">途牛旅游</a></li>
+					<li><a href="http://www.elong.com/?banid=360ku" class="orange">艺龙酒店预订</a></li>
+					<li><a href="http://www.17u.cn/#refid=16516372">同程旅游网</a></li>
+				</ul>
+				<a class="more" href="http://go.360.cn/website">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/nvxing.html">女性</a></h3>
+				<ul class="list">
+					<li><a href="http://www.rayli.com.cn/?utm_source=360woman&amp;utm_medium=paid">瑞丽网</a></li>
+					<li><a href="http://www.pclady.com.cn/?ad=9323">太平洋女性</a></li>
+					<li><a href="http://fashion.sohu.com/?pvid=2e97aedd88327457">搜狐时尚</a></li>
+					<li><a href="http://www.meilishuo.com/welcome?frm=360_homepage">美丽说</a></li>
+					<li><a href="http://www.mogujie.com/welcome?from=360">蘑菇街</a></li> 
+					<li><a href="http://www.onlylady.com">女人志</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/nvxing.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/fashion.html">时尚</a></h3>
+				<ul class="list">
+					<li><a href="http://www.vogue.com.cn/">服饰与美容</a></li>
+					<li><a href="http://www.gq.com.cn/">GQ男士网</a></li>
+					<li><a href="http://www.55bbs.com/">55BBS</a></li>
+					<li><a href="http://www.lady8844.com">爱美女性网</a></li>
+					<li><a href="http://www.self.com.cn/">悦己女性网</a></li>
+					<li><a href="http://www.haibao.cn/">海报时尚网</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/fashion.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/rencaizhaopin.html">招聘</a></h3>
+				<ul class="list">
+				<li><a href="http://cnt.zhaopin.com/Market/whole_counter.jsp?sid=121111369&amp;site=qihukuzhan&amp;url=http://www.zhaopin.com">智联招聘</a></li>
+	              <li><a href="http://my.51job.com/my/trace.php?adsnum=232019&amp;ajp=aHR0cDovL3d3dy41MWpvYi5jb20v">前程无忧</a></li>
+	              <li><a href="http://www.ganji.com/zhaopin/?ca_name=dh_hao360_013_zpku">赶集招聘</a></li>
+	              <li><a href="http://www.yingjiesheng.com/">应届生求职</a></li>
+	              <li><a href="http://www.lietou.com/event/landingpage/brand.shtml?mscid=t_d_003">猎聘网</a></li>
+	              <li><a href="http://www.58.com/?path=job.shtml?utm_source%3dhao360%26utm_campaign%3dhao360-108&amp;360cool_site">58同城招聘</a></li>
+	          	</ul>
+				<a class="more" href="http://hao.360.cn/rencaizhaopin.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/diannaowangluo.html">电脑</a></h3>
+				<ul class="list">
+					<li><a href="http://www.zol.com.cn/">中关村在线</a></li>
+					<li><a href="http://www.pchome.net/">电脑之家</a></li>
+					<li><a href="http://zhuomian.360.cn/">360安全桌面</a></li>
+					<li><a href="http://www.apple.com.cn/">苹果官网</a></li>
+					<li><a href="http://www.pconline.com.cn/?ad=6348">太平洋电脑</a></li>
+					<li><a href="http://www.lenovo.com.cn/">联想电脑</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/diannaowangluo.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/shoujitongxin.html">手机</a></h3>
+				<ul class="list">
+					<li><a href="http://mobile.zol.com.cn/">中关村手机</a></li>
+					<li><a href="http://mobile.pconline.com.cn/?ad=6349&amp;360cool_site">太平洋手机</a></li>
+					<li><a href="http://www.cnmo.com/">手机中国</a></li>
+					<li><a href="http://www.360.cn/shoujizhushou/index.html">手机助手</a></li>
+					<li><a href="http://www.10086.cn">中国移动</a></li>
+					<li><a href="http://meihua.360.cn/">360手机美化</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/shoujitongxin.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://zhushou.360.cn/">应用</a></h3>
+				<ul class="list">
+					<li><a href="http://zhushou.360.cn/detail/index/soft_id/3784?recrefer=SE_D_Zaker%E9%98%85%E8%AF%BB">Zaker阅读</a></li>
+					<li><a href="http://zhushou.360.cn/detail/index/soft_id/196116?recrefer=SE_D_%E6%8A%AC%E6%9D%A0">抬 杠</a></li>
+					<li><a href="http://zhushou.360.cn/detail/index/soft_id/125088">唱 吧</a></li>
+					<li><a href="http://zhushou.360.cn/detail/index/soft_id/214664?recrefer=SE_D_%E7%A5%9E%E5%BA%99%E9%80%83%E4%BA%A1">神庙逃亡2</a></li>
+					<li><a href="http://zhushou.360.cn/detail/index/soft_id/203100?recrefer=SE_D_">呼 啦</a></li>
+					<li><a href="http://mse.360.cn/index_hao360.html">手机浏览器</a></li>
+				</ul>
+				<a class="more" href="http://zhushou.360.cn/">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://hao.360.cn/qiqukuzhan.html">酷站</a></h3>
+				<ul class="list">
+					<li><a href="http://www.woxihuan.com/">我喜欢</a></li>
+					<li><a href="http://redirect.daoxila.com/?utm_source=DaoHang&amp;utm_medium=360&amp;utm_term=Index&amp;utm_content=DaoXiLa&amp;utm_campaign=Index_KuZhan">到喜啦婚宴网</a></li>
+					<li><a href="http://www.youtx.com/">游天下短租网</a></li>
+					<li><a href="http://lux.360.cn/?fname=hao_aside_lux&amp;eee=hao_aside_lux">奢侈品大全</a></li>
+					<li><a href="http://acs.56.com/redirect/click/2729/http://xiu.56.com/p/20118978">56美女直播</a></li>
+					<li><a href="http://www.suv.cn/">SUV汽车</a></li>
+				</ul>
+				<a class="more" href="http://hao.360.cn/qiqukuzhan.html">更多»</a>
+			</div>
+			<div class="item">
+				<h3 class="subtitle"><a href="http://tools.360.cn/">查询</a></h3>
+				<ul class="list">
+					<li><a href="http://go.360.cn/train">火车票</a></li>
+					<li><a href="http://go.360.cn/flight">机票查询</a></li>
+					<li><a href="http://hao.360.cn/kuaidi.html">物流快递</a></li>
+					<li><a href="http://hao.360.cn/weizhang.html">违章查询</a></li>
+					<li><a href="http://www.148365.com/">免费法律咨询</a></li>
+					<li><a href="http://edu.360.cn/yingyu?tn=xyy">学英语</a></li>
+				</ul>
+				<a class="more" href="http://tools.360.cn/">更多»</a>
+			</div>
+		</div>    
+        </textarea>
+    </div>
+    <div class="box">
+    <textarea class="fragment_box">
+<div id="ft">
+            <div class="gmodule g-box" id="category-bottom">
+	<div class="category-bottom-hd">
+		<h2>底部分类</h2>
+	</div>
+	<div class="category-bottom-bd">
+		<div class="inner">
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle xw"><a href="http://sh.qihoo.com/">新闻</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/junshiguofang.html">军事</a></li>
+						<li><a href="http://hao.360.cn/youmoxiaohua.html">搞笑</a></li>
+						<li><a href="http://hao.360.cn/yulebagua.html">八卦</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle ty"><a href="http://hao.360.cn/tiyuyundong.html">体育</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/nba.html">NBA</a></li>
+						<li><a href="http://hao.360.cn/cba.html">CBA</a></li>
+						<li><a href="http://hao.360.cn/zuqiushijie.html">足球</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle jy"><a href="http://edu.360.cn/">教育</a></h3>
+					<ul class="list">
+						<li><a href="http://edu.360.cn/yingyu/">英语</a></li>
+						<li><a href="http://edu.360.cn/liuxue/">留学</a></li>
+                                               <li><a href="http://edu.360.cn/site/kaoshi/">考试</a></li>
+						
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle mn"><a href="http://hao.360.cn/meinvdaohang.html">美女</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/bizhitupian.html">图片</a></li>
+						<li><a href="http://hao.360.cn/sheying.html">摄影</a></li>
+						<li><a href="http://tq.360.cn/">天气</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle ly"><a href="http://go.360.cn/">旅游</a></h3>
+					<ul class="list">
+						<li><a href="http://go.360.cn/train">火车票</a></li>
+						<li><a href="http://go.360.cn/flight">机票</a></li>
+						<li><a href="http://go.360.cn/hotel">酒店</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle dy"><a href="http://v.360.cn/dianshi/index.html">电视剧</a></h3>
+					<ul class="list">
+						<li><a href="http://v.360.cn/dianying/index.html">电影</a></li>
+						<li><a href="http://v.360.cn/dongman/index.html">动漫</a></li>
+						<li><a href="http://v.360.cn/zongyi/index.php">综艺</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle gw"><a href="http://s.mall.360.cn/?fname=hao_dibu_small&amp;eee=hao_dibu_small">购物</a></h3>
+					<ul class="list">
+						<li><a href="http://tuan.360.cn/?fname=hao_dibu_tuan&amp;eee=hao_dibu_tuan&amp;fsign=93014b6867">团购</a></li>						
+						<li><a href="http://te.tuan.360.cn/?fname=hao_dibu_tegong&amp;eee=hao_dibu_tegong&amp;fsign=72acc53afc">特供品</a></li>
+                                               <li><a href="http://tejia.youhui.360.cn/?fname=hao_dibu_zhidemai&amp;eee=hao_dibu_zhidemai">特卖</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle zp"><a href="http://hao.360.cn/rencaizhaopin.html">招聘</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/daxue/index.html">大学</a></li>
+						<li><a href="http://edu.360.cn/zhijiao/">职教</a></li>
+						<li><a href="http://hao.360.cn/jiaoyou.html">交友</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle sh"><a href="http://hao.360.cn/shenghuoxinxi.html">生活</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/fangchanjiaju.html">房产</a></li>
+						<li><a href="http://hao.360.cn/zhuangxiujiaju.html">家居</a></li>
+						<li><a href="http://hao.360.cn/yiliaojiankang.html">健康</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle nx"><a href="http://hao.360.cn/nvxing.html">女性</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/fashion.html">时尚</a></li>
+						<li><a href="http://hao.360.cn/jianfei.html">减肥</a></li>
+						<li><a href="http://hao.360.cn/meirong.html">美容</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle cp"><a href="http://cp.360.cn/hall/hall.html?a=dh2">彩票</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/gupiaojijin.html">股票</a></li>
+						<li><a href="http://hao.360.cn/touzilicai.html">基金</a></li>
+						<li><a href="http://hao.360.cn/yinhang.html">银行</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle yx"><a href="http://g.360.cn/">游戏</a></h3>
+					<ul class="list">
+						<li><a href="http://qipai.360.cn/">棋牌</a></li>
+						<li><a href="http://g.360.cn/pcg/index.html">单机</a></li>
+						<li><a href="http://xiaoyouxi.360.cn">小游戏</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle dn"><a href="http://hao.360.cn/diannaowangluo.html">电脑</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/ruanjianxiazai.html">软件</a></li>
+						<li><a href="http://hao.360.cn/shoujitongxin.html">手机</a></li>
+						<li><a href="http://hao.360.cn/jiadianshuma.html">家电</a></li>
+
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle ah"><a href="http://hao.360.cn/yishuaihao.html">爱好</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/shejishijue.html">设计</a></li>
+						<li><a href="http://hao.360.cn/quyi.html">曲艺</a></li>
+						<li><a href="http://hao.360.cn/zongjiao.html">宗教</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle et"><a href="http://hao.360.cn/children.html">儿童</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/muying.html">母婴</a></li>
+						<li><a href="http://hao.360.cn/chongwuhuaniao.html">宠物</a></li>
+						<li><a href="http://caipu.hao.360.cn/">美食</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle yy"><a href="http://music.so.com/">音乐</a></h3>
+					<ul class="list">
+						<li><a class="green" href="http://xiaoshuo.360.cn/">小说</a></li>
+						<li><a href="http://hao.360.cn/xingzuo.html">星座</a></li>
+						<li><a href="http://hao.360.cn/manhua.html">漫画</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle qc"><a href="http://hao.360.cn/cars.html">汽车</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/usedcar.html">二手车</a></li>
+						<li><a href="http://hao.360.cn/weizhang.html">违章</a></li>
+						<li><a href="http://hao.360.cn/ditu.html">地图</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle bz"><a href="http://hao.360.cn/baozhi.html">报纸</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/hunqing.html">婚嫁</a></li>
+						<li><a href="http://hao.360.cn/zhengfubumen.html">政府</a></li>
+						<li><a href="http://hao.360.cn/shehuirenwen.html">历史</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle zs"><a href="http://www.875.cn/index360.html">招商</a></h3>
+					<ul class="list">
+						<li><a class="orange" href="http://hao.360.cn/baoxian.html">保险</a></li>
+						<li><a href="http://hao.360.cn/hangyewangzhan.html">行业</a></li>
+						<li><a href="http://hao.360.cn/falvfagui.html">法律</a></li>
+					</ul>
+				</div>
+				<div class="item">
+					<h3 class="subtitle dfz"><a href="http://hao.360.cn/city/index.html">地方</a></h3>
+					<ul class="list">
+						<li><a href="http://hao.360.cn/city/sh.html">上海</a></li>
+						<li><a href="http://hao.360.cn/city/fj.html">福建</a></li>
+						<li><a class="more" href="http://hao.360.cn/shenghuowz.html">更多»</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="category-bottom-ft">
+		<div class="inner">
+			<div class="panel">
+				<div class="item">
+		        	<h3 class="subtitle sy"><a href="http://tools.360.cn/">实用查询</a></h3>
+		    		<ul class="list">
+		                <li><a href="http://cp.360.cn/kj/kaijiang.html?a=dhdb">彩票开奖</a></li>
+		                <li><a href="http://hao.360.cn/zgjm.html">周公解梦</a></li>
+		                <li><a href="http://hao.360.cn/weizhang.html">车辆违章</a></li>
+		                <li><a href="http://jishi.360.cn/?utm_source=360site&amp;utm_medium=hao360&amp;utm_campaign=2257">免费修电脑</a></li>
+		                <li><a href="http://hao.360.cn/sjgs.html">手机查询</a></li>
+		                <li><a href="http://edu.360.cn/fanyi">在线翻译</a></li>
+		                <li><a href="http://hao.360.cn/kuaidi.html">快递查询</a></li>
+		                <li><a class="orange" href="http://go.360.cn/flight/">机票预订</a></li>
+		                <li><a href="http://go.360.cn/hotel ">特价酒店</a></li>
+		                <li><a href="http://go.360.cn/train">火车查询</a></li> 
+		        	</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle yx"><a href="http://g.360.cn">游戏精选</a></h3>
+					<ul class="list">
+			            <li><a href="http://soyo.360.cn/zt/cf.html">穿越火线</a></li>
+			            <li><a href="http://soyo.360.cn/zt/lianliankan.html">连连看</a></li>
+			            <li><a href="http://xiaoyouxi.360.cn/?src=yxjx">360小游戏</a></li>
+			            <li><a class="new" href="http://soyo.360.cn/zt/girl.html?Src=yxjx">女生小游戏</a></li>
+			            <li><a href="http://soyo.360.cn/zt/plants.html">植物战僵尸</a></li>
+			            <li><a href="http://xiaoyouxi.360.cn/shuangren/index.html">双人小游戏</a></li>
+			            <li><a href="http://12.1198.com/nyt/?i=OMZjPejoYPeaiqQEqwhrmlqUuerp3yY=">幻想三国</a></li>
+			            <li><a href="http://yz.q1.com/zt/login_360.html?radid=360_yz&amp;rsid=360DH_YXJXWZL&amp;check=1">远征OL</a></li>
+				    <li><a href="http://ck.game.360.cn/zhuanti3.4a/index.html?source=DHSYCYQ">苍空</a></li>
+		                <li><a href="http://hx.game.360.cn/zhuanti/index.html?source=HXDHSY">狐仙</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle yx"><a href="http://wan.360.cn/?src=DH-bot-b7">网页游戏</a></h3>
+					<ul class="list">
+			            <li><a class="hot" href="http://zxy.wan.360.cn/?src=DH-bot-b7">醉西游</a></li>
+			            <li><a href="http://lhzs.wan.360.cn/?src=DH-bot-b7">烈火战神</a></li>
+			            <li><a href="http://sqol.wan.360.cn/?src=DH-bot-b7">神曲</a></li>
+			            <li><a href="http://hsol.wan.360.cn/?src=DH-bot-b7">海神</a></li>
+			            <li><a href=" http://sjsg.wan.360.cn/?src=DH-bot-b7">神将三国</a></li>
+			            <li><a href="http://dxz.wan.360.cn/?src=DH-bot-b7">大侠传</a></li>
+			            <li><a href="http://qmr.wan.360.cn/?src=DH-bot-b7">秦美人</a></li>
+			            <li><a href="http://frmmo.wan.360.cn/?src=DH-bot-b7">仙剑情</a></li>
+			            <li><a href="http://xyol.wan.360.cn/?src=DHN-kz-b7"> 轩辕传</a></li>
+			            <li><a href="http://djh.wan.360.cn/?src=DH-bot-b7">斗将魂</a></li> 
+					</ul>
+				</div>
+			</div>
+			<div class="panel">
+				<div class="item">
+					<h3 class="subtitle dn"><a href="http://hao.360.cn/ruanjianxiazai.html">常用软件</a></h3>
+					<ul class="list">
+			            <li><a href="http://www.360.cn/">360安全卫士</a></li>
+			            <li><a class="green" href="http://shouji.360.cn/">360手机卫士</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/2">游戏保险箱</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/105196">迅雷下载</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/103352">腾讯QQ</a></li>
+			            <li><a href="http://bizhi.360.cn/">高清壁纸</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/10162">美图秀秀</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/105368">暴风影音</a></li>
+			            <li><a href="http://baoku.360.cn/soft/show/appid/72">酷狗音乐</a></li>
+			            <li><a href="http://zhushou.360.cn/?ref=wzdh4">手机软件</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>		</div>    
+    
+    </div>
+    </textarea>
+</div>
+
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'lazyload', function(){    
+    var lazyload = E.ui.Lazyload,
+        boxs = E( '#wrapper textarea.fragment_box' ),
+        loader;
+    
+    loader = new lazyload( boxs, {
+        type : 'dom'
+    });
+    
+    loader.on( 'load', function( e ){
+        console.log( 'load' );
+        console.log( e.target );
+    });
+});
+</script>
+</body>
+</html>
