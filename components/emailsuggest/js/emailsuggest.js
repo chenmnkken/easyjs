@@ -1,5 +1,5 @@
 /*
-* Emailsuggest components for easy.js v0.1.0
+* Emailsuggest components v0.1.0 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses

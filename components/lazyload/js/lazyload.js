@@ -1,11 +1,11 @@
 /*
-* Lazyload components for easy.js v0.1.0
+* Lazyload components v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-5-27 
 */
 define(function(){
 
@@ -36,9 +36,16 @@ var easyLazyload = {
     
     load : {
         img : function( o, elem, isScroll ){
-            var attrName = o.attrName;
+            var attrName = o.attrName,
+                lazysrc;
             
             if( elem[0].tagName !== 'IMG' ){
+                return;
+            }
+            
+            lazysrc = elem.attr( attrName );
+            
+            if( !lazysrc ){
                 return;
             }
             
@@ -49,7 +56,7 @@ var easyLazyload = {
                 });
             }
 
-            elem[0].src = elem.attr( attrName );
+            elem[0].src = lazysrc;
             // 移除缓存
             elem.removeData( 'offset' ).removeAttr( attrName );               
         },
@@ -221,7 +228,7 @@ var Lazyload = function( target, options ){
     }
 
     if( isScrollEvent ){
-        load();
+        load({ type : 'scroll' });
     }
     
     o.target = target;
