@@ -1,11 +1,13 @@
 /*
- * easyCombo for easy.js
+ * easyCombo v0.2 for easy.js
+ * 2013-07-01
  */
 var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
     rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
     rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/,     
     rRightEnd = /,?\s*(function\s*\(.*|\{.*)/,    
     rPullDeps = /((?:define|E\.use)\(.*)/g,    
+    rDeps = /(define\([^\[]*\[)([^\]]+)/,
     rDefine = /define\(/,    
 
     fs = require( 'fs' ),
@@ -134,6 +136,22 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
         }
     },
     
+    formatDeps = function( _, define, deps ){
+        var arr = deps.split( ',' ),
+            len = arr.length,
+            i = 0,
+            item, index;
+            
+        for( ; i < len; i++ ){
+            item = arr[i];
+            item = item.replace( /['"]/g, '' ).trim();
+            index = item.lastIndexOf( '/' );
+            arr[i] = ~index ? item.slice( index + 1 ) : item;
+        }
+
+        return define + "'" + arr.join("','") + "'";
+    },    
+    
     // 合并内容
     comboContent = function( key, baseUrl, encoding, format ){
         var cache = depsCache[ key ],
@@ -169,6 +187,9 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
             if( !rExistId.test(content) ){  
                 content = content.replace( rDefine, "define('" + name + "'," );
             }
+            
+            // 格式化依赖模块列表 ['../hello5'] => ['hello5']
+            content = content.replace( rDeps, formatDeps );
             
             // 合并
             cache.contents += content + '\n';       
@@ -210,7 +231,7 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
         
         console.log( 'Output the [' + output + '] success.' );
         delete depsCache[ key ];
-    }
+    };
     
 var E = easyJS = {
     use : function( ids ){
