@@ -7,7 +7,7 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
     rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/,     
     rRightEnd = /,?\s*(function\s*\(.*|\{.*)/,    
     rPullDeps = /((?:define|E\.use)\(.*)/g,    
-    rDeps = /(define\([^\[]*\[)([^\]]+)/,
+    rDeps = /(define\([^\[f\{]*\[)([^\]]+)/,
     rDefine = /define\(/,    
 
     fs = require( 'fs' ),
