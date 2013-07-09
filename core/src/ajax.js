@@ -811,14 +811,18 @@ E.mix( E.prototype, {
     serializeArray : function(){        
         var elems = [],
             arr = [],
-            i = 0,
             j = 0,
-            elem, len, val;
+            elem, len, val, i, allElements;
             
         // 查找form中的所有表单元素然后合并成一个easyJS对象
         this.forEach(function(){
             if( this.tagName === 'FORM' ){
-                elems = E.makeArray( this.elements, elems );
+                allElements = this.elements;
+                len = allElements.length;
+                
+                for( i = 0; i < len; i++ ){
+                    elems[ elems.length++ ] = allElements[i];
+                }
             }
         });        
         
@@ -831,7 +835,7 @@ E.mix( E.prototype, {
         len = elems.length;
         
         // 将表单元素的name和value合并
-        for( ; i < len; i++ ){
+        for( i = 0; i < len; i++ ){
             elem = elems[i];
             val = E.makeArray( E(elem).val() );
             

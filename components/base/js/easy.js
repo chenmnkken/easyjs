@@ -1,11 +1,11 @@
 /*
-* easy.js v1.0.0
+* easy.js v1.0.1
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-9 23:29:2
+* Date : 2013-7-9 11:6:17
 */
 
 // ---------------------------------------------
@@ -157,7 +157,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '1.0.0',
+    version : '1.0.1',
     
     __uuid__ : 2,
     
@@ -410,6 +410,7 @@ var easyModule = {
         
         // 初始化时加载data-main中的模块
         if( initMod ){
+            initMod = initMod.split( ',' );
             easyJS.use( initMod );
         }
         
@@ -806,7 +807,7 @@ window.define = function( name, deps, factory ){
         insertIndex = 0,
         pullIndex = 0,
         useKey, data, modUrl, factorys, baseUrl, depMod, depName, result, exports, args, depsData, repeatDepsData, i, repeatName;
-
+        
     // 在模块都合并的情况下直接执行factory
     if( !mod ){
         mod = module[ name ] = {};
@@ -7348,14 +7349,18 @@ E.mix( E.prototype, {
     serializeArray : function(){        
         var elems = [],
             arr = [],
-            i = 0,
             j = 0,
-            elem, len, val;
+            elem, len, val, i, allElements;
             
         // 查找form中的所有表单元素然后合并成一个easyJS对象
         this.forEach(function(){
             if( this.tagName === 'FORM' ){
-                elems = E.makeArray( this.elements, elems );
+                allElements = this.elements;
+                len = allElements.length;
+                
+                for( i = 0; i < len; i++ ){
+                    elems[ elems.length++ ] = allElements[i];
+                }
             }
         });        
         
@@ -7368,7 +7373,7 @@ E.mix( E.prototype, {
         len = elems.length;
         
         // 将表单元素的name和value合并
-        for( ; i < len; i++ ){
+        for( i = 0; i < len; i++ ){
             elem = elems[i];
             val = E.makeArray( E(elem).val() );
             

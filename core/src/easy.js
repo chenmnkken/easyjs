@@ -400,6 +400,7 @@ var easyModule = {
         
         // 初始化时加载data-main中的模块
         if( initMod ){
+            initMod = initMod.split( ',' );
             easyJS.use( initMod );
         }
         
