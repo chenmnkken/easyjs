@@ -1,4 +1,4 @@
-var version = '1.0.1',
+var version = '1.0.2',
     licenses = 'MIT Licenses',
     rDefine = /define\(.+\r\n/,
     date = new Date(),

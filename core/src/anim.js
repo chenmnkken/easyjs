@@ -731,21 +731,15 @@ E.mix( E.prototype, {
         else{
             return this.forEach(function(){
                 var currentDisplay = E( this ).css( 'display' ),
-                    oldDisplay;
+                    oldDisplay = easyData.data( this, null, 'display' );
                     
-                if( currentDisplay === 'none' ){
-                    oldDisplay = easyData.data( this, null, 'display' );    
-                    // 如果有缓存的显示模式就用缓存的显示模式    
-                    if( oldDisplay ){
-                        easyData.removeData( this, null, 'display' );
-                    }
-                    // 无缓存就只能强制用block了
-                    else{
-                        oldDisplay = currentDisplay;
-                    }
-                    
-                    this.style.display = oldDisplay === 'none' ? 'block' : '';
-                }                
+                // 无缓存则缓存当前显示模式    
+                if( !oldDisplay ){
+                    oldDisplay = easyData.data( this, null, 'display', currentDisplay );
+                }
+                
+                // 原始模式为none的时设置block来显示，非none时则用原始模式
+                this.style.display = oldDisplay === 'none' ? 'block' : oldDisplay;         
             });
         }
     },
@@ -765,13 +759,15 @@ E.mix( E.prototype, {
         // 无动画效果
         else{
             return this.forEach(function(){
-                var currentDisplay = E( this ).css( 'display' );
-                
-                if( currentDisplay !== 'none' ){
-                    // 隐藏的时候缓存原始的显示模式，以便在下次show的时候能正确的还原
-                    easyData.data( this, null, 'display', currentDisplay );
-                    this.style.display = 'none';
+                var currentDisplay = E( this ).css( 'display' ),
+                    oldDisplay = easyData.data( this, null, 'display' );
+                    
+                // 无缓存则缓存当前显示模式     
+                if( !oldDisplay ){
+                    oldDisplay = easyData.data( this, null, 'display', currentDisplay );
                 }
+                
+                this.style.display = 'none';
             });
         }
     },
