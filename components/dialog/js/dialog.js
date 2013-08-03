@@ -1,11 +1,11 @@
 /*
-* Dialog components v0.1.0 for easy.js
+* Dialog components v0.2.0 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-08-03 
 */
 define(['../../drag/js/drag'], function(){
 
@@ -30,7 +30,9 @@ var defaults = {
     effects    :   null,      // String        对话框关闭和显示的动画效果
     zIndex     :   9999,      // Number        遮罩层默认的zIndex值
     drag       :   true,      // Boolean       是否绑定拖拽功能
-    topWindow  :   false      // Boolean       设置对话框运行的窗口(在iframe中可以让对话框在顶级窗口中显示)
+    topWindow  :   false,     // Boolean       设置对话框运行的窗口(在iframe中可以让对话框在顶级窗口中显示)
+    elem       :   null,      // String|Element|easyJS Object 设置添加到对话框中自定义的元素id
+    dragHandle :   null       // String|Element|easyJS Object 设置自定义拖拽的在指定的区域可触发拖拽的元素
 };
 
 var isIE6 = E.browser.ie && E.browser.version === '6.0',
@@ -77,19 +79,32 @@ var easyDialog = {
         }
     },
     
-    createDialogWrap : function( o ){
-        var isShowBtnYes = E.isFunction( o.yesFn ),          
-            isShowBtnNo = E.isFunction( o.noFn ) || o.noFn === true,            
-            isShowFooter = isShowBtnYes || isShowBtnNo,
-            title, html,
+    createDialogContent : function( o ){
+        var children = dialogElem.children().last(),
+            isShowBtnYes, isShowBtnNo, isShowFooter, title, html, btnNoCallback;
+
+        if( o.elem ){
+            if( wrapElem ){
+                wrapElem.remove();
+                wrapElem = null;
+            }
             
-            btnNoCallback = function( e ){
-                easyDialog.close( o );
-                
-                if( e ){
-                    e.preventDefault();
-                }
-            };    
+            dialogElem.append( o.elem );
+            o.elem.show();
+            return;
+        }
+
+        isShowBtnYes = E.isFunction( o.yesFn );      
+        isShowBtnNo = E.isFunction( o.noFn ) || o.noFn === true;           
+        isShowFooter = isShowBtnYes || isShowBtnNo;
+        
+        btnNoCallback = function( e ){
+            easyDialog.close( o );
+            
+            if( e ){
+                e.preventDefault();
+            }
+        };    
 
         // 初次构建默认模板的HTML结构
         if( !wrapElem ){            
@@ -104,6 +119,12 @@ var easyDialog = {
                     '</div>';
                         
             wrapElem = E( html, doc );           
+            
+            if( children.length ){
+                children.hide();
+                $body.append( children );
+            }
+            
             dialogElem.append( wrapElem );
             btnYes = wrapElem.find( 'a.dg_btn_yes' );
             btnNo = wrapElem.find( 'a.dg_btn_no' );
@@ -243,7 +264,8 @@ var easyDialog = {
     setPosition : function( o ){ 
         var cssMap = {},
             winWidth = $win.width() / 2,
-            winHeight = $win.height() / 2;
+            winHeight = $win.height() / 2,
+            elem = o.elem || wrapElem;
             
         if( !o.fixed || isIE6 ){      
             cssMap.position = 'absolute';
@@ -256,8 +278,8 @@ var easyDialog = {
             cssMap.left = winWidth + 'px';             
         }
 
-        cssMap.marginTop = '-' + ( wrapElem.outerHeight() / 2 ) + 'px';
-        cssMap.marginLeft = '-' + ( wrapElem.outerWidth() / 2 ) + 'px';   
+        cssMap.marginTop = '-' + ( elem.outerHeight() / 2 ) + 'px';
+        cssMap.marginLeft = '-' + ( elem.outerWidth() / 2 ) + 'px';   
         
         if( o.top ){
             cssMap.top = o.top;
@@ -284,13 +306,13 @@ var easyDialog = {
         }
     },
     
-    bindDrag : function( isDrag ){
-        if( isDrag ){
-            var header = dialogElem.find( 'div.dg_header' );
+    bindDrag : function( o ){
+        if( o.drag ){
+            var dragHandle = o.dragHandle || dialogElem.find( 'div.dg_header' );
             
-            if( header.length && header.is(':visible') ){
+            if( dragHandle.length && dragHandle.is(':visible') ){
                 drag = new E.ui.Drag( dialogElem, {
-                    handle : header
+                    handle : dragHandle
                 });
             }
         }
@@ -394,10 +416,12 @@ var easyDialog = {
                 return function(){
                     dialogElem.css( cssMap );                    
                     easyDialog.bindExpression( o );                    
-                    easyDialog.bindDrag( o.drag );
+                    easyDialog.bindDrag( o );
                     
-                    if( btnYes.is(':visible') ){
-                        btnYes[0].focus();
+                    if( !o.elem ){
+                        if( btnYes.is(':visible') ){
+                            btnYes[0].focus();
+                        }
                     }
                     
                     if( !o.top && !o.left ){
@@ -514,9 +538,11 @@ var easyDialog = {
             drag = null;
         }        
 
-        btnYes.un( 'click.dialog' );
-        btnNo.un( 'click.dialog' );
-        btnClose.un( 'click.dialog' );
+        if( wrapElem ){
+            btnYes.un( 'click.dialog' );
+            btnNo.un( 'click.dialog' );
+            btnClose.un( 'click.dialog' );
+        }
         
         $win.un( 'resize.dialog' );
         $doc.un( 'keyup.dialog' );
@@ -533,7 +559,7 @@ var easyDialog = {
         
         easyDialog.createOverlay( o.zIndex );	
         easyDialog.createDialogBox( o.zIndex + 1, o.overlay );    
-        easyDialog.createDialogWrap( o );
+        easyDialog.createDialogContent( o );
 
         if( o.overlay ){
             overlayElem.css({
@@ -578,7 +604,7 @@ var easyDialog = {
 };
     
 var Dialog = function( target, options ){
-    target = E( target );
+    target = E( target ).eq( 0 );
     options = options || {};
     
     if( !target.length ){
@@ -593,6 +619,23 @@ var Dialog = function( target, options ){
     $win = E( win );
     $doc = E( doc );    
     $body = E( doc.body );
+    
+    // 设置将要添加到对话框中的自定义元素
+    if( o.elem ){
+        o.elem = E( o.elem ).eq( 0 );
+        
+        if( !o.elem.length ){
+            o.elem = null;
+        }
+    }
+    
+    if( o.dragHandle ){
+        o.dragHandle = E( o.dragHandle ).eq( 0 );
+        
+        if( !o.dragHandle.length ){
+            o.dragHandle = null;
+        }
+    }
     
     target.on( o.trigger + '.dialog', function(){
         easyDialog.init( o );
