@@ -31,8 +31,8 @@ var defaults = {
     zIndex     :   9999,      // Number        遮罩层默认的zIndex值
     drag       :   true,      // Boolean       是否绑定拖拽功能
     topWindow  :   false,     // Boolean       设置对话框运行的窗口(在iframe中可以让对话框在顶级窗口中显示)
-    elem       :   null,      // String|Element|easyJS Object 设置添加到对话框中自定义的元素id
-    dragHandle :   null       // String|Element|easyJS Object 设置自定义拖拽的在指定的区域可触发拖拽的元素
+    elem       :   null,      // String|Element|easyJS Object 自定义对话框的HTML结构
+    dragHandle :   null       // String|Element|easyJS Object 自定义对话框的拖拽区域
 };
 
 var isIE6 = E.browser.ie && E.browser.version === '6.0',
