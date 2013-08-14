@@ -3,6 +3,6 @@ require( './easyCombo' ).easyCombo({
     //uglifyUrl : '../uglify/uglify-js',
     modules : [{
         input : ['hello'],
-        output : './output/hello.js'
+        output : 'output/hello.js'
     }]    
 });

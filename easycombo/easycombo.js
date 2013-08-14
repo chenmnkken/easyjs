@@ -91,19 +91,17 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
     },
     
     // 分析模块的依赖，将依赖模块的模块标识组成一个数组以便合并
-    parseDeps = function( key, baseUrl, ids, encoding ){    
+    parseDeps = function( key, mods, encoding ){    
         var cache = depsCache[ key ],
             deps = [];
         
-        ids.forEach(function( id ){
-            var result = parseModId( id, baseUrl ),
-                name = result[0],
-                url = result[1],
+        mods.forEach(function( mod ){
+            var baseUrl = mod.slice( 0, mod.lastIndexOf('/') + 1 ),
                 content, literals;          
 
             // 读取文件
             try{
-                content = fs.readFileSync( url, encoding );
+                content = fs.readFileSync( mod, encoding );
             }
             catch( error ){
                 console.log( 'Read file ' + error );
@@ -123,6 +121,12 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
                 arr = eval( literal );
                 
                 if( arr && arr.length ){
+                    // 为依赖模块解析真实的模块路径
+                    arr.forEach(function( item, i ){
+                        var result = parseModId( item, baseUrl );
+                        arr[i] = result[1];
+                    });
+                
                     deps = deps.concat( arr );
                 }
             });
@@ -132,7 +136,7 @@ var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
             cache.ids = deps.concat( cache.ids );
             
             // 递归调用直到所有的依赖模块都添加完
-            parseDeps( key, baseUrl, deps, encoding );
+            parseDeps( key, deps, encoding );
         }
     },
     
@@ -254,8 +258,11 @@ var easyCombo = function( options ){
         };
             
         mod.input.forEach(function( id ){
-            depsCache[ randomKey ].ids.push( baseUrl + id );
-            parseDeps( randomKey, baseUrl, [id], encoding );
+            var result = parseModId( id, baseUrl ),
+                modUrl = result[1];
+        
+            depsCache[ randomKey ].ids.push( modUrl );
+            parseDeps( randomKey, [modUrl], encoding );
         });
 
         comboContent( randomKey, baseUrl, encoding, mod.format );
