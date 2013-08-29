@@ -1,0 +1,14 @@
+/* @module dialog */
+
+.eui_overlay{ background:#333; opacity:0.6; filter:alpha(opacity=60); }
+.eui_dialog .dg_wrapper{ background:#3498f0; box-shadow:0 0 4px rgba(0, 0, 0, 0.4); position:relative; padding:6px; border:1px solid #3571a4; overflow:hidden; font-size:12px; }
+.eui_dialog .dg_header{ height:27px; line-height:22px; overflow:hidden; color:#fff; font-weight:700; text-indent:5px; }
+.eui_dialog .dg_btn_close{ width:19px; height:18px; overflow:hidden; display:block; position:absolute; top:7px; right:7px; background:#3498f0 url(../../base/images/icon_close.png) no-repeat 5px 5px; text-indent:-999em; }
+.eui_dialog .dg_btn_close:hover{ background-color:#c75050; }
+.eui_dialog .dg_content{ padding:25px 10px; line-height:22px; border:1px solid #2384da; background:#fff; }
+.eui_dialog .dg_footer{ width:300; padding:10px; padding-top:0; overflow:hidden; _zoom:1; border:1px solid #2384da; border-top:0 none; margin-top:-1px; background:#fff; }
+.eui_dialog .dg_btn_no,
+.eui_dialog .dg_btn_yes{ padding:0 18px; *padding:0 9px; height:20px; line-height:20px; background:#eaeaea; cursor:pointer; float:right; margin-left:10px; font-family:"Microsoft yahei",arial; font-size:12px; outline:none; color:#333; text-decoration:none; border:1px solid #acacac; }
+.eui_dialog .dg_btn_yes{ color:#000; border-color:#3399ff; }
+.eui_dialog .dg_btn_yes:hover,
+.eui_dialog .dg_btn_no:hover{ background:#e0effc; }    

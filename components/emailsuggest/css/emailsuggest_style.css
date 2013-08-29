@@ -1,0 +1,6 @@
+/* @module emailsuggest_style */
+
+.eui_emailsuggest{ position:absolute; background:#fff; border:1px solid #ddd; width:186px; padding:5px 0; display:none; box-shadow:0 2px 5px rgba(0, 0, 0, 0.2); }
+.eui_emailsuggest li{ height:28px; line-height:28px; padding:0 10px; overflow:hidden; cursor:pointer; font-size:12px; }
+.eui_emailsuggest .tip{ color:#999; }
+.eui_emailsuggest .current{ color:#fff; background:#2d89ef; }

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Emaisuggest demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/emailsuggest_style.css" />
+<style type="text/css">
+.wrapper{ width:500px; padding:20px; margin:50px auto 0; }
+input{ border:1px solid #ddd; padding:3px; height:16px; width:180px; }
+
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Emaisuggest demo</h1>
+<hr />
+
+<div class="wrapper">
+		<label for="email">电子邮箱：</label><input type="text" id="email" />
+</div>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'emailsuggest', function(){
+    var arr = [ '163.com', '126.com', 'qq.com', 'yahoo.com.cn', 'qq1.com', 'gmail.com', 'sohu.com', 'qq2.com', 'hotmail.com' ];
+    
+    var suggest = new E.ui.EmailSuggest( '#email', {
+        data : arr
+    });
+    
+    
+    suggest.on( 'selected', function( e ){
+        console.log( e.value );
+        console.log( e.target );
+    });
+});
+</script>
+
+</body>
+</html>

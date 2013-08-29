@@ -1,0 +1,5 @@
+/* @module tab_style */
+
+.eui_tab .tab_menu{ height:30px; background:#f0f0f0; padding-left:10px; width:310px; border-bottom:1px solid #ddd; }
+.eui_tab .tab_menu li{ padding:0 15px; float:left; height:28px; line-height:28px; cursor:pointer; border:solid #f0f0f0; border-width:2px 1px 0; position:relative; }
+.eui_tab .tab_menu .current{ background:#fff; color:#06c; border-color:#ddd; border-top-color:#2d89ef; height:29px; _margin-bottom:-1px; }

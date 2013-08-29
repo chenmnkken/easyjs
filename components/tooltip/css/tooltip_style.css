@@ -1,0 +1,10 @@
+/* @module tooltip_style */
+
+.eui_tooltip{ position:absolute; display:none; }
+.eui_tooltip .tt_wrapper{ position:relative; padding:6px 10px; background:#2a2a2a; color:#fff; font-size:12px; line-height:18px; }
+.eui_tooltip .tt_btn_close{ position:absolute; right:6px; top:6px; width:19px; height:18px; display:block; background:url(../../base/images/icon_close.png) no-repeat 5px 5px; text-indent:-999em; }
+.eui_tooltip .tt_arrow{ position:absolute; border:6px solid transparent; width:0px; height:0px; line-height:0px; display:block; _display:none; }
+.eui_tooltip .tt_arrow_bottom{ border-bottom-color:#2a2a2a; top:-12px; left:50%; margin-left:-6px; }
+.eui_tooltip .tt_arrow_top{ border-top-color:#2a2a2a; bottom:-12px; left:50%; margin-left:-6px; }
+.eui_tooltip .tt_arrow_right{ border-right-color:#2a2a2a; top:50%; left:-12px; margin-top:-6px; }
+.eui_tooltip .tt_arrow_left{ border-left-color:#2a2a2a; top:50%; right:-12px; margin-top:-6px; }

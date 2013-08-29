@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Dialog demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/dialog_style.css" />
+<style type="text/css">
+#hello{ width:300px; height:50px; line-height:50px; background:#f5f5f5; }
+#testBox{ width:120px; height:100px; background:#fff; text-align:center; line-height:100px; display:none; }
+</style>
+</head>
+<body>
+<h1 style="font-size:36px;">Dialog demo</h1>
+<hr />
+<p style="height:300px"></p>
+
+<div id="testBox">Press Esc close.</div>
+
+<button id="open1">open1</button>
+<button id="open2">open2</button>
+<button id="destroy">destroy</button>
+
+<p style="height:1000px"></p>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'dialog', function(){
+    var Dialog = E.ui.Dialog,
+        testDialog;
+    
+    testDialog = new Dialog( '#open1', {
+        title : '对话框标题',
+        content : 'hello world : )',
+        yesFn : function(){
+            console.log( 'yes' );
+        },
+        noFn : function(){
+            console.log( 'no' );
+        },
+        effects : 'fade'
+    });
+    
+    new Dialog( '#open2', {
+        elem : '#testBox',
+        dragHandle : '#testBox'
+    });
+});
+</script>
+</body>
+
+</html>

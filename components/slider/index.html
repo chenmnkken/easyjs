@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Slider demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/slider_style.css" />
+<style type="text/css">
+.wrapper{ width:220px; margin:50px auto 0; }
+.demoText{ width:100%; text-align:center; line-height:100px; height:100px; margin-top:30px; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Slider demo</h1>
+<hr />
+
+<div class="wrapper">
+    <div class="eui_slider eui_slider_x" id="slider">
+        <div class="sd_complete"></div>
+        <div class="sd_thumb"></div>
+    </div>
+    
+    <div id="demoText" class="demoText"></div>
+</div>
+
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'slider', function(){
+
+    var slider = new E.ui.Slider( '#slider', {
+        min : -100,
+        max : 100,
+        axis : 'x'
+    });
+    
+    var demoText = E( '#demoText' );
+    
+    slider.on( 'slide', function( e ){
+            demoText.text( this.value );
+        });
+        
+    demoText.on( 'click', function(){
+        slider.setValue( 80 )
+    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>Tooltip demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/tooltip_style.css" />
+<style type="text/css">
+.wrapper{ width:500px; padding:20px; margin:50px auto 0; font-size:14px; border:1px solid #ddd; }
+input{ padding:3px; border:1px solid #ddd; height:15px; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Tooltip demo</h1>
+<hr />
+
+<div class="wrapper">
+Tight pants next level keffiyeh <a href="#" title="Tooltips hello world.">you probably</a> haven't heard of them. Photo booth beard raw denim letterpress vegan messenger bag stumptown. Farm-to-table seitan, mcsweeney's fixie sustainable quinoa 8-bit american apparel <a href="#" title="Tofu biodiesel williamsburg marfa Farm-to-table seitan,">have a</a> terry richardson vinyl chambray. 
+<button id="btn" title="Tooltips hello world.">click</button>
+<p><input type="text" id="testInput" title="Input focus tooltip test." /></p>
+<p id="custom" title="Custom event tooltip test.">custom test</p>
+<p><button id="customBtn">custom</button></p>
+</div>
+
+<!--
+<div style="z-index: 9900; display: block; left: 602px; top: 144.5px;" class="eui_tooltip"><div class="tt_wrapper" style="display: inline-block; width: 150px;"><s class="tt_arrow tt_arrow_right"></s><a class="tt_btn_close" href="#" style="display: block;">×</a><div class="tt_content">Input focus tooltip test.</div></div></div>-->
+
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'tooltip', function(){
+    var hoverTip = new E.ui.Tooltip( '.wrapper a', {
+        position : 'top',
+        effects : 'slide'
+    });
+    
+
+    
+    var clickTip = new E.ui.Tooltip( '#btn', {
+        trigger : 'click',
+        position : 'left'
+    });
+    
+    clickTip.on( 'open', function( e ){
+        console.log( e.type );
+        console.log( e.target );
+    });
+    
+    clickTip.on( 'close', function( e ){
+        console.log( e.type );
+        console.log( e.target );
+    });    
+    
+    /*var inputTip = new E.ui.Tooltip( '#testInput', {
+        trigger : 'focus',
+        position : 'right'
+    });
+    
+    /*new E.ui.Tooltip( '#custom', {
+        trigger : 'custom',
+        position : 'left'
+    });  */
+    
+    E( '#customBtn' ).one( 'click', function(){
+        hoverTip.destroy();
+    });
+});
+</script>
+
+</body>
+</html>

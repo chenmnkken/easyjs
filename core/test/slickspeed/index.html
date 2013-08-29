@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>SlickSpeed selectors Test</title>
+<link rel="stylesheet" href="style.css" type="text/css" media="screen">
+<script type="text/javascript" src="jct.js"></script>
+<script type="text/javascript" src="selectors.js"></script>
+<script type="text/javascript" src="frameworks.js"></script>
+<script type="text/javascript" src="slickspeed.js"></script>
+</head>
+<body>
+<div id="container">
+<h1 style="float:left;"><span>SlickSpeed</span></h1>
+<div id="controls">
+	<a class="stop" href="#">stop tests</a>
+	<a class="start" href="#">start tests</a>
+</div>
+<h2>speed/validity selectors test for frameworks.</h2>
+<p>Tests are run against a local copy of <a href="http://www.w3.org/TR/2001/CR-css3-selectors-20011113/">this document</a>.</p> 
+<div>
+<!---
+	var time= new Date().getTime();
+	for(var k in Frameworks){
+	if (Frameworks[k].disable) continue;
+	var file=Frameworks[k].file;
+	var fun=Frameworks[k].fun;
+	var src='template.html?include='+file+'&function='+fun+'&nocache='+time;
+-->
+<iframe name='+-k-+' src='+-src-+'></iframe>
+<!---}-->
+</div>
+<table>
+	<thead id="thead">
+		<tr>
+			<th class="selectors-title">selectors</th>
+			<!---for(var k in Frameworks)
+			if (!Frameworks[k].disable){--><th class='framework'>+-k-+</th><!---}--></tr>
+	</thead>
+
+	<tbody id="tbody">
+	<!---
+		for(var i=0;selectors[i];i++){-->
+		<tr>
+			<th class='selector'>+-selectors[i]-+</th>
+			<!---for(var k in Frameworks)
+			if (!Frameworks[k].disable){ --><td class='empty'></td><!---}--></tr>
+		<!---}-->
+	</tbody>
+	<tfoot id="tfoot">
+		<tr>
+			<th class="score-title"><strong>final time (less is better)</strong></th>
+			<!---for(var k in Frameworks)
+			if (!Frameworks[k].disable){ --><td class='score'>0</td><!---}--></tr>
+	</tfoot>
+</table>
+<h2>Legend</h2>
+<table id="legend">
+	<tr>
+		<th>the faster</th>
+		<th>the slower</th>
+		<th>exception thrown or zero elements found</th>
+		<th>different returned elements</th>
+	</tr>
+	<tr>
+		<td class="good"></td>
+		<td class="bad"></td>
+		<td class="exception"></td>
+		<td class="mismatch"></td>
+	</tr>
+</table>
+<div id="footer">
+	<h3>Original SlickSpeed:</h3>
+	<p class="footer">copyright &copy; 2007 <a href="http://mootools.net">http://mootools.net</a> | MIT License | <a href="http://slickspeed.googlecode.com/svn/trunk">download from googlecode</a></p>
+	<h3>This SlickSpeed:</h3>
+	<p class="footer">copyright &copy; 2008 inQuery | MIT License | <a href="http://inquery.googlecode.com/svn/trunk/slickspeed/">download from googlecode</a></p>
+	<h3>Instructions</h3>
+	<ol>
+		<li>edit frameworks.js and fill in your framework list.</li>
+		<li>edit selectors.js and edit your selectors list.</li>
+		<li>edit style.css, index.html if you wish.</li>
+		<li>edit template.html if you want to change the selectors html file. It DOES NOT accept the full document, just elements.</li>
+	<ol>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>easy.js 单元测试</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+<div id="sandbox" style="display:none">
+    <!-- after -->
+    <div id="afterBox1"></div>
+    <span id="afterSpan1">span </span><a href="#" id="afterLink1">link </a>
+    <span id="afterSpan2">span </span><a href="#" id="afterLink2">link </a>
+    <dl id="afterList1">
+        <dt>list1</dt>
+        <dd>dd1</dd>
+        <dd>dd2</dd>
+    </dl>
+    <dl id="afterList2">
+        <dt>list2</dt>
+        <dd>dd3</dd>
+        <dd>dd4</dd>
+    </dl>
+    <dl id="afterList3">
+        <dt>list3</dt>
+        <dd><a href="#">link1</a></dd>
+        <dd><a href="#">link2</a></dd>
+    </dl>
+    <dl id="afterList4">
+        <dt>list4</dt>
+        <dd><span>span1</span></dd>
+        <dd><span>span2</span></dd>
+    </dl>
+    <span id="afterSpan3">span </span><em id="afterEm1">em </em><a href="#" id="afterLink3">link </a>
+    <div id="afterBox2">box2 </div>
+    
+    <!-- aterTo -->
+    <em id="afterToEm1">em1</em>
+    <div id="afterToBox2">box2</div>
+    
+    <!-- before -->
+    <div id="beforeBox1"></div>
+    
+    <!-- beforeTo -->
+    <dl id="beforeToList1">
+        <dt>list1</dt>
+        <dd><span>span1</span></dd>
+        <dd><span>span2</span></dd>
+    </dl>
+    
+    <!-- append -->
+    <span id="appendSpan2">span </span><a href="#" id="appendLink2">link </a>
+    
+    <!-- appendTo -->
+    <dl id="appendToList1">
+        <dt>list1</dt>
+        <dd><a href="#">link1</a></dd>
+        <dd><a href="#">link2</a></dd>
+    </dl>
+    <dl id="appendToList2">
+        <dt>list2</dt>
+        <dd><span>span1</span></dd>
+        <dd><span>span2</span></dd>
+    </dl>
+    
+    <!-- prepend -->
+    <span id="prependSpan1">span </span><em id="prependEm1">em </em><a href="#" id="prependLink1">link </a>
+    <div id="prependBox1">box1 </div>    
+    
+    <!-- prependTo -->
+    <div id="prependToBox1">box1</div>
+    
+    <!-- query element -->
+    <ul id="queryList1">
+        <li class="item1">test1</li>
+        <li class="item2">test2</li>
+        <li class="item3">test3</li>
+        <li class="item4">test4</li>
+    </ul>
+    
+    <!-- clone -->
+    <p class="clonePara1">test1</p>
+    <div id="cloneBox1">box1</div>
+    
+    <p class="clonePara2">test2</p>
+    <div id="cloneBox2">box2</div>
+    
+    <!-- create -->
+    <div id="createBox1">box1</div>
+    
+    <!-- empty -->
+    <ul id="emptyList1">
+        <li class="item1">test1</li>
+        <li class="item2">test2</li>
+        <li class="item3">test3</li>
+        <li class="item4">test4</li>
+    </ul>
+    
+    <!-- html -->
+    <p id="htmlPara3">para3</p>
+    <p id="htmlPara4">para4</p>
+    <div id="htmlBox1"><p>para1</p></div>
+    <dl id="htmlList1">
+        <dt>list1</dt>
+        <dd>dd1</dd>
+        <dd>dd2</dd>
+    </dl>
+    
+    <!-- replace -->
+    <div id="replaceBox1">box1</div>
+    
+    <!-- wrap -->
+    <p id="wrapPara1">para1</p>
+    
+    <!-- attr -->
+    <div id="attrDiv" gameid="hello"></div>
+    <ul id="attrList1">
+        <li>test1</li>
+        <li>test2</li>
+        <li>test3</li>
+    </ul>
+    <form id="attrForm">
+        <input type="text" id="attrInput1" value="hello" />
+        <input type="checkbox" id="attrCheck1" checked="checked" />
+        <input type="checkbox" id="attrCheck2" />
+        <input type="radio" id="attrRadio1" checked="checked" />
+        <input type="radio" id="attrRadio2" />
+    </form>
+    
+</div>
+
+<div class="wrapper">
+    <h1><a href="javascript:;" class="run" id="run">Run</a>easy.js 单元测试</h1>
+    <div class="box" id="easyBox">
+        <h3><span class="arrow"></span>种子模块</h3>
+        <!--<ul class="result_list">
+            <li><span class="f_333">[ <b>mix</b> ]</span> 通过测试&emsp;耗时 <b class="f_333">0</b> ms</li>
+            <li class="error">[ <b>mix</b> ] 未通过测试&emsp;错误原因：E is undeined</li>
+            <li><span class="f_333">[ <b>merge</b> ]</span> 通过测试&emsp;耗时 <b class="f_333">1</b> ms</li>
+        </ul>
+        <p>共 <b class="f_333">11</b> 条测试数据，成功 <b class="f_green">11</b> 条，失败 <b class="f_red">0</b> 条。</p>
+        <ul class="error_list">
+            <li>[ <b>mix</b> ] 未通过测试&emsp;错误原因：E is undeined</li>
+        </ul>-->
+    </div>
+    
+    <div class="box" id="moduleBox">
+        <h3><span class="arrow"></span>模块加载</h3>
+    </div>
+    
+    <div class="box" id="langBox">
+        <h3><span class="arrow"></span>语言扩展模块</h3>
+    </div>
+    
+    <div class="box" id="dataBox">
+        <h3><span class="arrow"></span>数据存储模块</h3>
+    </div>
+    
+    <div class="box" id="selectorBox">
+        <h3><span class="arrow"></span>选择器模块</h3>
+    </div>
+    
+    <div class="box" id="nodeBox">
+        <h3><span class="arrow"></span>节点模块</h3>
+    </div>
+    
+    <div class="box" id="attrBox">
+        <h3><span class="arrow"></span>属性模块</h3>
+    </div>
+    
+    <div class="box" id="cssBox">
+        <h3><span class="arrow"></span>样式模块</h3>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="../build/easy-1.0.2.min.js"></script>
+<script type="text/javascript">
+E( '.box h3' ).on( 'mouseenter', function(){
+        E( this ).addClass( 'current' );
+    })
+    .on( 'mouseleave', function(){
+        var elem = E( this ),
+            next = elem.next();
+            
+        if( !next.length || next.is(':hidden') ){
+            elem.removeClass( 'current' );
+        }
+    })
+    .on( 'click', function(){        
+        var elem = E( this ),
+            next = elem.next();
+            
+        if( next.length ){
+            next.slideToggle( 'normal', 'swing', function(){
+                elem.find( 'span' ).toggleClass( 'arrow_up' );
+                
+                if( E(this).is(':visible') ){
+                    elem.addClass( 'current' );
+                }
+                else{
+                    elem.removeClass( 'current' );
+                }
+            });
+        }
+    });
+
+E.config({
+    baseUrl : 'module/'
+});
+
+E.use( 'check', function(){
+    E( '#run' ).one( 'click', function( e ){        
+        var checkList = 'easyCheck moduleCheck langCheck dataCheck selectorCheck nodeCheck attrCheck cssCheck'.split( ' ' );
+        
+        checkList.forEach(function( name ){
+            name += ( '.js?' + E.guid() );
+            E.use( name, function(){
+                arguments[0]();
+            });
+        });
+        
+        e.preventDefault();
+    });
+});
+
+</script>
+</body>
+</html>

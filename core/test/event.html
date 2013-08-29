@@ -1,0 +1,416 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>easy.js 事件模块测试</title>
+<link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+<div class="wrapper">
+    <h1>easy.js 事件模块测试</h1>
+    <p class="tip">按照次序，先触发，后卸载。</p>
+    <div class="box" id="fireBox">
+		<button class="btn" id="fireBtn">触发</button>
+        <h3><span class="arrow"></span>触发事件</h3>
+    </div>
+    <div class="box" id="unBox">
+		<button class="btn" id="unBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载事件</h3>
+    </div>
+    <div class="box" id="oneBox">
+		<button class="btn" id="oneBtn">触发</button>
+        <h3><span class="arrow"></span>一次性事件</h3>
+    </div>
+    <div class="box" id="delegateBox">
+		<button class="btn" id="delegateBtn">触发</button>
+        <h3><span class="arrow"></span>触发代理事件</h3>
+    </div>
+    <div class="box" id="unDelegateBox">
+		<button class="btn" id="unDelegateBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载代理事件</h3>
+    </div>
+    <div class="box" id="customBox">
+		<button class="btn" id="customBtn">触发</button>
+        <h3><span class="arrow"></span>触发自定义事件</h3>
+    </div>
+    <div class="box" id="unCustomBox">
+		<button class="btn" id="unCustomBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载自定义事件</h3>
+    </div>
+    <div class="box" id="mouseenterBox">
+		<button class="btn" id="mouseenterBtn">mouseenter</button>
+        <h3><span class="arrow"></span>触发 mouseenter 事件</h3>
+    </div>
+    <div class="box" id="unMouseenterBox">
+		<button class="btn" id="unMouseenterBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载 mouseenter 事件</h3>
+    </div>
+    <div class="box" id="focusinBox">
+		<input type="text" class="testInput" placeholder="触发focusin事件" />
+        <h3><span class="arrow"></span>触发 focusin 事件</h3>
+    </div>
+    <div class="box" id="unFocusinBox">
+		<button class="btn" id="unFocusinBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载 focusin 事件</h3>
+    </div>
+    <div class="box" id="textChangeBox">
+		<input type="text" class="testInput" id="textInput" placeholder="输入文字触发change事件" />
+        <h3><span class="arrow"></span>触发普通输入框的 change 事件</h3>
+    </div>
+    <div class="box" id="unTextChangeBox">
+		<button class="btn" id="unTextChangeBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载普通输入框的 change 事件</h3>
+    </div>
+    <div class="box" id="checkChangeBox">
+		<input type="checkbox" id="checkInput" />
+        <h3><span class="arrow"></span>触发 checkbox 的 change 事件</h3>
+    </div>
+    <div class="box" id="unCheckChangeBox">
+		<button class="btn" id="unCheckChangeBtn">卸载</button>
+        <h3><span class="arrow"></span>卸载普通输入框的 change 事件</h3>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="../build/easy-1.0.2.min.js"></script>
+<script type="text/javascript">
+E( '.box h3' ).on( 'mouseenter', function(){
+    E( this ).addClass( 'current' );
+})
+.on( 'mouseleave', function(){
+    var elem = E( this ),
+        next = elem.next( '.result_list' );
+        
+    if( !next.length || next.is(':hidden') ){
+        elem.removeClass( 'current' );
+    }
+})
+.on( 'click', function(){        
+    var elem = E( this ),
+        next = elem.next( '.result_list' );
+        
+    if( next.length ){
+        next.slideToggle( 'normal', 'swing', function(){
+            elem.find( 'span' ).toggleClass( 'arrow_up' );
+            
+            if( E(this).is(':visible') ){
+                elem.addClass( 'current' );
+            }
+            else{
+                elem.removeClass( 'current' );
+            }
+        });
+    }
+});
+
+E.config({
+    baseUrl : 'module/'
+});
+
+E.use( 'check', function( Check ){ 
+    // 普通的点击事件
+    var clickCount = 0;
+    
+    E( '#fireBtn' ).on( 'click', function(){
+        clickCount++;
+    })
+    .on( 'click', { count : 2 }, function( e ){
+        clickCount += e.extraData.count;
+    })
+    .on( 'click.firetest', function(){
+        clickCount++;
+    })
+    .on( 'click', function(){
+        var check = new Check( 'fireBox' );
+        
+        check.run( 'fire', function(){
+            return clickCount;
+        })
+        .equal( 4 )            
+        .output();
+    });
+        
+    E( '#unBtn' ).on( 'click', function(){
+        var fireBtn = E( '#fireBtn' ),
+            check = new Check( 'unBox' );
+        
+        fireBtn.un( 'click.firetest' );
+
+        check.run( 'un', function(){
+            var index = fireBtn[0][E.euid],
+                events = E.cache[index].event.click,
+                len = events.length;                        
+            
+            if( len === 4 ){
+                fireBtn.un( 'click' );
+                return fireBtn[0][E.euid] === undefined;
+            }
+            
+            return false;
+        })
+        .equal( true )            
+        .output();            
+    });
+    
+    
+    // 一次性事件
+    E( '#oneBtn' ).one( 'click', function(){
+        var check = new Check( 'oneBox' ),
+            elem = this;
+        
+        check.run( 'one', function(){
+            return elem[ E.euid ] === undefined;
+        })
+        .equal( true )        
+        .output();
+    });
+    
+    
+    // 代理事件
+    E( '#delegateBox' ).on( 'click', '.btn', function(){
+        var check = new Check( 'delegateBox' );
+        
+        check.run( 'delegate', function(){
+            return true;
+        })
+        .equal( true )
+        .output();
+    }); 
+    
+    E( '#unDelegateBtn' ).on( 'click', function(){
+        var box = E( '#delegateBox' ),
+            check = new Check( 'unDelegateBox' );
+            
+        box.un( 'click', '.btn' );
+        
+        check.run( 'un delegate', function(){
+            return box[0][E.euid] === undefined;
+        })
+        .equal( true )
+        .output();
+    }); 
+    
+    
+    // 自定义事件
+    var tickCount = 0;
+    
+    E( '#customBtn' ).on( 'tick.custom', function(){
+        tickCount++;
+    })
+    .on( 'tick', function(){
+        tickCount += 2;
+    })
+    .on( 'click', function(){
+        var check = new Check( 'customBox' ),
+            elem = E( this );
+            
+        elem.fire( 'tick.custom' );        
+        check.run( 'custom', function(){
+            elem.fire( 'tick' );
+            return tickCount;
+        })
+        .equal( 4 )
+        .output();
+    });
+    
+    E( '#unCustomBtn' ).on( 'click', function(){
+        var btn = E( '#customBtn' ),
+            check = new Check( 'unCustomBox' );
+            
+        btn.un( 'tick.custom' );
+        check.run( 'un custom', function(){
+            var index = btn[0][ E.euid ],
+                len = E.cache[ index ].event.tick.length;
+                
+            if( len === 2 ){
+                btn.un( 'tick click' );
+                return btn[0][ E.euid ] === undefined;
+            }            
+            return false;
+        })
+        .equal( true )
+        .output();
+    });
+    
+    
+    // mouseenter事件测试
+    var mouseenterCount = 0;
+    
+    E( '#mouseenterBtn' ).on( 'mouseenter', function(){
+        mouseenterCount++;
+    })
+    .on( 'mouseenter', { count : 2 }, function( e ){
+        mouseenterCount += e.extraData.count;
+    })
+    .on( 'mouseenter.firetest', function(){
+        mouseenterCount++;
+    })
+    .one( 'mouseenter', function(){
+        var check = new Check( 'mouseenterBox' );
+
+        check.run( 'mouseenter', function(){
+            return mouseenterCount;
+        })
+        .equal( 4 )            
+        .output();
+    });
+    
+    E( '#unMouseenterBtn' ).on( 'click', function(){
+        var fireBtn = E( '#mouseenterBtn' ),
+            check = new Check( 'unMouseenterBox' );
+        
+        fireBtn.un( 'mouseenter.firetest' );
+
+        check.run( 'un mouseenter', function(){
+            var index = fireBtn[0][E.euid],
+                events = E.cache[index].event,
+                name;
+            
+            for( name in events ){
+                if( events[name].length === 3 ){
+                    fireBtn.un( 'mouseenter' );
+                    return fireBtn[0][E.euid] === undefined;
+                }
+            }
+            
+            return false;
+        })
+        .equal( true )            
+        .output();            
+    });
+    
+    
+    // focusin事件测试
+    var focusinCount = 0;
+
+    E( '#focusinBox' ).on( 'focusin', function(){
+        focusinCount++;
+    })
+    .on( 'focusin', { count : 2 }, function( e ){
+        focusinCount += e.extraData.count;
+    })
+    .on( 'focusin.firetest', function(){
+        focusinCount++;
+    })
+    .one( 'focusin', function(){
+        var check = new Check( 'focusinBox' );
+
+        check.run( 'focusin', function(){
+            return focusinCount;
+        })
+        .equal( 4 )            
+        .output();
+    });
+    
+    E( '#unFocusinBtn' ).on( 'click', function(){
+        var fireBtn = E( '#focusinBox' ),
+            check = new Check( 'unFocusinBox' );
+        
+        fireBtn.un( 'focusin.firetest' );
+
+        check.run( 'un focusin', function(){
+            var index = fireBtn[0][E.euid],
+                events = E.cache[index].event,
+                name;
+            
+            for( name in events ){
+                if( events[name].length === 3 ){
+                    fireBtn.un( 'focusin' );
+                    return fireBtn[0][E.euid] === undefined;
+                }
+            }
+            
+            return false;
+        })
+        .equal( true )            
+        .output();            
+    });
+    
+    
+    // 普通输入框的change事件
+    var textChangeCount = 0;
+
+    E( '#textInput' ).on( 'change', function(){
+        textChangeCount++;
+    })
+    .on( 'change', { count : 2 }, function( e ){
+        textChangeCount += e.extraData.count;
+    })
+    .on( 'change.firetest', function(){
+        textChangeCount++;
+    })
+    .one( 'change', function(){
+        var check = new Check( 'textChangeBox' );
+
+        check.run( 'input change', function(){
+            return textChangeCount;
+        })
+        .equal( 4 )            
+        .output();
+    });
+    
+    E( '#unTextChangeBtn' ).on( 'click', function(){
+        var fireBtn = E( '#textInput' ),
+            check = new Check( 'unTextChangeBox' );
+        
+        fireBtn.un( 'change.firetest' );
+
+        check.run( 'input un change', function(){
+            var index = fireBtn[0][E.euid],
+                events = E.cache[index].event,
+                name;
+            
+            for( name in events ){
+                if( events[name].length === 3 ){
+                    fireBtn.un( 'change' );
+                    return fireBtn[0][E.euid] === undefined;
+                }
+            }
+            
+            return false;
+        })
+        .equal( true )            
+        .output();            
+    });
+    
+    
+    // checkbox的change事件
+    var checkChangeCount = 0;
+
+    E( '#checkInput' ).on( 'change', function(){
+        checkChangeCount++;
+    })
+    .on( 'change', { count : 2 }, function( e ){
+        checkChangeCount += e.extraData.count;
+    })
+    .on( 'change.firetest', function(){
+        checkChangeCount++;
+    })
+    .one( 'change', function(){
+        var check = new Check( 'checkChangeBox' );
+
+        check.run( 'checkbox change', function(){
+            return checkChangeCount;
+        })
+        .equal( 4 )            
+        .output();
+    });
+    
+    E( '#unCheckChangeBtn' ).on( 'click', function(){
+        var fireBtn = E( '#checkInput' ),
+            check = new Check( 'unCheckChangeBox' );
+        
+        fireBtn.un( 'change.firetest' );
+
+        check.run( 'checkbox un change', function(){
+            fireBtn.un( 'change' );
+            return fireBtn[0][E.euid] === undefined;
+        })
+        .equal( true )            
+        .output();            
+    });
+
+});    
+</script>
+</body>
+</html>

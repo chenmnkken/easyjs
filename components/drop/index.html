@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>drop demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<style type="text/css">
+.box1{ width:400px; height:280px; border:1px solid #ddd; margin:0 auto; position:relative; }
+.box2{ width:200px; height:180px; border:1px solid #06c; margin:40px 0 0 50px; padding:20px; }
+.box3{ background:#333; width:100px; height:100px; }
+.box4{ background:#333; width:100px; height:100px; }
+.drop_box{ border:1px solid #b2b2b2; padding:100px; float:left; }
+.droped{ border:1px solid #000; background:#f5f5f5; }
+</style>
+</head>
+<body>
+
+<h1 style="font-size:36px;">Drop demo</h1>
+<hr />
+
+<div class="box1" id="box1">
+	<div class="box2" id="box2">
+		<div class="box3" id="box3"></div>
+		<div class="box4" id="box4"></div>
+	</div>
+</div>
+
+<button id="teardown">teardown</button>
+
+<div class="drop_box" id="dropBox1"></div>
+
+<p style="height:1000px;"></p>
+
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+
+E.use( 'drop', function(){
+    var Drop = E.ui.Drop,
+        Drag = E.ui.Drag,
+        box3 = E( '#box3' ),
+        box4 = E( '#box4' ),
+        drag1, drag2,
+        dropBox1 = E( '#dropBox1' );
+    
+    var drop1 = new Drop( dropBox1, {
+        //mode : 'intersect'
+        //mode : 'strict'
+    });
+    
+    drag1 = new Drag( '#box3', {
+        proxy : true,
+        refresh : false
+    });
+    
+    new Drag( '#box4', {
+        proxy : false,
+        refresh : false
+    });
+    
+    drop1.on( 'dropenter', function( e ){
+            dropBox1.addClass( 'droped' );
+        })
+        .on( 'dropexit', function( e ){
+            dropBox1.removeClass( 'droped' );
+        })
+        .on( 'drop', function(e){
+            dropBox1.append( e.drag );
+            dropBox1.removeClass( 'droped' );
+        });
+        
+    /*drop2.on( 'dropenter', function( e ){
+            console.log( e.type );
+        })
+        .on( 'dropexit', function( e ){
+            dropBox2.removeClass( 'droped' );
+            this.destroy();
+        })
+        .on( 'drop', function(e){
+            dropBox2.addClass( 'droped' );
+        });
+        
+        /*
+    drop1.on( 'dropenter', function( e ){
+            console.log( e.type );
+        })
+        .on( 'dropover', function( e ){
+            console.log( e.type );
+        })
+        .on( 'dropexit', function( e ){
+            console.log( e.type );
+        })
+        .on( 'drop', function( e ){
+            console.log( e.drag );
+            console.log( e.drop );
+            console.log( e.target );
+        });*/
+});
+
+</script>    
+</body>
+
+</html>
