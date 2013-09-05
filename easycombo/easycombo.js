@@ -1,13 +1,13 @@
 /*
- * easyCombo v0.2 for easy.js
- * 2013-07-01
+ * easyCombo v0.3 for easy.js
+ * 2013-09-05
  */
-var rExistId = /define\(\s*['"][^\[f'"\{]+['"]\s*,?/,
+var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
     rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
     rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/,     
     rRightEnd = /,?\s*(function\s*\(.*|\{.*)/,    
     rPullDeps = /((?:define|E\.use)\(.*)/g,    
-    rDeps = /(define\([^\[f\{]*\[)([^\]]+)/,
+    rDeps = /((?:define|seed\.use)\([^\[\(\{]*\[)([^\]]+)/,
     rDefine = /define\(/,    
 
     fs = require( 'fs' ),

@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>test</title>
+<style type="text/css">
+*{ margin:0; padding:0; }
+p{ font-famliy:arial; font-size:12px; width:120px; padding:10px; background:#f0f0f0; color:#333; margin:50px auto 0; line-height:24px; }
+</style>
+</head>
+
+
+<body>
+
+<p id="para">一些美国官员日披露。</p>
+
+<script type="text/javascript" src="easy-1.0.2.js"></script>
+<script type="text/javascript">
+(function(){
+
+var para = E( '#para' ),
+    len = para.text().length,
+    lineHeight = parseInt( para.css('line-height') ),
+    height = para.height(),
+    lines = height / lineHeight;
+    
+var text = '一些美国官员23日披露，美军已经更新叙利亚目标打击清单，在地中海增加一艘携带巡航导弹的驱逐舰，以备总统贝拉克·奥巴马可能下令军事打击叙利亚。然而，美国内部就是否动武意见不一。24日，叙利亚官方电视台称，政府军当天与反对派作战时，身体出现受到化学武器袭击的症状。';
+
+para.text( text );
+
+console.log( para.height() );
+console.log( text.length / 10 * lineHeight );
+
+})();
+</script>
+
+</body>
+</html>
