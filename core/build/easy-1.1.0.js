@@ -1,11 +1,11 @@
 /*
-* easy.js v1.0.2
+* easy.js v1.1.0
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-7-15 23:30:52
+* Date : 2013-9-17 22:16:4
 */
 
 // ---------------------------------------------
@@ -39,7 +39,8 @@ var document = window.document,
     // 模块加载器的配置对象
     moduleOptions = {
         baseUrl : null,
-        charset : {}    // 模块对应的charset存储对象
+        charset : {},    // 模块对应的charset存储对象
+        alias : {}
     },
     
     // 浏览器判定的正则    
@@ -157,7 +158,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '1.0.2',
+    version : '1.1.0',
     
     __uuid__ : 2,
     
@@ -279,19 +280,22 @@ easyJS.mix( easyJS, {
      */
     use : function( ids, fn ){
         ids = typeof ids === 'string' ? [ ids ] : ids;
-        var module = easyJS.module,
+        var alias = moduleOptions.alias,
+            module = easyJS.module,
             len = ids.length,
             isLoaded = true,
             namesCache = [],
             modNames = [],
             modUrls = [],
             j = 0,
-            mod, modName, result, useKey, args, name, i;        
+            mod, modName, result, useKey, args, name, i, id;        
             
         for( i = 0; i < len; i++ ){
+            id = ids[i];
+        
             // 获取解析后的模块名和url
-            result = easyModule.parseModId( ids[i], moduleOptions.baseUrl );
-            modName = result[0];
+            result = easyModule.parseModId( alias[id] || id, moduleOptions.baseUrl );
+            modName = alias[ id ] ? id : result[0];
             mod = module[ modName ];            
 
             if( !mod ){
@@ -363,18 +367,23 @@ easyJS.mix( easyJS, {
      * @param { Object }
      */
     config : function( options ){
-        var baseUrl = options.baseUrl,
+        var baseUrl, isHttp;
+    
+        if( options.baseUrl ){
+            baseUrl = options.baseUrl;
             isHttp = baseUrl.slice( 0, 4 ) === 'http';
             
-        if( isHttp ){
-            moduleOptions.baseUrl = baseUrl;
-        }
-        // 相对路径的baseUlr是基于HTML页面所在的路径(无论是http地址还是file地址)
-        else{
-            moduleOptions.baseUrl = easyModule.mergePath( baseUrl, document.location.href );
+            if( isHttp ){
+                moduleOptions.baseUrl = baseUrl;
+            }
+            // 相对路径的baseUlr是基于HTML页面所在的路径(无论是http地址还是file地址)
+            else{
+                moduleOptions.baseUrl = easyModule.mergePath( baseUrl, window.location.href );
+            }
         }
         
-        moduleOptions.charset = easyJS.merge( moduleOptions.charset, options.charset );
+        easyModule.merge( 'charset', options.charset );
+        easyModule.merge( 'alias', options.alias );
     },
     
     error : function( msg ){
@@ -388,11 +397,22 @@ easyJS.euid = easyJS.guid();
 modClassName = easyJS.guid( 'easyJS_mod_' );
 
 var easyModule = {
+
+    // 用于合并模块加载器配置的工具函数
+    merge : function( key, options ){    
+        if( options ){
+            var name;
+            
+            for( name in options ){
+                moduleOptions[ key ][ name ] = options[ name ];
+            }
+        }
+    },   
     
     // 初始化模块加载器时获取baseUrl(既是当前js文件加载的url)
     init : function(){
         var i = 0,
-            script, scripts, initMod, url;
+            script, scripts, initMod, initBaseUrl, url;
         
         // firefox支持currentScript属性
         if( document.currentScript ){
@@ -405,8 +425,11 @@ var easyModule = {
         }           
 
         initMod = script.getAttribute( 'data-main' );
+        initBaseUrl = script.getAttribute( 'data-baseurl' ); 
         url = script.hasAttribute ? script.src : script.getAttribute( 'src', 4 );        
-        moduleOptions.baseUrl = url.slice( 0, url.lastIndexOf('/') + 1 );
+        moduleOptions.baseUrl = initBaseUrl ? 
+            easyModule.mergePath( initBaseUrl, window.location.href ) : 
+            url.slice( 0, url.lastIndexOf('/') + 1 );
         
         // 初始化时加载data-main中的模块
         if( initMod ){
@@ -798,7 +821,8 @@ window.define = function( name, deps, factory ){
         deps = null;
     }
 
-    var module = easyJS.module,
+    var alias = moduleOptions.alias,
+        module = easyJS.module,
         mod = module[ name ],
         isRepeat = false,
         isLoaded = true,
@@ -806,7 +830,7 @@ window.define = function( name, deps, factory ){
         urls = [],
         insertIndex = 0,
         pullIndex = 0,
-        useKey, data, modUrl, factorys, baseUrl, depMod, depName, result, exports, args, depsData, repeatDepsData, i, repeatName;
+        useKey, data, modUrl, factorys, baseUrl, depMod, depName, result, exports, args, depsData, repeatDepsData, i, repeatName, dep;
         
     // 在模块都合并的情况下直接执行factory
     if( !mod ){
@@ -838,8 +862,9 @@ window.define = function( name, deps, factory ){
         // 遍历依赖模块列表，如果该依赖模块没加载过，
         // 则将该依赖模块名和模块路径添加到当前模块加载队列的数据去进行加载
         for( i = 0; i < deps.length; i++ ){
-            result = easyModule.parseModId( deps[i], baseUrl );
-            depName = result[0];             
+            dep = deps[i];         
+            result = easyModule.parseModId( alias[dep] || dep, baseUrl );
+            depName = alias[ dep ] ? dep : result[0];    
             depMod = module[ depName ];
             mod.deps.push( depName );            
             depsData[ depName ] = true;

@@ -1,16 +1,17 @@
 /*
- * easyCombo v0.3 for easy.js
- * 2013-09-05
+ * easyCombo v1.1.0 for easy.js
+ * 2013-09-17
  */
 var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
     rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
-    rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/,     
+    rModId = /([^\\\/?]+?)(\.(?:js|css))?(\?.*)?$/,     
     rRightEnd = /,?\s*(function\s*\(.*|\{.*)/,    
-    rPullDeps = /((?:define|E\.use)\(.*)/g,    
-    rDeps = /((?:define|seed\.use)\([^\[\(\{]*\[)([^\]]+)/,
+    rPullDeps = /((?:define|E\.use|easyJS\.use)\(.*)/g,    
+    rDeps = /((?:define|E\.use|easyJS\.use)\([^\[\(\{]*\[)([^\]]+)/,
     rDefine = /define\(/,    
 
     fs = require( 'fs' ),
+    path = require( 'path' ),
     depsCache = {},    
 
     define = function( name, deps ){
@@ -20,88 +21,23 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
         
         return deps;     
     },
-
-    // 将模块标识(相对路径)和基础路径合并成新的真正的模块路径(不含模块的文件名)
-    mergePath = function( id, url ){
-        var isHttp = url.slice( 0, 4 ) === 'http',
-            protocol = '',
-            domain = '',
-            i = 0,
-            protocol, isHttp, urlDir, idDir, dirPath, len, dir, matches;
-
-        matches = url.match( rProtocol );
-        
-        if( matches ){
-            protocol = matches[1];
-            url = url.slice( protocol.length );
-        }
-        
-        // HTTP协议的路径含有域名
-        if( isHttp ){
-            domain = url.slice( 0, url.indexOf('/') + 1 );
-            url = url.slice( domain.length );
-        }
-        
-        // 组装基础路径的目录数组
-        urlDir = url.split( '/' );
-        urlDir.pop();
-        
-        // 组装模块标识的目录数组
-        idDir = id.split( '/' );
-        idDir.pop();    
-        len = idDir.length;
-        
-        for( ; i < len; i++ ){
-            dir = idDir[i];
-            // 模块标识的目录数组中含有../则基础路径的目录数组删除最后一个目录
-            // 否则直接将模块标识的目录数组的元素添加到基础路径的目录数组中        
-            if( dir === '..' ){
-                urlDir.pop();
-            }
-            else if( dir !== '.' ){
-                urlDir.push( dir );
-            }
-        }
-
-        // 基础路径的目录数组转换成目录字符串
-        dirPath = urlDir.join( '/' );    
-        // 无目录的情况不用加斜杠
-        dirPath = dirPath === '' ? '' : dirPath + '/';        
-        return protocol + domain + dirPath;
-    },
-
-    // 解析模块标识，返回模块名和模块路径
-    parseModId = function( id, url ){
-        var isAbsoluteId = rProtocol.test( id ),        
-            result = id.match( rModId ),
-            modName = result[1],
-            suffix = result[2] || '.js',
-            search = result[3] || '',
-            baseUrl, modUrl;
-        
-        // 模块标识为绝对路径时，标识就是基础路径
-        if( isAbsoluteId ){
-            url = id;
-            id = '';
-        }
-
-        baseUrl = mergePath( id, url );
-        modUrl = baseUrl + modName + suffix + search;
-        return [ modName, modUrl ];
-    },
     
     // 分析模块的依赖，将依赖模块的模块标识组成一个数组以便合并
     parseDeps = function( key, mods, encoding ){    
         var cache = depsCache[ key ],
             deps = [];
         
-        mods.forEach(function( mod ){
-            var baseUrl = mod.slice( 0, mod.lastIndexOf('/') + 1 ),
+        mods.forEach(function( modUrl ){
+            var baseUrl = path.resolve( modUrl, '..' ),
                 content, literals;          
+            
+            if( !~modUrl.indexOf('.js') ){
+                modUrl += '.js'
+            }
 
             // 读取文件
             try{
-                content = fs.readFileSync( mod, encoding );
+                content = fs.readFileSync( modUrl, encoding );
             }
             catch( error ){
                 console.log( 'Read file ' + error );
@@ -120,11 +56,10 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
                 // 然后用eval去执行处理过的define和use获取到依赖模块的标识
                 arr = eval( literal );
                 
-                if( arr && arr.length ){
+                if( arr && arr.length ){                
                     // 为依赖模块解析真实的模块路径
                     arr.forEach(function( item, i ){
-                        var result = parseModId( item, baseUrl );
-                        arr[i] = result[1];
+                        arr[i] = path.resolve( baseUrl, item );
                     });
                 
                     deps = deps.concat( arr );
@@ -163,18 +98,23 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
             ids = cache.ids;
             
         ids.forEach(function( id ){
-            var result = parseModId( id, baseUrl ),
-                name = result[0],
-                url = result[1],
-                content = fs.readFileSync( url, encoding );
+            var modName = id.match( rModId )[1],
+                modUrl = path.resolve( __dirname, id ),
+                content;
+                
+            if( !~modUrl.indexOf('.js') ){
+                modUrl += '.js'
+            }
+               
+            content = fs.readFileSync( modUrl, encoding );
 
             // 非use()的情况下防止重复合并
             if( !~content.indexOf('use(') ){
-                if( unique[name] ){
+                if( unique[modUrl] ){
                     return;
                 }
             
-                unique[ name ] = true;                 
+                unique[ modUrl ] = true;                 
             }                
         
             // utf-8 编码格式的文件可能会有 BOM 头，需要去掉
@@ -189,16 +129,16 @@ var rExistId = /define\(\s*['"][^\[\('"\{]+['"]\s*,?/,
             
             // 为匿名模块添加模块名
             if( !rExistId.test(content) ){  
-                content = content.replace( rDefine, "define('" + name + "'," );
+                content = content.replace( rDefine, "define('" + modName + "'," );
             }
             
             // 格式化依赖模块列表 ['../hello5'] => ['hello5']
-            content = content.replace( rDeps, formatDeps );
+            content = content.replace( rDeps, formatDeps );            
             
             // 合并
             cache.contents += content + '\n';       
-            console.log( 'Combo the [' + url + '] success.' );  
-        });        
+            console.log( 'Combo the [' + modName + '] success.' );  
+        });         
     },
     
     // 写入文件
@@ -245,7 +185,7 @@ var E = easyJS = {
 
 var easyCombo = function( options ){
     var modules = options.modules,
-        baseUrl = options.baseUrl;
+        baseUrl = path.resolve();
         
     modules.forEach(function( mod ){
         var encoding = mod.encoding = ( mod.encoding || 'UTF-8' ).toUpperCase(),
@@ -258,8 +198,7 @@ var easyCombo = function( options ){
         };
             
         mod.input.forEach(function( id ){
-            var result = parseModId( id, baseUrl ),
-                modUrl = result[1];
+            var modUrl = path.resolve( baseUrl, id );
         
             depsCache[ randomKey ].ids.push( modUrl );
             parseDeps( randomKey, [modUrl], encoding );
@@ -267,7 +206,7 @@ var easyCombo = function( options ){
 
         comboContent( randomKey, baseUrl, encoding, mod.format );
         writeFile( randomKey, mod, options.uglifyUrl );
-    });    
+    });   
 };
 
 exports.easyCombo = easyCombo;

@@ -1,8 +1,7 @@
 require( './easyCombo' ).easyCombo({
-    baseUrl : './',
     //uglifyUrl : '../uglify/uglify-js',
     modules : [{
-        input : ['hello'],
+        input : ['hello.js'],
         output : 'output/hello.js'
     }]    
 });
