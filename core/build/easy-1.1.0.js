@@ -5,7 +5,7 @@
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-9-17 22:16:4
+* Date : 2013-10-21 23:13:35
 */
 
 // ---------------------------------------------
@@ -44,7 +44,7 @@ var document = window.document,
     },
     
     // 浏览器判定的正则    
-    rUA = [ /ms(ie)\s(\d\.\d)/,    // IE
+    rUA = [ /ms(ie)\s(\d+\.\d)/,    // IE
             /(chrome)\/(\d+\.\d+)/,    // chrome
             /(firefox)\/(\d+\.\d+)/,   // firefox 
             /version\/(\d+\.\d+)(?:\.\d)?\s(safari)/,    // safari
@@ -485,7 +485,7 @@ var easyModule = {
         var isHttp = url.slice( 0, 4 ) === 'http',
             domain = '',
             i = 0,
-            protocol, isHttp, urlDir, idDir, dirPath, len, dir;
+            protocol, urlDir, idDir, dirPath, len, dir;
 
         protocol = url.match( rProtocol )[1];
         url = url.slice( protocol.length );
