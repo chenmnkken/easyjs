@@ -1,11 +1,11 @@
 /*
-* Lazyload components v0.1.1 for easy.js
+* Lazyload component v0.1.2 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-27 
+* Date : 2013-10-31
 */
 define(function(){
 
@@ -70,8 +70,8 @@ var easyLazyload = {
             }
             
             parent = elem.parent();
-            parent.html( val );
-            elem.fire( 'likeload', { target : parent[0] }).remove();
+            parent.html( val ).fire( 'likeload' );
+            elem.remove();
         }
     }
     

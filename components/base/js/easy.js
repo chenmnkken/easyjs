@@ -1,11 +1,11 @@
 /*
-* easy.js v1.1.0
+* easy.js v1.1.1
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-10-21 23:13:35
+* Date : 2013-10-31 22:28:10
 */
 
 // ---------------------------------------------
@@ -25,7 +25,7 @@ var document = window.document,
     uaMatch, modClassName,
     
     rQuickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,    
-    rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
+    rProtocol = /^(file\:.+\:\/|[\w\-]+\:\/\/)/,
     rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/, 
     rReadyState = /loaded|complete|undefined/,  
     
@@ -158,7 +158,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '1.1.0',
+    version : '1.1.1',
     
     __uuid__ : 2,
     

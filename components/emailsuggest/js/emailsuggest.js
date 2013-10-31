@@ -1,11 +1,11 @@
 /*
-* Emailsuggest components v0.1.0 for easy.js
+* Emailsuggest component v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-10-31 
 */
 define(function(){
 
@@ -26,7 +26,7 @@ var $doc = E( document ),
 var easyEMS = {
 
     createSuggest : function( o ){
-        var html = '<ul class="eui_emailsuggest" style="z-index:' + o.zIndex + '">',
+        var html = '<ul class="eui_emailsuggest" style="position:absolute;z-index:' + o.zIndex + '">',
             suggestElem, itemElem;
         
         o.data.forEach(function( item ){

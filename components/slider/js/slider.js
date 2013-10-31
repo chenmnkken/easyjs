@@ -1,11 +1,11 @@
 /*
-* Slider components v0.1.0 for easy.js
+* Slider component v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-10-31 
 */
 define(['../../drag/js/drag'], function(){
 
@@ -48,6 +48,10 @@ var easySlider = {
 var Slider = function( target, options ){
     target = E( target ).eq( 0 );
     options = options || {};
+    
+    if( !target.length ){
+        return;
+    }    
     
     var o = E.merge( defaults, options ),
 

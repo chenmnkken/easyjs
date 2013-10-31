@@ -1,11 +1,11 @@
 /*
-* Tab components v0.1.0 for easy.js
+* Tab component v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-10-31
 */
 define(function(){
 
@@ -176,7 +176,10 @@ E.each({
             multiple = 1,
             animMap = {},            
             isReverse = false,
-            thresholdElem, thresholdVal, distance, nextIndex, complete;
+            thresholdElem, thresholdVal, distance, nextIndex, 
+            complete = function(){                
+                o.target.fire( 'likechange' );
+            };            
             
         len--;
 
@@ -223,6 +226,8 @@ E.each({
                     // 此时content的初始top/left值应为0px
                     contentElem.css( posName, '0px' );                        
                     thresholdElem.css( 'position', '' ).css( posName, '' );
+                    
+                    o.target.fire( 'likechange' );
                 };
             } 
         }
@@ -250,8 +255,6 @@ E.each({
             easing : o.easing,
             complete : complete
         });
-
-        o.target.fire( 'likechange' );
     };
 });
     
@@ -273,7 +276,7 @@ var Tab = function( target, options ){
     o.menuElem = target.children( 'ul.tab_menu' ).children( 'li' );    
     o.wrapElem = target.children( 'div.tab_wrapper' );    
     o.contentElem = o.wrapElem.children( 'div.tab_content' );  
-    o.boxElem = o.contentElem.children( 'div' );   
+    o.boxElem = o.contentElem.children( 'div.tab_box' );
     
     ET.initMenu( o );
     

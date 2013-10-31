@@ -15,7 +15,7 @@ var document = window.document,
     uaMatch, modClassName,
     
     rQuickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/,    
-    rProtocol = /^(http(?:s)?\:\/\/|file\:.+\:\/)/,
+    rProtocol = /^(file\:.+\:\/|[\w\-]+\:\/\/)/,
     rModId = /([^\/?]+?)(\.(?:js|css))?(\?.*)?$/, 
     rReadyState = /loaded|complete|undefined/,  
     

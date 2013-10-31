@@ -1,11 +1,11 @@
 /*
-* Switchable components v0.1.0 for easy.js
+* Switchable component v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-10-31 
 */
 define(function(){
 
@@ -228,16 +228,16 @@ var easySwitchable = {
             currentItem.fadeOut( o.duration, o.easing, function(){
                 currentItem.css( 'zIndex', '1' );
                 nextItem.css( 'zIndex', '2' );
+                
+                // 触发change事件
+                o.target.fire( 'likechange' );                     
             });    
             
             // 索引的高亮效果切换
             indexElem.eq( currentIndex ).removeClass( 'current' );            
             indexElem.eq( nextIndex )
                 .addClass( 'current' )
-                .fire( 'likeinit' );
-
-            // 触发change事件
-            o.target.fire( 'likechange' );        
+                .fire( 'likeinit' );   
         }  
     }
 
@@ -265,7 +265,11 @@ E.each({
             // 单次切换的li的个数，索引按钮切换时可能是多个，翻页按钮切换和默认切换都是1个
             multiple = 1,
             animMap = {},
-            thresholdElem, thresholdVal, distance, complete;
+            thresholdElem, thresholdVal, distance,
+            complete = function(){
+                // 触发change事件
+                o.target.fire( 'likechange' );   
+            };            
 
         if( currentIndex === nextIndex ){
             return;
@@ -306,6 +310,8 @@ E.each({
                     // 此时ul的初始top/left值应为0px
                     listElem.css( posName, '0px' );                        
                     thresholdElem.css( 'position', '' ).css( posName, '' );
+                    // 触发change事件
+                    o.target.fire( 'likechange' );                    
                 };
             }
         }
@@ -323,6 +329,8 @@ E.each({
                     // 此时ul的初始top/left值为：-(ul的宽度/高度 - li的宽度/高度)
                     listElem.css( posName, '-' + (listSize - size) + 'px' );                        
                     thresholdElem.css( 'position', '' ).css( posName, '' );
+                    // 触发change事件
+                    o.target.fire( 'likechange' );                    
                 };
             }
         }
@@ -356,10 +364,7 @@ E.each({
         indexElem.eq( currentIndex ).removeClass( 'current' );            
         indexElem.eq( nextIndex )
             .addClass( 'current' )    
-            .fire( 'likeinit' );
-
-        // 触发change事件
-        o.target.fire( 'likechange' );   
+            .fire( 'likeinit' );  
     };
 });
 

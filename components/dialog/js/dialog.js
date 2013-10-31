@@ -1,11 +1,11 @@
 /*
-* Dialog components v0.2.0 for easy.js
+* Dialog component v0.3.0 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-08-03 
+* Date : 2013-10-31 
 */
 define(['../../drag/js/drag'], function(){
 
@@ -25,6 +25,7 @@ var defaults = {
     left       :   null,      // String        设置对话框的left位置值(须含单位)
     trigger    :   'click',   // String        触发显示对话框的事件类型
     overlay    :   true,	  // Boolean       是否添加遮罩层
+    overlayClose :   false,	  // Boolean       是否点击遮罩层关闭对话框
     fixed      :   true,	  // Boolean       是否固定定位    
     lock       :   false,	  // Boolean       是否允许ESC键来关闭对话框
     effects    :   null,      // String        对话框关闭和显示的动画效果
@@ -62,7 +63,9 @@ var easyDialog = {
 				
             if( isIE6 ){             
                 overlayElem.css( 'position', 'absolute' );
-                easyDialog.appendIframe( overlayElem );                  
+                easyDialog.appendIframe( overlayElem );    
+                // 修复IE6中只有iframe时无法点击遮罩层的BUG
+                overlayElem.append( '<div style="position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;" />' );                
             }            
         }
     },
@@ -84,6 +87,11 @@ var easyDialog = {
             isShowBtnYes, isShowBtnNo, isShowFooter, title, html, btnNoCallback;
 
         if( o.elem ){
+            if( children.length ){
+                children.hide();
+                $body.append( children );
+            }            
+        
             if( wrapElem ){
                 wrapElem.remove();
                 wrapElem = null;
@@ -544,8 +552,16 @@ var easyDialog = {
             btnClose.un( 'click.dialog' );
         }
         
+        if( o.elem ){
+            o.elem.hide();
+        }            
+        
         $win.un( 'resize.dialog' );
         $doc.un( 'keyup.dialog' );
+        
+        if( o.overlayClose ){
+            overlayElem.off( 'click.dialog' );
+        }        
         
         o.target.fire( 'likeclose' );
     },
@@ -566,6 +582,12 @@ var easyDialog = {
                 visibility : 'hidden', 
                 display : 'block'
             });    
+            
+            if( o.overlayClose ){
+                overlayElem.on( 'click.dialog', function(){
+                    easyDialog.close( o );
+                });
+            }            
             
             // ie6不对遮罩层进行固定定位
             if( isIE6 ){

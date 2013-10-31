@@ -1,11 +1,11 @@
 /*
-* Tooltip components v0.1.0 for easy.js
+* Tooltip component v0.1.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-5-11 
+* Date : 2013-10-31
 */
 define(function(){
 
@@ -124,7 +124,12 @@ var easyTooltip = {
     createTip : (function(){
         var tipElem;
         
-        return function( reCreate ){                
+        return function( reCreate ){        
+            if( tipElem && tipElem.is(':animated') ){
+                tipElem.stop( true, true );
+                reCreate = false;
+            }
+            
             tipElem = tipElem && !reCreate ? tipElem :
                 E( '<div class="eui_tooltip" style="z-index:' + ( zIndex++ ) + '">' +
                     '<div class="tt_wrapper">' + 
@@ -247,8 +252,12 @@ var easyTooltip = {
         isVisible = false;
         euid = tipElem.data( 'targetIndex' );
         delete tipCache[ euid ];
-        o.currentTarget.fire( 'likeclose' );
-        delete o.currentTarget;
+        
+        if( o.currentTarget ){
+            o.currentTarget.fire( 'likeclose' );
+            delete o.currentTarget;
+        }
+        
         easyTooltip.patterns[ o.effects ].hide( o );        
         
         if( (trigger !== 'mouseenter' && trigger !== 'focus') || o.unClose ){
@@ -268,6 +277,7 @@ easyTooltip.patterns = {
         hide : function( o ){
             o.tipElem.css( 'display', 'none' ).remove();
             delete o.tipElem;
+            isVisible = false;
         }
     },
     
@@ -280,6 +290,7 @@ easyTooltip.patterns = {
             o.tipElem.fadeOut( o.duration, o.easing, function(){
                 o.tipElem.remove( o );
                 delete o.tipElem;
+                isVisible = false;
             });            
         }
     },
@@ -291,6 +302,10 @@ easyTooltip.patterns = {
 [ 'show', 'hide' ].forEach(function( item ){
 
     easyTooltip.patterns.slide[ item ] = function( o ){
+        if( !o.tipElem ){
+            return;
+        }    
+    
         var tipElem = o.tipElem,
             top = tipElem.css( 'top' ),
             left = tipElem.css( 'left' ),            
@@ -310,6 +325,7 @@ easyTooltip.patterns = {
                     .remove();
                     
                 delete o.tipElem;
+                isVisible = false;
             };
         }
         
@@ -353,6 +369,10 @@ easyTooltip.patterns = {
 var Tooltip = function( target, options ){
     target = E( target );
     options = options || {};
+    
+    if( !target.length ){
+        return;
+    }    
     
     var o = E.merge( defaults, options );
     o.effects = o.effects || 'normal';    
