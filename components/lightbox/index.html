@@ -1,0 +1,286 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Lightbox demo</title>
+<link rel="stylesheet" href="../base/css/reset.css" />
+<link rel="stylesheet" href="css/lightbox_style.css" />
+<style type="text/css">
+html{ width:100%; height:100%; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<p style="height:600px;"></p>
+<button id="btn">show</button>
+<p style="height:600px;"></p>
+
+
+<div style="display: none;" id="euiLightBox" class="eui_lightbox">
+    <div class="lb_wrapper">
+        <a class="lb_close" href="#closelightbox"></a>
+        <div class="lb_body">
+            <div class="lb_imgbox">
+                <div class="lb_navigator">
+                    <div class="lb_navbox">
+                        <div class="lb_navmask"><div></div></div>
+                    </div>
+                </div>
+            </div>
+            <a href="#" class="lb_toggle lb_prev"><span>上一张</span></a>
+            <a href="#" class="lb_toggle lb_next"><span>下一张</span></a>
+            <div class="lb_loading"></div>
+        </div>
+        
+        <div class="lb_toolbar">
+            <ul class="lb_toolbarlist">
+                <li><span class="lb_pageation"><b class="lb_page_current">5</b>/<span class="lb_page_total">13</span></span></li>
+                <li><span class="lb_thumb_toggle lb_thumb_toggle_up">显示缩略图</span></li>
+                <li><span class="lb_zoom lb_zoomin lb_zoom_disable"></span></li>
+            </ul>
+        </div>
+        
+        <div class="lb_footer"></div>      
+        
+    </div>
+    
+    <div class="lb_sidebar">
+        <h2 class="photo_title">彩色房子</h2>
+        <div class="photo_desc">6月24日，珠海出现少见强降雨，全城严重内涝，交通几近瘫痪，部分地区积水超过1米。</div>
+        <h6>详细参数(exif)</h6>
+        <dl class="exif_list">
+            <dt>拍摄日期</dt>
+            <dd>2013-06-24</dd>
+            <dt>相机</dt>
+            <dd>EOS 5D Mark II</dd>
+            <dt>镜头</dt>
+            <dd>EF 17-40L</dd>            
+            <dt>焦距</dt>
+            <dd>22mm</dd>          
+            <dt>曝光时间</dt>
+            <dd>1/250</dd>       
+            <dt>光圈</dt>
+            <dd>F11</dd> 
+            <dt>ISO</dt>
+            <dd>100</dd>                
+        </dl>
+        <h6>评论(56)</h6>
+        <ul class="comment_list">
+            <li>
+                <div class="com_left">
+                    <img alt="" src="http://0.gravatar.com/avatar/a39d887468c8d5d74520ba9cee914345?s=56&amp;d=&amp;r=G" height="40" width="40">		
+                </div>
+
+                <div class="com_right">
+                    <div class="com_info"><cite class="com_author"><a href="http://www.lecoq.com.cn" rel="external nofollow" class="url">环法自行车赛</a></cite><span class="com_date">
+                        2013/06/24 08:55</span>
+                    </div>
+
+                    <div class="com_content"><p>博客不错，学习了顶</p></div>
+                </div>				
+            </li>
+
+            <li>
+                <div class="com_left">
+                    <img alt="" src="http://0.gravatar.com/avatar/a39d887468c8d5d74520ba9cee914345?s=56&amp;d=&amp;r=G" class="avatar avatar-56 photo" height="40" width="40">		
+                </div>
+
+                <div class="com_right">
+                    <div class="com_info"><cite class="com_author"><a href="http://www.lecoq.com.cn" rel="external nofollow" class="url">环法自行车赛</a></cite><span class="com_date">
+                        2013/06/24 08:55</span>
+                    </div>
+
+                    <div class="com_content"><p>博客不错，学习了顶</p></div>
+                </div>				
+            </li>            
+        </ul>
+        
+        <div id="respond">
+        <div id="cancel-comment-reply"> 
+            <small><a style="display:none;" href="/dom-event-optimize.html#respond" id="cancel-comment-reply-link" rel="nofollow">点击这里取消回复。</a></small>
+        </div> 
+
+
+        <form id="commentform" method="post" action="http://stylechen.com/wp-comments-post.php">
+        <ul>
+        <li><label for="author">昵称</label><input type="text" aria-required="true" tabindex="1" value="" id="author" name="author"><span>*</span></li>
+        <li><label for="email">邮箱</label><input type="text" aria-required="true" tabindex="2" value="" id="email" name="email"><span>*</span></li>
+        <li><label for="url">网站</label><input type="text" tabindex="3" size="22" value="" id="url" name="url"></li>
+        <li><label for="comment">评论</label><textarea tabindex="4" rows="" cols="" id="comment" name="comment"></textarea></li>
+        <li><input type="submit" value="提交评论" tabindex="5" id="submit" name="submit"><input type="hidden" id="comment_post_ID" value="758" name="comment_post_ID">
+        <input type="hidden" value="0" id="comment_parent" name="comment_parent">
+        </li>
+        </ul>
+        </form>
+
+        </div>        
+    </div>
+</div>
+
+<!--
+<div style="margin: 0px; padding: 0px; display: block; position: fixed; top: 0px; left: 0px; width: 100%; height: 100%; z-index: 9999;" class="eui_lightbox_overlay"></div>
+<div style="margin: 0px; padding: 0px; display: block; position: fixed; top: 0px; left: 0px; z-index: 10000; width: 1920px; height: 957px;" class="eui_lightbox">
+    <div class="lb_wrapper" style="float:left;width:1640px;">
+        <a class="lb_close" href="#closelightbox"></a>
+        <div class="lb_body" style="height: 827px;">
+            <div class="lb_imgbox" style="top: 50%; left: 50%; margin-top: -300.5px; margin-left: -450px; width: 900px; height: 601px;"><div class="lb_navigator" style="display: none;"><div class="lb_navbox" style="width: 150px; height: 94px; margin-top: -47px; margin-left: -75px;"><div class="lb_navmask" style="width: 148px; height: 63px; top: 0px; left: 0px;"><div></div></div><img style="width: 150px; height: 94px;" src="file:///F:/phpnow/vhosts/easyjs/components/lightbox/images/0012.jpg"></div></div><img class="lb_mainimg" style="width: 900px; height: 601px; top: 0px; left: 0px;" src="images/005.jpg"></div>
+            <a href="#" class="lb_toggle lb_prev"><span>上一张</span></a>
+            <a href="#" class="lb_toggle lb_next"><span>下一张</span></a>
+            <div class="lb_loading" style="display: none;"></div>
+        </div>
+        
+        <div class="lb_toolbar">
+            <ul class="lb_toolbarlist">
+                <li><span class="lb_pageation"><b class="lb_page_current">5</b>/<span class="lb_page_total">13</span></span></li>
+                <li><span class="lb_thumb_toggle lb_thumb_toggle_down" style="display: block;">隐藏缩略图</span></li>
+                <li><span class="lb_zoom lb_zoomin lb_zoom_disable" style="display: block;"></span></li>
+            </ul>
+        </div>
+        
+        <div style="display: block;" class="lb_footer"><div class="carousel"><a href="#" class="carousel_arrow carousel_prev" style="display: none;"><span>上一组</span></a><div class="carousel_wrapper" style="width: 1105px; overflow: hidden;"><ul class="carousel_list" style="width: 1105px; left: 0px;"><li data-index="0" class=""><img width="65" height="65" src="images/01.jpg"></li><li data-index="1"><img width="65" height="65" src="images/02.jpg"></li><li data-index="2"><img width="65" height="65" src="images/03.jpg"></li><li data-index="3"><img width="65" height="65" src="images/04.jpg"></li><li data-index="4" class="current"><img width="65" height="65" src="images/05.jpg"></li><li data-index="5" class=""><img width="65" height="65" src="images/06.jpg"></li><li data-index="6" class=""><img width="65" height="65" src="images/07.jpg"></li><li data-index="7" class=""><img width="65" height="65" src="images/08.jpg"></li><li data-index="8" class=""><img width="65" height="65" src="images/09.jpg"></li><li data-index="9" class=""><img width="65" height="65" src="images/010.jpg"></li><li data-index="10" class=""><img width="65" height="65" src="images/011.jpg"></li><li data-index="11" class=""><img width="65" height="65" src="images/012.jpg"></li><li data-index="12"><img width="65" height="65" src="images/013.jpg"></li></ul></div><a href="#" class="carousel_arrow carousel_next" style="display: none;"><span>下一组</span></a></div></div>      
+        
+    </div>
+    
+    <div class="lb_sidebar">
+        <h2 class="photo_title">彩色房子</h2>
+        <div class="photo_desc">6月24日，珠海出现少见强降雨，全城严重内涝，交通几近瘫痪，部分地区积水超过1米。</div>
+        <h6>详细参数(exif)</h6>
+        <dl class="exif_list">
+            <dt>拍摄日期</dt>
+            <dd>2013-06-24</dd>
+            <dt>相机</dt>
+            <dd>EOS 5D Mark II</dd>
+            <dt>镜头</dt>
+            <dd>EF 17-40L</dd>            
+            <dt>焦距</dt>
+            <dd>22mm</dd>          
+            <dt>曝光时间</dt>
+            <dd>1/250</dd>       
+            <dt>光圈</dt>
+            <dd>F11</dd> 
+            <dt>ISO</dt>
+            <dd>100</dd>                
+        </dl>
+        <h6>评论(56)</h6>
+        <ul class="comment_list">
+            <li>
+                <div class="com_left">
+                    <img alt="" src="http://0.gravatar.com/avatar/a39d887468c8d5d74520ba9cee914345?s=56&amp;d=&amp;r=G" height="40" width="40">		
+                </div>
+
+                <div class="com_right">
+                    <div class="com_info"><cite class="com_author"><a href="http://www.lecoq.com.cn" rel="external nofollow" class="url">环法自行车赛</a></cite><span class="com_date">
+                        2013/06/24 08:55</span>
+                    </div>
+
+                    <div class="com_content"><p>博客不错，学习了顶</p></div>
+                </div>				
+            </li>
+
+            <li>
+                <div class="com_left">
+                    <img alt="" src="http://0.gravatar.com/avatar/a39d887468c8d5d74520ba9cee914345?s=56&amp;d=&amp;r=G" class="avatar avatar-56 photo" height="40" width="40">		
+                </div>
+
+                <div class="com_right">
+                    <div class="com_info"><cite class="com_author"><a href="http://www.lecoq.com.cn" rel="external nofollow" class="url">环法自行车赛</a></cite><span class="com_date">
+                        2013/06/24 08:55</span>
+                    </div>
+
+                    <div class="com_content"><p>博客不错，学习了顶</p></div>
+                </div>				
+            </li>                    
+        </ul>
+        
+        <div id="respond">
+        <div id="cancel-comment-reply"> 
+            <small><a style="display:none;" href="/dom-event-optimize.html#respond" id="cancel-comment-reply-link" rel="nofollow">点击这里取消回复。</a></small>
+        </div> 
+
+
+        <form id="commentform" method="post" action="http://stylechen.com/wp-comments-post.php">
+        <ul>
+        <li><label for="author">昵称</label><input type="text" aria-required="true" tabindex="1" value="" id="author" name="author"><span>*</span></li>
+        <li><label for="email">邮箱</label><input type="text" aria-required="true" tabindex="2" value="" id="email" name="email"><span>*</span></li>
+        <li><label for="url">网站</label><input type="text" tabindex="3" size="22" value="" id="url" name="url"></li>
+        <li><label for="comment">评论</label><textarea tabindex="4" rows="" cols="" id="comment" name="comment"></textarea></li>
+        <li><input type="submit" value="提交评论" tabindex="5" id="submit" name="submit"><input type="hidden" id="comment_post_ID" value="758" name="comment_post_ID">
+        <input type="hidden" value="0" id="comment_parent" name="comment_parent">
+        </li>
+        </ul>
+        </form>
+
+        </div>        
+    </div>
+</div>-->
+
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+(function(){
+    E.config({
+        baseUrl : './js/'
+    });
+
+    var loadData = function(){
+        var url = 'http://api.flickr.com/services/feeds/photos_public.gne?tags=people&tagmode=any&format=json&jsoncallback=?',
+            promise = new E.Promise();
+
+        E.getJSON( url, function( data ){
+            var arr = [];
+            data.items.forEach(function( item ){
+                arr[ arr.length++ ] = { src : item.media.m.replace( /_m\./, '.' ) };
+            });
+            
+            promise.resolve( arr );
+        });
+        
+        return promise;
+    };
+
+    var arr1 = [
+        { src : 'images/001.jpg', width : 500, height : 313, thumbSrc : 'images/01.jpg', thumbWidth : 65, thumbHeight : 65 }, 
+        { src : 'images/002.jpg', width : 500, height : 313, thumbSrc : 'images/02.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/003.jpg', width : 500, height : 313, thumbSrc : 'images/03.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/004.jpg', width : 500, height : 313, thumbSrc : 'images/04.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/005.jpg', width : 900, height : 601, thumbSrc : 'images/05.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/006.jpg', width : 1920, height : 1080, thumbSrc : 'images/06.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/007.jpg', width : 1920, height : 1200, thumbSrc : 'images/07.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/008.jpg', width : 1920, height : 1200, thumbSrc : 'images/08.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/009.jpg', width : 1920, height : 1200, thumbSrc : 'images/09.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0010.jpg', width : 1920, height : 1200, thumbSrc : 'images/010.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0011.jpg', width : 1920, height : 1200, thumbSrc : 'images/011.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0012.jpg', width : 1920, height : 1200, thumbSrc : 'images/012.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0013.jpg', width : 1920, height : 1200, thumbSrc : 'images/013.jpg', thumbWidth : 65, thumbHeight : 65 }
+        ];
+        
+    var arr2 = [
+        { src : 'images/0014.jpg', width : 1920, height : 1200, thumbSrc : 'images/014.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0015.jpg', width : 1920, height : 1200, thumbSrc : 'images/015.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0016.jpg', width : 1920, height : 1200, thumbSrc : 'images/016.jpg', thumbWidth : 65, thumbHeight : 65 },
+        { src : 'images/0017.jpg', width : 1920, height : 1200, thumbSrc : 'images/017.jpg', thumbWidth : 65, thumbHeight : 65 }
+        ];
+
+    E.use( 'lightbox', function(){
+        var lightbox = new E.ui.LightBox( '#btn', {
+            data : arr1,
+            thumb : true,
+            hash : true,
+            changeHash : function( data ){
+                return {
+                    id : data.height
+                }
+            }
+        });
+        
+        
+        /*lightbox.on( 'end', function(){
+            this.reload( arr2 );
+        });*/
+    });    
+
+})();
+</script>   
+    
+</body>
+</html>

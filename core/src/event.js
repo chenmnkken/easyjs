@@ -687,8 +687,7 @@ var easyEvent = {
                 docElem = doc.documentElement,
                 body = doc.body,
                 button = sourceEvent.button,
-                fromElement = sourceEvent.fromElement,
-                offset;
+                fromElement = sourceEvent.fromElement;
 
             // 合并鼠标事件的常用属性到新Event中    
             event = E.mix( event, sourceEvent, true, mouseProps );                
@@ -701,9 +700,8 @@ var easyEvent = {
             
             // firefox不支持event.offsetX和event.offsetY
             if( event.offsetX === undefined ){
-                offset = E( target ).offset();
-                event.offsetX = event.pageX - offset.left;
-                event.offsetY = event.pageY - offset.top;
+                event.offsetX = sourceEvent.layerX;
+                event.offsetY = sourceEvent.layerY;
             }
             
             // relatedTarget 属性返回触发 mouseover 和 mouseout 的元素

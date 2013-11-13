@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<title>carousel test</title>
+<style type="text/css">
+*{ margin:0; padding:0; }
+.carousel{ *zoom:1; width:1200px; margin:50px auto 0; }
+.carousel:after{ content: ".";display: block;clear: both;visibility: hidden;line-height: 0;height: 0; }
+.carousel .carousel_arrow{ float:left; }
+.carousel .carousel_wrapper{ float:left; position:relative; height:73px; width:860px; overflow:hidden; margin:0 10px; background:#ccc; }
+.carousel .carousel_list{ position:absolute; height:73px; list-style:none; }
+.carousel .carousel_list li{ float:left; width:70px; padding:0 8px; cursor:pointer; }
+.carousel .carousel_list .current{ background:blue; }
+</style>
+</head>
+<body>
+<div class="carousel" id="carousel">
+    <a href="#" class="carousel_arrow carousel_prev"><span>«</span></a>    
+    <div class="carousel_wrapper">
+        <ul class="carousel_list">
+            <li><img src="images/01.jpg" alt="" /></li>
+            <li><img src="images/02.jpg" alt="" /></li>
+            <li><img src="images/03.jpg" alt="" /></li>
+            <li><img src="images/04.jpg" alt="" /></li>
+            <li><img src="images/05.jpg" alt="" /></li>
+            <li><img src="images/06.jpg" alt="" /></li>
+            <li><img src="images/07.jpg" alt="" /></li>
+            <li><img src="images/08.jpg" alt="" /></li>
+            <li><img src="images/09.jpg" alt="" /></li>
+            <li><img src="images/10.jpg" alt="" /></li>
+            <li><img src="images/11.jpg" alt="" /></li>
+            <li><img src="images/12.jpg" alt="" /></li>
+            <li><img src="images/13.jpg" alt="" /></li>
+            <li><img src="images/14.jpg" alt="" /></li>
+            <li><img src="images/15.jpg" alt="" /></li>
+            <li><img src="images/16.jpg" alt="" /></li>
+            <li><img src="images/17.jpg" alt="" /></li>
+            <li><img src="images/18.jpg" alt="" /></li>
+            <li><img src="images/19.jpg" alt="" /></li>
+            <li><img src="images/20.jpg" alt="" /></li>
+            <li><img src="images/21.jpg" alt="" /></li>
+            <li><img src="images/22.jpg" alt="" /></li>
+            <li><img src="images/23.jpg" alt="" /></li>
+            <li><img src="images/08.jpg" alt="" /></li>
+            <li><img src="images/09.jpg" alt="" /></li>
+            <li><img src="images/10.jpg" alt="" /></li>
+            <li><img src="images/11.jpg" alt="" /></li>
+            <li><img src="images/12.jpg" alt="" /></li>
+            <li><img src="images/13.jpg" alt="" /></li>
+            <li><img src="images/14.jpg" alt="" /></li>
+            <li><img src="images/15.jpg" alt="" /></li>
+            <li><img src="images/16.jpg" alt="" /></li>
+        </ul>        
+    </div>    
+    <a href="#" class="carousel_arrow carousel_next"><span>»</span></a>    
+</div>
+
+<button id="btn">click</button>
+
+<script type="text/javascript" src="../base/js/easy.js"></script>
+<script type="text/javascript">
+E.config({
+    baseUrl : './js/'
+});
+
+E.use( 'carousel', function(){
+    new E.ui.Carousel( '#carousel' );
+});  
+</script>
+</body>
+</html>

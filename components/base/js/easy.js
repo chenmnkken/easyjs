@@ -1,11 +1,11 @@
 /*
-* easy.js v1.1.1
+* easy.js v1.1.2
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-10-31 22:28:10
+* Date : 2013-11-13 22:41:41
 */
 
 // ---------------------------------------------
@@ -158,7 +158,7 @@ easyJS.mix = function( target, source, override, whitelist ){
 
 easyJS.mix( easyJS, {
 
-    version : '1.1.1',
+    version : '1.1.2',
     
     __uuid__ : 2,
     
@@ -5263,8 +5263,7 @@ var easyEvent = {
                 docElem = doc.documentElement,
                 body = doc.body,
                 button = sourceEvent.button,
-                fromElement = sourceEvent.fromElement,
-                offset;
+                fromElement = sourceEvent.fromElement;
 
             // 合并鼠标事件的常用属性到新Event中    
             event = E.mix( event, sourceEvent, true, mouseProps );                
@@ -5277,9 +5276,8 @@ var easyEvent = {
             
             // firefox不支持event.offsetX和event.offsetY
             if( event.offsetX === undefined ){
-                offset = E( target ).offset();
-                event.offsetX = event.pageX - offset.left;
-                event.offsetY = event.pageY - offset.top;
+                event.offsetX = sourceEvent.layerX;
+                event.offsetY = sourceEvent.layerY;
             }
             
             // relatedTarget 属性返回触发 mouseover 和 mouseout 的元素
