@@ -1,11 +1,11 @@
 /*
-* Dialog component v0.3.0 for easy.js
+* Dialog component v0.3.1 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-10-31 
+* Date : 2013-11-16
 */
 define(['../../drag/js/drag'], function(){
 
@@ -681,8 +681,14 @@ Dialog.prototype = {
             this.close();
         }
         
+        if( o.elem ){
+            o.elem.hide();
+            $body.append( o.elem );
+        }        
+        
         overlayElem.remove();
         dialogElem.remove();
+        overlayElem = dialogElem = null;
         
         o.target.un( o.trigger + '.dialog likeopen likeclose' );
         delete this.__o__;
