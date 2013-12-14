@@ -1,11 +1,11 @@
 /*
-* Tooltip component v0.1.1 for easy.js
+* Tooltip component v0.1.2 for easy.js
 *
 * Copyright (c) 2013 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-10-31
+* Date : 2013-12-14
 */
 define(function(){
 
@@ -288,7 +288,7 @@ easyTooltip.patterns = {
         
         hide : function( o ){
             o.tipElem.fadeOut( o.duration, o.easing, function(){
-                o.tipElem.remove( o );
+                o.tipElem.remove();
                 delete o.tipElem;
                 isVisible = false;
             });            
