@@ -1,11 +1,11 @@
 /*
-* Dialog component v0.3.1 for easy.js
+* Dialog component v0.3.2 for easy.js
 *
-* Copyright (c) 2013 Yiguo Chan
+* Copyright (c) 2013-2014 Yiguo Chan
 * Released under the MIT Licenses
 *
 * Mail : chenmnkken@gmail.com
-* Date : 2013-11-16
+* Date : 2014-03-19
 */
 define(['../../drag/js/drag'], function(){
 
@@ -514,7 +514,7 @@ var easyDialog = {
                     promise.resolve();
                 };
 
-                dialogElem.css( 'overflow', effects === 'zoom' ? 'hidden' : '' ).anim( animMap );                    
+                dialogElem.css( 'overflow', effects === 'zoom' ? 'hidden' : '' ).anim( animMap );
                 return promise;
             };
             
@@ -530,6 +530,10 @@ var easyDialog = {
                                 display : 'none',
                                 opacity : opacity
                             });
+
+                            if( o.elem ){
+                                o.elem.hide();
+                            }                                
                         }
                     });
                 }        
@@ -539,6 +543,10 @@ var easyDialog = {
         else{
             overlayElem.hide();
             dialogElem.hide();
+
+            if( o.elem ){
+                o.elem.hide();
+            }            
         }
 
         if( drag ){
@@ -550,11 +558,7 @@ var easyDialog = {
             btnYes.un( 'click.dialog' );
             btnNo.un( 'click.dialog' );
             btnClose.un( 'click.dialog' );
-        }
-        
-        if( o.elem ){
-            o.elem.hide();
-        }            
+        }    
         
         $win.un( 'resize.dialog' );
         $doc.un( 'keyup.dialog' );
